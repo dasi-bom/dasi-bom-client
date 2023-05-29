@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dasi_bom_client/Kakao_login.dart';
-import 'package:dasi_bom_client/MyLoginPage.dart';
 import 'package:dasi_bom_client/main_view_model.dart';
 
 // Page1의 _buildMiddle() 메서드에 들어갈 사진 url
@@ -474,7 +473,7 @@ class Page11 extends StatelessWidget {
 
   // 프로필 내정보 위젯
   Widget _information() {
-    final viewModel = MainViewModel(KakaoLogin());
+    // final viewModel = MainViewModel(KakaoLogin());
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15.0),
       child: Column(
@@ -485,9 +484,9 @@ class Page11 extends StatelessWidget {
             children: <Widget>[
               CircleAvatar(
                 radius: 40,
-                backgroundImage: NetworkImage(
-                    viewModel.user?.kakaoAccount?.profile?.profileImageUrl ??
-                        ''),
+                // backgroundImage: NetworkImage(
+                //     viewModel.user?.kakaoAccount?.profile?.profileImageUrl ??
+                //         ''),
                 // backgroundImage: AssetImage('assets/img.jpg'),
               ),
               // 유저 프로필사진 가져오기

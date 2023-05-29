@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
-import 'package:dasi_bom_client/MyLoginPage.dart';
 import 'package:dasi_bom_client/MainPage.dart';
 import 'package:dasi_bom_client/OnboardingPage.dart';
 import 'package:dasi_bom_client/SplashPage.dart';
@@ -31,10 +30,9 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'dasi-bom',
       theme: ThemeData(primaryColor: Colors.white),
-      home: OnbardingPage(),
+      home: OnboardingPage(),
       // 라우터로 페이지 이동
       routes: {
-        // '/login': (context) => MyLoginPage(),
         '/main': (context) => MainPage(),
       },
     );
