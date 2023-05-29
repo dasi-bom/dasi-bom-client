@@ -41,6 +41,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
     return Scaffold(
       body: Column(
         children: <Widget>[
+          // 온보딩
           SizedBox(
             height: 600,
             child: Container(
@@ -96,6 +97,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
               ),
             ),
           ),
+          // 로그인
           SizedBox(
             height: 205,
             child: Container(
