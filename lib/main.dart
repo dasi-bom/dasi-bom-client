@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:dasi_bom_client/widgets/NaverLogin.dart';
 
-void main() {
+
+Future<void> main() async {
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
+  await Future.delayed(const Duration(seconds: 2));
+  FlutterNativeSplash.remove();
+
   runApp(const MyApp());
 }
 
@@ -17,7 +26,9 @@ class MyApp extends StatelessWidget {
           centerTitle: false,
           title: Text('다시봄'),
         ),
-        body: SizedBox(),
+        body: SizedBox(
+          child: NaverLoginButton(),
+        ),
         bottomNavigationBar: BottomAppBar(),
       ),
     );
