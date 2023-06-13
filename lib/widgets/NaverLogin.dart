@@ -20,21 +20,22 @@ class _NaverLoginButtonState extends State<NaverLoginButton> {
     return Align(
         alignment: Alignment.bottomCenter,
         child: Container(
-          width: 340,
-          margin: EdgeInsets.fromLTRB(0, 0, 0, 50),
+          width: 212,
+          margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
           child: ElevatedButton(
             onPressed: () {
               print('naver login');
               signInWithNaver();
             },
             style: ButtonStyle(
-              backgroundColor: MaterialStatePropertyAll<Color>(
-                  Color.fromRGBO(3, 199, 90, 1)),
-            ),
+                backgroundColor: MaterialStatePropertyAll<Color>(
+                    Color.fromRGBO(3, 199, 90, 1)),
+                shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15)))),
             child: Image.asset(
               'assets/naver_login_btn.png',
               fit: BoxFit.fill,
-              height: 60,
+              height: 45,
             ),
           ),
         ));
@@ -50,6 +51,7 @@ class _NaverLoginButtonState extends State<NaverLoginButton> {
         email = res.account.email;
         print(res.accessToken);
       });
+      final result = await Navigator.pushNamed(context, '/main');
     } catch (err) {
       print(err);
     }
