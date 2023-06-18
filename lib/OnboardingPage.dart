@@ -3,6 +3,7 @@ import 'package:introduction_screen/introduction_screen.dart';
 import 'package:dasi_bom_client/MainPage.dart';
 import 'Kakao_Login.dart';
 import 'main_view_model.dart';
+import 'package:dasi_bom_client/widgets/NaverLogin.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({Key? key}) : super(key: key);
@@ -17,19 +18,21 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   @override
   Widget build(BuildContext context) {
-
     // 화면 크기
     Size screenSize(BuildContext context) {
       return MediaQuery.of(context).size;
     }
+
     // 화면 높이
     double screenHeight(BuildContext context, {double dividedBy = 1}) {
       return screenSize(context).height / dividedBy;
     }
+
     // 화면 너비
     double screenWidth(BuildContext context, {double dividedBy = 1}) {
       return screenSize(context).width / dividedBy;
     }
+
     //상단 툴바를 제외한 화면 높이
     double screenHeightExcludingToolbar(BuildContext context,
         {double dividedBy = 1}) {
@@ -101,7 +104,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
               margin: EdgeInsets.only(top: 20),
               child: ElevatedButton(
                 style: ButtonStyle(
-                  shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
+                  shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15))),
                   backgroundColor: MaterialStateProperty.all(Color(0xFFFCE301)),
                 ),
                 onPressed: () async {
@@ -119,19 +123,22 @@ class _OnboardingPageState extends State<OnboardingPage> {
           ),
           // 네이버 로그인
           SizedBox(
-            child: Container(
-              height: 45,
-              color: Colors.white,
-              margin: EdgeInsets.only(top: 20),
-              child: ElevatedButton(
-                style: ButtonStyle(
-                  shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
-                  backgroundColor: MaterialStateProperty.all(Color(0xFF00C65A)),
-                ),
-                onPressed: (){},
-                child: Image.asset('assets/btn_naver.png'),
-              ),
-            ),
+            child: NaverLoginButton(),
+            // Container(
+            //   height: 45,
+            //   color: Colors.white,
+            //   margin: EdgeInsets.only(top: 20),
+            //   child: ElevatedButton(
+            //     style: ButtonStyle(
+            //       shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
+            //       backgroundColor: MaterialStateProperty.all(Color(0xFF00C65A)),
+            //     ),
+            //     onPressed: (){
+            //
+            //     },
+            //     child: Image.asset('assets/btn_naver.png'),
+            //   ),
+            // ),
           ),
           // 둘러보기
           SizedBox(
@@ -143,8 +150,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all(Color(0xFF000000)),
                 ),
-                onPressed: (){},
-                child: Text("둘러보기",style: TextStyle(color: Colors.white),),
+                onPressed: () {},
+                child: Text(
+                  "둘러보기",
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ),
           ),
@@ -157,9 +167,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
 // PageViewModel의 이미지 decoration 인자 값으로 주기 위한 메서드
 PageDecoration getPageDecoration() {
   return PageDecoration(
-    // title 스타일
-      titlePadding: EdgeInsets.symmetric(vertical: 30) ,
-      bodyAlignment:Alignment.topLeft,
+      // title 스타일
+      titlePadding: EdgeInsets.symmetric(vertical: 30),
+      bodyAlignment: Alignment.topLeft,
       titleTextStyle: TextStyle(
           fontSize: 25, fontWeight: FontWeight.bold, color: Colors.black),
       // 본문 스타일

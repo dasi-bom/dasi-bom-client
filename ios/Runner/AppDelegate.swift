@@ -12,20 +12,13 @@ import NaverThirdPartyLogin
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 
- override func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-     var applicationResult = false
-     if (!applicationResult) {
-        applicationResult = NaverThirdPartyLoginConnection.getSharedInstance().application(app, open: url, options: options)
-     }
-     // if you use other application url process, please add code here.
+  override func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
 
-     if (!applicationResult) {
-        applicationResult = super.application(app, open: url, options: options)
-     }
-     return applicationResult
- }
+      if (url.absoluteString.contains("thirdPartyLoginResult")) {
+          return NaverThirdPartyLoginConnection.getSharedInstance().application(app, open: url, options: options)
+      }
+
+      return super.application(app, open: url, options: options)
+
+  }
 }
-
-
-
-
