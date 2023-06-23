@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:dasi_bom_client/Kakao_login.dart';
-import 'package:dasi_bom_client/main_view_model.dart';
+import 'package:dasi_bom_client/widgets/Kakao_login.dart';
+import 'package:dasi_bom_client/widgets/main_view_model.dart';
 
 // Page1의 _buildMiddle() 메서드에 들어갈 사진 url
 final dummyItems = [
@@ -19,10 +19,10 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   // 로그인 생성자
-  // final viewModel = MainViewModel(KakaoLogin());
+  final viewModel = MainViewModel(KakaoLogin());
 
+  // 하단 바 페이지 전환 변수 선언
   var _index = 0; // 페이지 인덱스 0,1,2,3
-
   var _pages = [
     // Page1,2,3,4 클래스와 연동하여 변수 선언(페이지를 _pages 리스트 변수의 값으로 정의)
     Page1(),
@@ -38,45 +38,43 @@ class _MainPageState extends State<MainPage> {
       key: _scaffoldKey,
       // 상단 앱 바
       appBar: AppBar(
-        backgroundColor: Color(0xffFFF1AA), // 배경색을 흰색으로
+        backgroundColor: Color(0xffFFF1AA),
         title: Image.asset('assets/logo.png', width: 45, height: 45),
         actions: <Widget>[
           // actions 프로퍼티에는 어떠한 위젯도 리스트로 배치 가능
           IconButton(
+            onPressed: () async {
+              await viewModel.logout();
+              setState(() {});
+              // 로그아웃 되면 로그인 화면으로 화면 이동
+              final result = await Navigator.pushNamed(context, '/login');
+            },
+            icon: Icon((Icons.outbond)),
+            color: Colors.black,
+          ),
+          IconButton(
             onPressed: () {},
             icon: Icon((Icons.chat)),
-            color: Colors.black, // 앱의 전체 테마를 수정했다면 작성하지 않아도 됨
+            color: Colors.black,
           ),
           IconButton(
             onPressed: () {},
             icon: Icon((Icons.notifications)),
-            color: Colors.black, // 앱의 전체 테마를 수정했다면 작성하지 않아도 됨
+            color: Colors.black,
           ),
           IconButton(
             onPressed: () {
               _scaffoldKey.currentState?.openEndDrawer();
             },
             icon: Icon((Icons.menu)),
-            color: Colors.black, // 앱의 전체 테마를 수정했다면 작성하지 않아도 됨
+            color: Colors.black,
           ),
-          // 로그아웃 버튼
-          // ElevatedButton(
-          //     // onPressed: () async {
-          //     //   await viewModel.logout();
-          //     //   setState(() {});
-          //     //   // 버튼 클릭시 로그인 페이지로 이동
-          //     //   Navigator.pushNamedAndRemoveUntil(
-          //     //       context, '/login', (route) => false);
-          //     // },
-          //     // child: const Text('Logout'))
         ],
-        // centerTitle: true, // 제목을 가운데로
       ),
       // 옵션 바
       endDrawer: Drawer(
         elevation: 10,
         child: ListView(
-          // Important: Remove any padding from the ListView.
           padding: EdgeInsets.zero,
           children: [
             const DrawerHeader(
@@ -106,7 +104,8 @@ class _MainPageState extends State<MainPage> {
           ],
         ),
       ),
-      body: _pages[_index], // index에 따라 페이지 바뀜
+      // index에 따라 페이지 바뀜
+      body: _pages[_index],
       // 글쓰기 플로팅 위젯
       floatingActionButton: FloatingActionButton(
           onPressed: () {},
@@ -164,7 +163,7 @@ class Page1 extends StatelessWidget {
     );
   }
 
-  // 상단
+  // 홈 클래스 _ 상단
   Widget _buildTop() {
     return Padding(
       // 전체 여백 주기
@@ -278,7 +277,7 @@ class Page1 extends StatelessWidget {
     );
   }
 
-  // ??중단??
+  // 홈 클래스 _ 중단
   Widget _buildMiddle() {
     return CarouselSlider(
       options: CarouselOptions(
@@ -306,7 +305,7 @@ class Page1 extends StatelessWidget {
     );
   }
 
-// 하단
+  // 홈 클래스 _ 하단
   Widget _buildBottom() {
     final items = List.generate(100, (i) {
       // 0부터 9까지의 수를 생성하여 두 번째 인수의 함수에 i 매개변수로 전달함
@@ -326,7 +325,7 @@ class Page1 extends StatelessWidget {
   }
 }
 
-// 둘러보기 클래스
+// 둘러보기 클래스-> Scaffold의 body 프로퍼티에 코드 연동
 class Page2 extends StatefulWidget {
   const Page2({Key? key}) : super(key: key);
 
@@ -361,7 +360,7 @@ class _Page2State extends State<Page2> {
   }
 }
 
-// 마켓 클래스
+// 마켓 클래스-> Scaffold의 body 프로퍼티에 코드 연동
 class Page3 extends StatelessWidget {
   const Page3({Key? key}) : super(key: key);
 
@@ -376,7 +375,7 @@ class Page3 extends StatelessWidget {
   }
 }
 
-// 내 정보 클래스
+// 내 정보 클래스-> Scaffold의 body 프로퍼티에 코드 연동
 class Page4 extends StatefulWidget {
   const Page4({Key? key}) : super(key: key);
 
@@ -385,8 +384,9 @@ class Page4 extends StatefulWidget {
 }
 
 class _Page4State extends State<Page4> with TickerProviderStateMixin {
-  late TabController tabController; // Tab 변수 선언
 
+  // Tab 변수 선언
+  late TabController tabController;
   // Tab 변수 초기화
   @override
   void initState() {
@@ -434,7 +434,7 @@ class _Page4State extends State<Page4> with TickerProviderStateMixin {
   }
 }
 
-// 내 정보- 프로필 탭
+// 내 정보 클래스 _ 프로필 탭
 class Page11 extends StatelessWidget {
   const Page11({Key? key}) : super(key: key);
 
@@ -471,9 +471,9 @@ class Page11 extends StatelessWidget {
     );
   }
 
-  // 프로필 내정보 위젯
+  // 프로필 탭 _ 내정보 위젯
   Widget _information() {
-    // final viewModel = MainViewModel(KakaoLogin());
+    final viewModel = MainViewModel(KakaoLogin());
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15.0),
       child: Column(
@@ -484,9 +484,9 @@ class Page11 extends StatelessWidget {
             children: <Widget>[
               CircleAvatar(
                 radius: 40,
-                // backgroundImage: NetworkImage(
-                //     viewModel.user?.kakaoAccount?.profile?.profileImageUrl ??
-                //         ''),
+                backgroundImage: NetworkImage(
+                    viewModel.user?.kakaoAccount?.profile?.profileImageUrl ??
+                        ''),
                 // backgroundImage: AssetImage('assets/img.jpg'),
               ),
               // 유저 프로필사진 가져오기
@@ -517,7 +517,7 @@ class Page11 extends StatelessWidget {
     );
   }
 
-  // 프로필 Edit profile 위젯
+  // 프로필 탭 _ Edit profile 위젯
   Widget _menu() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
@@ -543,7 +543,7 @@ class Page11 extends StatelessWidget {
     );
   }
 
-  // 프로필 게시물 GridView 위젯
+  // 프로필 탭 _ 게시물 GridView 위젯
   Widget _tabView() {
     return GridView.builder(
         physics: const NeverScrollableScrollPhysics(),
@@ -563,7 +563,7 @@ class Page11 extends StatelessWidget {
   }
 }
 
-// 내 정보- 히스토리 탭
+// 내 정보 클래스 _ 히스토리 탭
 class Page22 extends StatelessWidget {
   const Page22({Key? key}) : super(key: key);
 
@@ -573,7 +573,7 @@ class Page22 extends StatelessWidget {
   }
 }
 
-// 내 정보- 내활동 탭
+// 내 정보 클래스 _ 내활동 탭
 class Page33 extends StatelessWidget {
   const Page33({Key? key}) : super(key: key);
 

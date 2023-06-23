@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:dasi_bom_client/MainPage.dart';
-import 'Kakao_Login.dart';
-import 'main_view_model.dart';
+import 'widgets/Kakao_Login.dart';
+import 'widgets/main_view_model.dart';
 import 'package:dasi_bom_client/widgets/NaverLogin.dart';
 
 class OnboardingPage extends StatefulWidget {
@@ -111,34 +111,16 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 onPressed: () async {
                   await viewModel.login();
                   setState(() {});
-                  // 로그인 되면 MainPage로 화면 이동
-                  final result = await Navigator.pushNamed(context, '/main');
+                  // 로그인 되면 프로필 등록 페이지로 화면 이동
+                  final result = await Navigator.pushNamed(context, '/register1');
                 },
                 child: Image.asset('assets/btn_kakao.png'),
-                // child: const Text(
-                //   '카카오톡으로 로그인하기',
-                //   style: TextStyle(color: Colors.black),
               ),
             ),
           ),
           // 네이버 로그인
           SizedBox(
             child: NaverLoginButton(),
-            // Container(
-            //   height: 45,
-            //   color: Colors.white,
-            //   margin: EdgeInsets.only(top: 20),
-            //   child: ElevatedButton(
-            //     style: ButtonStyle(
-            //       shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
-            //       backgroundColor: MaterialStateProperty.all(Color(0xFF00C65A)),
-            //     ),
-            //     onPressed: (){
-            //
-            //     },
-            //     child: Image.asset('assets/btn_naver.png'),
-            //   ),
-            // ),
           ),
           // 둘러보기
           SizedBox(

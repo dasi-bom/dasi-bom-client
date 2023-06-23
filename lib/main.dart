@@ -3,6 +3,8 @@ import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:dasi_bom_client/MainPage.dart';
 import 'package:dasi_bom_client/OnboardingPage.dart';
 import 'package:dasi_bom_client/SplashPage.dart';
+import 'package:dasi_bom_client/profile/profile_register_ani.dart';
+import 'package:dasi_bom_client/profile/profile_register_pro.dart';
 
 void main() async {
   // 웹 환경에서 카카오 로그인을 정상적으로 완료하려면 runApp() 호출 전 아래 메서드 호출 필요
@@ -36,6 +38,8 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => OnboardingPage(),
         '/main': (context) => MainPage(),
+    '/register1': (context) => RegisterProfileProtector(),
+    '/register2': (context) => RegisterProfileAnimal(),
       },
     );
   }
