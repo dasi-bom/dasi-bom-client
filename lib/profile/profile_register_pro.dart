@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -24,8 +25,8 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
   // Textformfield 값 받아오기
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   late bool validationResult;
-  String _nickname = '';
-  String _address = '';
+  String _nickname = ''; // 내 닉네임
+  String _address = ''; // 내 동네
 
   @override
   void initState() {
@@ -83,6 +84,7 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
                 const SizedBox(
                   height: 25,
                 ),
+                // 사진 등록
                 if (_pickedFile == null)
                   Container(
                     constraints: BoxConstraints(
@@ -125,10 +127,19 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
                     style: TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
                   ),
                 ),
+                // 내 닉네임 등록
                 Padding(
                   padding:
                   const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                   child: TextFormField(
+                    maxLength: 14,
+                    keyboardType: TextInputType.name,
+                    inputFormatters: [
+                      FilteringTextInputFormatter(
+                        RegExp('[a-z A-Z ㄱ-ㅎ|가-힣| ·|： 0-9]'),
+                        allow: true,
+                      )
+                    ],
                     autovalidateMode: AutovalidateMode.always,
                     decoration: InputDecoration(
                         border: OutlineInputBorder(
@@ -152,8 +163,9 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
                         _nickname = value as String;
                       });
                     },
+                    // 유효성 검사
                     validator: (value) {
-                      if (value?.isEmpty ?? true) return '닉네임을 입력해 주세요.';
+                      if (value!.isEmpty) return '닉네임을 입력해 주세요.';
                       if (value.toString().length <= 2)
                         return '닉네임은 두글자 이상 입력 해주셔야 합니다.';
                       return null;
@@ -171,10 +183,12 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
                     style: TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
                   ),
                 ),
+                // 내 동네 등록
                 Padding(
                   padding:
                   const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                   child: TextFormField(
+                    keyboardType: TextInputType.streetAddress,
                     autovalidateMode: AutovalidateMode.always,
                     decoration: InputDecoration(
                         border: OutlineInputBorder(
@@ -198,6 +212,7 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
                         _nickname = value as String;
                       });
                     },
+                    // 유효성 검사
                     validator: (value) {
                       if (value?.isEmpty ?? true) return '동네를 입력해 주세요.';
                       if (value!.contains(RegExp(r'[0-9]')))
@@ -206,6 +221,7 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
                     },
                   ),
                 ),
+                // 다음 단계로 이동하기
                 // Text(validationResult ? 'Success' : 'Failed'),
                 SizedBox(
                   height: 60,
@@ -243,6 +259,7 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
                     ),
                   ),
                 ),
+                // 나중에 등록하기
                 SizedBox(
                   height: 60,
                   width: 350,
@@ -270,6 +287,9 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
                       ),
                     ),
                   ),
+                ),
+                const SizedBox(
+                  height: 50,
                 ),
               ],
             ),
