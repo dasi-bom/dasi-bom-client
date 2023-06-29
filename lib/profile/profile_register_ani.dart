@@ -2,6 +2,7 @@ import 'dart:ffi';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -14,6 +15,7 @@ class RegisterProfileAnimal extends StatefulWidget {
 }
 
 class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
+
   // 프로필 이미지 받아오기
   XFile? _pickedFile; // 이미지를 담을 변수 선언
   CroppedFile? _croppedFile; // 크롭된 이미지 담을 변수 선언
@@ -23,8 +25,19 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
   // Textformfield 값 받아오기
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   late bool validationResult;
-  String _name = '';
-  String _age = '' ;
+  String _name = ''; // 이름
+  String _age = ''; // 나이
+  String _intro = ''; // 소개
+  String _kindinput = '';
+
+  // 종류 콤보박스
+  final _animals = ['강아지', '고양이', '직접 입력'];
+  var _selectedValue = '강아지';
+  // 성별 콤보박스
+  final _kind = ['남', '여'];
+  var _selectedKind = '남';
+  // 처음 만난 날 변수 선언
+  DateTime? _selectedDate;
 
   @override
   void initState() {
@@ -63,7 +76,7 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                         child: Image.asset('assets/ch_top_orange.png'),
                       ),
                       SizedBox(
-                        child: Image.asset('assets/ic_balloon_pr.png'),
+                        child: Image.asset('assets/ic_balloon_an.png'),
                       ),
                     ],
                   ),
@@ -82,6 +95,7 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                 const SizedBox(
                   height: 25,
                 ),
+                // 사진 등록
                 if (_pickedFile == null)
                   Container(
                     constraints: BoxConstraints(
@@ -125,10 +139,19 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                     TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
                   ),
                 ),
+                // 이름 등록
                 Padding(
                   padding:
                   const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                   child: TextFormField(
+                    maxLength: 20,
+                    keyboardType: TextInputType.name,
+                    inputFormatters: [
+                      FilteringTextInputFormatter(
+                        RegExp('[a-z A-Z ㄱ-ㅎ|가-힣| ·|：]'),
+                        allow: true,
+                      )
+                    ],
                     autovalidateMode: AutovalidateMode.always,
                     decoration: InputDecoration(
                         border: OutlineInputBorder(
@@ -143,7 +166,7 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                           ),
                         ),
                         prefixIcon: Icon(
-                          Icons.person,
+                          Icons.star,
                           color: Colors.black,
                         ),
                         hintText: '동물의 애칭을 적어주세요.'),
@@ -152,10 +175,11 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                         _name = value as String;
                       });
                     },
+                    // 유효성 검사
                     validator: (value) {
                       if (value?.isEmpty ?? true) return '이름을 입력해 주세요.';
-                      if (value.toString().length <= 2)
-                        return '이름은 두글자 이상 입력 해주셔야 합니다.';
+                      if (value.toString().length <= 1)
+                        return '이름은 한글자 이상 입력 해주셔야 합니다.';
                       return null;
                     },
                   ),
@@ -172,10 +196,15 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                     TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
                   ),
                 ),
+                // 나이 등록
                 Padding(
                   padding:
                   const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                   child: TextFormField(
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
                     autovalidateMode: AutovalidateMode.always,
                     decoration: InputDecoration(
                         border: OutlineInputBorder(
@@ -189,23 +218,195 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                             width: 1,
                           ),
                         ),
-                        prefixIcon: Icon(
-                          Icons.search,
-                          color: Colors.black,
-                        ),
                         hintText: '모르실 경우 공란으로 두세요!'),
                     onSaved: (value) {
                       setState(() {
                         _age = value as String;
                       });
                     },
-                    validator: (value) {
-                      if (value!.contains(RegExp(r'[0-9]')))
-                        return '숫자 입력은 불가능합니다.';
-                      return null;
+                  ),
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                Container(
+                  width: 340,
+                  child: Text(
+                    '종류 *',
+                    textAlign: TextAlign.left,
+                    style:
+                    TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
+                  ),
+                ),
+                // 종류 등록
+                Padding(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 1),
+                  child: DropdownButton(
+                    value: _selectedValue,
+                    items: _animals.map(
+                          (value) {
+                        return DropdownMenuItem(
+                          value: value,
+                          child: Text(value),
+                        );
+                      },
+                    ).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedValue = value!;
+                      });
                     },
                   ),
                 ),
+                // 종류 직접 입력시 등록
+                Padding(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                  child: TextFormField(
+                    maxLength: 10,
+                    keyboardType: TextInputType.text,
+                    inputFormatters: [
+                      FilteringTextInputFormatter(
+                        RegExp('[a-z A-Z ㄱ-ㅎ|가-힣| ·|：]'),
+                        allow: true,
+                      )
+                    ],
+                    autovalidateMode: AutovalidateMode.always,
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.black,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.black,
+                            width: 1,
+                          ),
+                        ),
+                        hintText: '동물의 종을 적어주세요.'),
+                    onSaved: (value) {
+                      setState(() {
+                        _kindinput = value as String;
+                      });
+                    },
+                  ),
+                ),
+                Container(
+                  width: 340,
+                  child: Text(
+                    '성별 *',
+                    textAlign: TextAlign.left,
+                    style:
+                    TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
+                  ),
+                ),
+                // 성별 등록
+                Padding(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 1),
+                  child: DropdownButton(
+                    value: _selectedKind,
+                    items: _kind.map(
+                          (value) {
+                        return DropdownMenuItem(
+                          value: value,
+                          child: Text(value),
+                        );
+                      },
+                    ).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedKind = value!;
+                      });
+                    },
+                  ),
+                ),
+                Container(
+                  width: 340,
+                  child: Text(
+                    '처음 만난 날 *',
+                    textAlign: TextAlign.left,
+                    style:
+                    TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
+                  ),
+                ),
+                // 처음 만난 날 등록
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(1990),
+                            lastDate: DateTime.now(),
+                          ).then((seletedDate) {
+                            setState(() {
+                              _selectedDate = seletedDate;
+                            });
+                          });
+                        },
+                        child: const Text("날짜 선택"),
+                      ),
+                      Text(
+                        _selectedDate !=null
+                            ? _selectedDate.toString()
+                            : "날짜가 아직 선택되지 않았습니다.",
+                        style: const TextStyle(fontSize: 15),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                Container(
+                  width: 340,
+                  child: Text(
+                    '소개',
+                    textAlign: TextAlign.left,
+                    style:
+                    TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
+                  ),
+                ),
+                // 소개 등록
+                Padding(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                  child: TextFormField(
+                    maxLines: 6,
+                    maxLength: 300,
+                    keyboardType: TextInputType.text,
+                    autovalidateMode: AutovalidateMode.always,
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.black,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.black,
+                            width: 1,
+                          ),
+                        ),
+                        hintText: '자유롭게 소개해 주세요:)'),
+                    onSaved: (value) {
+                      setState(() {
+                        _intro = value as String;
+                      });
+                    },
+                  ),
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                // 등록 완료하기
                 // Text(validationResult ? 'Success' : 'Failed'),
                 SizedBox(
                   height: 60,
@@ -242,6 +443,7 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                     ),
                   ),
                 ),
+                // 나중에 등록하기
                 SizedBox(
                   height: 60,
                   width: 350,
@@ -270,6 +472,9 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                       ),
                     ),
                   ),
+                ),
+                const SizedBox(
+                  height: 50,
                 ),
               ],
             ),
