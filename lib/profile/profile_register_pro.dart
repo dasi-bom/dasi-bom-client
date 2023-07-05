@@ -15,7 +15,6 @@ class RegisterProfileProtector extends StatefulWidget {
 }
 
 class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
-
   // 프로필 이미지 받아오기
   XFile? _pickedFile; // 이미지를 담을 변수 선언
   CroppedFile? _croppedFile; // 크롭된 이미지 담을 변수 선언
@@ -27,6 +26,7 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
   late bool validationResult;
   String _nickname = ''; // 내 닉네임
   String _address = ''; // 내 동네
+  String _times = ''; // 임시보호 횟수
 
   @override
   void initState() {
@@ -124,7 +124,8 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
                   child: Text(
                     '내 닉네임 *',
                     textAlign: TextAlign.left,
-                    style: TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
+                    style:
+                    TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
                   ),
                 ),
                 // 내 닉네임 등록
@@ -142,6 +143,7 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
                     ],
                     autovalidateMode: AutovalidateMode.always,
                     decoration: InputDecoration(
+                        counterText: '',
                         border: OutlineInputBorder(
                           borderSide: BorderSide(
                             color: Colors.black,
@@ -180,7 +182,8 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
                   child: Text(
                     '내 동네 *',
                     textAlign: TextAlign.left,
-                    style: TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
+                    style:
+                    TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
                   ),
                 ),
                 // 내 동네 등록
@@ -209,7 +212,7 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
                         hintText: '사당동'),
                     onSaved: (value) {
                       setState(() {
-                        _nickname = value as String;
+                        _address = value as String;
                       });
                     },
                     // 유효성 검사
@@ -218,6 +221,48 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
                       if (value!.contains(RegExp(r'[0-9]')))
                         return '숫자 입력은 불가능합니다.';
                       return null;
+                    },
+                  ),
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                Container(
+                  width: 340,
+                  child: Text(
+                    '임시보호 횟수',
+                    textAlign: TextAlign.left,
+                    style:
+                    TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
+                  ),
+                ),
+                // 임시보호 횟수 등록
+                Padding(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                  child: TextFormField(
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
+                    autovalidateMode: AutovalidateMode.always,
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.black,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.black,
+                            width: 1,
+                          ),
+                        ),
+                        hintText: '없으셨다면 0으로 적어주세요!'),
+                    onSaved: (value) {
+                      setState(() {
+                        _times = value as String;
+                      });
                     },
                   ),
                 ),
@@ -243,43 +288,15 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
                               formKey.currentState?.validate() ?? false;
                           formKey.currentState!.save();
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(_nickname + '/' + _address)),
+                            SnackBar(content: Text(_nickname + '/' + _address + '/' + _times)),
                           );
                           // 동물 프로필 등록 화면으로 이동
-                          final result = await Navigator.pushNamed(context, '/register2');
+                          final result =
+                          await Navigator.pushNamed(context, '/register2');
                         },
                       ),
                       child: Text(
                         "다음 단계로 이동하기",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                // 나중에 등록하기
-                SizedBox(
-                  height: 60,
-                  width: 350,
-                  child: Container(
-                    height: 30,
-                    color: Colors.white,
-                    margin: EdgeInsets.only(top: 20),
-                    child: ElevatedButton(
-                      style: ButtonStyle(
-                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15))),
-                        backgroundColor:
-                        MaterialStateProperty.all(Color(0xFFF8F8F9)),
-                      ),
-                      onPressed: () async {
-                        // 홈 화면으로 이동
-                        final result = await Navigator.pushNamed(context, '/main');
-                      },
-                      child: Text(
-                        "나중에 등록하기",
                         style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
@@ -299,7 +316,7 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
     );
   }
 
-  // 아래의 해당 함수(카메라, 갤러리)를 버튼과 연결
+  // 아래의 해당 함수(카메라, 갤러리, 기본이미지)를 버튼과 연결
   _showBottomSheet() {
     return showModalBottomSheet(
       context: this.context,
@@ -335,6 +352,19 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
             const SizedBox(
               height: 20,
             ),
+            const Divider(
+              thickness: 3,
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            ElevatedButton(
+              onPressed: () => _getDefaultImage(),
+              child: const Text('기본이미지'),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
           ],
         );
       },
@@ -357,6 +387,20 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
 
 // 갤러리로 이동
   _getPhotoLibraryImage() async {
+    final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _pickedFile = pickedFile;
+      });
+    } else {
+      if (kDebugMode) {
+        print('이미지 선택안함');
+      }
+    }
+  }
+
+  // 기본이미지 설정
+  _getDefaultImage() async {
     final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
