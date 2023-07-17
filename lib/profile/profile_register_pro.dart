@@ -1,10 +1,11 @@
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:dotted_border/dotted_border.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:remedi_kopo/remedi_kopo.dart';
 
 class RegisterProfileProtector extends StatefulWidget {
   const RegisterProfileProtector({Key? key}) : super(key: key);
@@ -15,6 +16,7 @@ class RegisterProfileProtector extends StatefulWidget {
 }
 
 class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
+
   // 프로필 이미지 받아오기
   XFile? _pickedFile; // 이미지를 담을 변수 선언
   CroppedFile? _croppedFile; // 크롭된 이미지 담을 변수 선언
@@ -25,8 +27,10 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   late bool validationResult;
   String _nickname = ''; // 내 닉네임
-  String _address = ''; // 내 동네
   String _times = ''; // 임시보호 횟수
+
+  // 내 동네 카카오 API 값 컨트롤러
+  TextEditingController _AddressController = TextEditingController();
 
   @override
   void initState() {
@@ -190,38 +194,35 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
                 Padding(
                   padding:
                   const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                  child: TextFormField(
-                    keyboardType: TextInputType.streetAddress,
-                    autovalidateMode: AutovalidateMode.always,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(
+                  child: GestureDetector(
+                    onTap: () {
+                      HapticFeedback.mediumImpact();
+                      _addressAPI(); // 카카오 주소 API
+                    },
+                    child: TextFormField(
+                      enabled: false,
+                      autovalidateMode: AutovalidateMode.always,
+                      decoration: InputDecoration(
+                          isDense: false,
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.black,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.black,
+                              width: 1,
+                            ),
+                          ),
+                          prefixIcon: Icon(
+                            Icons.search,
                             color: Colors.black,
                           ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.black,
-                            width: 1,
-                          ),
-                        ),
-                        prefixIcon: Icon(
-                          Icons.search,
-                          color: Colors.black,
-                        ),
-                        hintText: '사당동'),
-                    onSaved: (value) {
-                      setState(() {
-                        _address = value as String;
-                      });
-                    },
-                    // 유효성 검사
-                    validator: (value) {
-                      if (value?.isEmpty ?? true) return '동네를 입력해 주세요.';
-                      if (value!.contains(RegExp(r'[0-9]')))
-                        return '숫자 입력은 불가능합니다.';
-                      return null;
-                    },
+                          hintText: '주소 검색'),
+                      controller: _AddressController,
+                      style: TextStyle(fontSize: 15),
+                    ),
                   ),
                 ),
                 const SizedBox(
@@ -288,7 +289,9 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
                               formKey.currentState?.validate() ?? false;
                           formKey.currentState!.save();
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(_nickname + '/' + _address + '/' + _times)),
+                            SnackBar(
+                                content: Text(
+                                    _nickname + '/' + '/' + _times)),
                           );
                           // 동물 프로필 등록 화면으로 이동
                           final result =
@@ -401,15 +404,20 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
 
   // 기본이미지 설정
   _getDefaultImage() async {
-    final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _pickedFile = pickedFile;
-      });
-    } else {
-      if (kDebugMode) {
-        print('이미지 선택안함');
-      }
-    }
+    setState(() {
+      _pickedFile = Image.asset('assets/ch_top_yellow.png') as XFile?;
+    });
+  }
+
+  // 카카오주소 API
+  _addressAPI() async {
+    KopoModel model = await Navigator.push(
+      context,
+      CupertinoPageRoute(
+        builder: (context) => RemediKopo(),
+      ),
+    );
+    _AddressController.text =
+    '${model.sido!} ${model.sigungu!} ${model.bname!}';
   }
 }

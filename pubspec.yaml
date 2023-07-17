@@ -40,6 +40,7 @@ dependencies:
   flutter_native_splash: ^2.3.0
   flutter_naver_login: ^1.8.0
   kakao_flutter_sdk: ^1.2.2
+  remedi_kopo:
 
 flutter_native_splash:
   android: true
