@@ -68,7 +68,7 @@ class _RegisterAnimalProfileState extends State<RegisterAnimalProfile> {
     );
   }
 }
-// test
+
 class customStyleArrow extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
