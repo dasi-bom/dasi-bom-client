@@ -51,7 +51,7 @@ class _NaverLoginButtonState extends State<NaverLoginButton> {
         email = res.account.email;
         print(res.accessToken);
       });
-      final result = await Navigator.pushNamed(context, '/main');
+      final result = await Navigator.pushNamed(context, '/animal');
     } catch (err) {
       print(err);
     }

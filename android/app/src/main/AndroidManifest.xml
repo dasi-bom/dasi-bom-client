@@ -9,6 +9,8 @@
         android:name="${applicationName}"
         android:icon="@mipmap/launch_image">
 
+        <uses-permission android:name="android.permission.INTERNET" />
+
         <meta-data
             android:name="com.naver.sdk.clientId"
             android:value="@string/client_id" />
