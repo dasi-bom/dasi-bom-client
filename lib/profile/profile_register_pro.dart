@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:remedi_kopo/remedi_kopo.dart';
+import 'package:dasi_bom_client/profile/profile_register_ani.dart';
 
 class RegisterProfileProtector extends StatefulWidget {
   const RegisterProfileProtector({Key? key}) : super(key: key);
@@ -54,7 +55,7 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
             ),
           ),
         ),
-        body: Form(
+        body: Form( // form으로 input 데이터 저장
           key: formKey,
           child: SingleChildScrollView(
             child: Column(
@@ -294,8 +295,7 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
                                     _nickname + '/' + '/' + _times)),
                           );
                           // 동물 프로필 등록 화면으로 이동
-                          final result =
-                          await Navigator.pushNamed(context, '/register2');
+                          final result = await Navigator.of(context).push(_createRoute());
                         },
                       ),
                       child: Text(
@@ -316,6 +316,25 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
           ),
         ),
       ),
+    );
+  }
+
+  // 페이지 전환 애니메이션
+  Route _createRoute() {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => const RegisterProfileAnimal(),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(0.0, 10.0);
+        const end = Offset.zero;
+        const curve = Curves.ease;
+
+        var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
+        );
+      },
     );
   }
 

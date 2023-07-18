@@ -58,6 +58,7 @@
                     android:host="oauth"/>
             </intent-filter>
         </activity>
+<!--        사진 크롭 이용으로 인한 코드 추가-->
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="portrait"
