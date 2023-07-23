@@ -273,7 +273,7 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                   ),
                 ),
                 // 종류 직접 입력시 등록(직접 입력 시에만 뜨도록 구현해야 합니다!)
-                Padding(
+                if (_selectedValue == '직접 입력') Padding(
                   padding:
                   const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                   child: TextFormField(
