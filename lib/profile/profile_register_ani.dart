@@ -107,7 +107,7 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                   height: 25,
                 ),
                 // 사진 등록
-                if (_pickedFile == null)
+                if (_pickedFile == null && isDefault == false)
                   Container(
                     constraints: BoxConstraints(
                       minHeight: _imageSize,
