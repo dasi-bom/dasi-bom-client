@@ -44,7 +44,7 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
   String _address = '';
 
   // 내 동네 카카오 API 값 컨트롤러
-  final TextEditingController _AddressController = TextEditingController();
+  TextEditingController _AddressController = TextEditingController();
 
   @override
   void initState() {
@@ -104,7 +104,7 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
                   height: 25,
                 ),
                 // 사진 등록
-                if (_pickedFile == null && isDefault == false)
+                if (_pickedFile == null)
                   Container(
                     constraints: BoxConstraints(
                       minHeight: _imageSize,

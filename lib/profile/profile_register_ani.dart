@@ -1,4 +1,5 @@
 import 'dart:ffi';
+import 'package:dasi_bom_client/WritingPage.dart';
 import 'package:dasi_bom_client/provider/user_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -107,7 +108,7 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                   height: 25,
                 ),
                 // 사진 등록
-                if (_pickedFile == null && isDefault == false)
+                if (_pickedFile == null)
                   Container(
                     constraints: BoxConstraints(
                       minHeight: _imageSize,
@@ -592,7 +593,7 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
   // 페이지 전환 애니메이션
   Route _createRoute() {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => const MainPage(),
+      pageBuilder: (context, animation, secondaryAnimation) => const Writing(),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         const begin = Offset(0.0, 10.0);
         const end = Offset.zero;
