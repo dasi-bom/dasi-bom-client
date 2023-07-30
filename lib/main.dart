@@ -1,11 +1,11 @@
-import 'package:dasi_bom_client/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:dasi_bom_client/SplashPage.dart';
 import 'package:dasi_bom_client/OnboardingPage.dart';
-import 'package:dasi_bom_client/profile/profile_register_ani.dart';
 import 'package:dasi_bom_client/profile/profile_register_pro.dart';
+import 'package:dasi_bom_client/profile/profile_register_ani.dart';
 import 'package:dasi_bom_client/MainPage.dart';
+import 'package:dasi_bom_client/provider/user_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
