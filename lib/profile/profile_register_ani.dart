@@ -1,11 +1,11 @@
 import 'dart:ffi';
 import 'package:dasi_bom_client/provider/user_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:dotted_border/dotted_border.dart';
-import 'package:image_cropper/image_cropper.dart';
-import 'package:provider/provider.dart';
+import 'package:dasi_bom_client/profile/register_finish.dart';
 import '../MainPage.dart';
 
 import 'package:image_picker/image_picker.dart';
@@ -21,7 +21,6 @@ class RegisterProfileAnimal extends StatefulWidget {
 class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
   // 프로필 이미지 받아오기
   XFile? _pickedFile; // 이미지를 담을 변수 선언
-  CroppedFile? _croppedFile; // 크롭된 이미지 담을 변수 선언
   final List<XFile?> _pickedImages = []; // 이미지 여러개 담을 변수 선언
   final ImagePicker imagePicker = ImagePicker(); // ImagePicker 초기화
 
@@ -107,7 +106,7 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                   height: 25,
                 ),
                 // 사진 등록
-                if (_pickedFile == null && isDefault == false)
+                if (_pickedFile == null)
                   Container(
                     constraints: BoxConstraints(
                       minHeight: _imageSize,
@@ -507,35 +506,9 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                                         _intro)),
                           );
 
-                          // 가입 완료 팝업 메시지
-                          showDialog(
-                              context: context,
-                              barrierDismissible: false,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: Text('환영합니다!'),
-                                  content: SingleChildScrollView(
-                                    child: ListBody(
-                                      children: <Widget>[
-                                        Text('회원가입이 완료되었습니다:)'),
-                                      ],
-                                    ),
-                                  ),
-                                  actions: <Widget>[
-                                    ElevatedButton(
-                                      child: Text('확인'),
-                                      onPressed: () {
-                                        Navigator.of(context)
-                                            .push(_createRoute());
-                                      },
-                                    )
-                                  ],
-                                );
-                              });
-
                           // 홈 화면으로 이동
-                          // final result =
-                          //     await Navigator.of(context).push(_createRoute());
+                          final result =
+                              await Navigator.of(context).push(_createRoute());
                         },
                       ),
                       child: Text(
@@ -592,7 +565,7 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
   // 페이지 전환 애니메이션
   Route _createRoute() {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => const MainPage(),
+      pageBuilder: (context, animation, secondaryAnimation) => const RegisterFinish(),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         const begin = Offset(0.0, 10.0);
         const end = Offset.zero;
