@@ -10,6 +10,7 @@ import 'package:dasi_bom_client/profile/profile_register_ani.dart';
 
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterProfileProtector extends StatefulWidget {
   const RegisterProfileProtector({Key? key}) : super(key: key);
@@ -28,6 +29,7 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
 
   var defaultImg = 'assets/ch_top_yellow.png';
   bool isDefault = false;
+  bool isExist = false;
 
   // Textformfield 값 받아오기
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -205,6 +207,9 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
                     // 유효성 검사
                     validator: (value) {
                       if (value!.isEmpty) return '닉네임을 입력해 주세요.';
+                      if (isExist == true) {
+                        return '이미 사용중인 닉네임 입니다.';
+                      }
                       if (value.toString().length <= 2)
                         return '닉네임은 두글자 이상 입력 해주셔야 합니다.';
                       return null;
@@ -465,6 +470,10 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
         isDefault = false;
         _pickedFile = pickedFile;
       });
+
+      if (_pickedFile != null) {
+        uploadImage(_pickedFile!.path);
+      }
     } else {
       if (kDebugMode) {
         print('이미지 선택안함');
@@ -497,30 +506,65 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
     formData['address'] = address;
   }
 
-  Future registerProtectorProfile(data) async {
+  registerProtectorProfile(data) async {
     try {
+      final storage = await SharedPreferences.getInstance();
+      var token = storage.getString('accessToken');
+
       final url = Uri.parse('http://13.209.51.119:8080/member/profile');
       final headers = {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token'
       };
 
-      final testData = data['nickname'];
-      final body = jsonEncode({
-        'nickname': testData
-      });
+      final nickname = data['nickname'];
+      final body = jsonEncode({'nickname': nickname});
 
-      final res = await http.post(url, headers: headers, body: body);
+      final res = await http.patch(url, headers: headers, body: body);
       print(res.statusCode);
-      // print(res.body);
 
-      print(data);
-      print(body);
-      // print(data['address']);
-      // print(data['times']);
+      if (res.statusCode == 200) {
+        final result = await Navigator.of(context).push(_createRoute());
+      } else if (res.statusCode == 302) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('로그인을 다시 해주세요.')));
+        await Navigator.pushNamed(context, '/login');
+      } else {
+        print(jsonDecode(res.body));
+        setState(() {
+          setState(() {
+            isExist = true;
+          });
+        });
+      }
 
       return res;
     } catch (err) {
-      print('err => ${err}');
+      print('error => ${err}');
+    }
+  }
+
+  uploadImage(image) async {
+    try {
+      final storage = await SharedPreferences.getInstance();
+      var token = storage.getString('accessToken');
+
+      final url = Uri.parse('http://13.209.51.119:8080/member/profile/images');
+      final headers = {
+        'Content-Type': 'multipart/form-data',
+        'Authorization': 'Bearer $token'
+      };
+
+      var request = http.MultipartRequest('POST', url);
+      request.files
+          .add(await http.MultipartFile.fromPath('multipartFile', image));
+      request.headers.addAll(headers);
+
+      var response = await request.send();
+      print(response.statusCode);
+    } catch (err) {
+      print('err =>  $err');
     }
   }
 }
