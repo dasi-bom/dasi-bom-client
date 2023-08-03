@@ -44,6 +44,9 @@ dependencies:
   http: ^1.1.0
   remedi_kopo:
   confetti:
+  url_launcher: ^6.1.12
+  shared_preferences: ^2.2.0
+  flutter_web_auth: ^0.5.0
 
 flutter_native_splash:
   android: true

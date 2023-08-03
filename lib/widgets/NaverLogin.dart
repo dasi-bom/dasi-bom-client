@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_login/flutter_naver_login.dart';
 import 'package:dasi_bom_client/profile/profile_register_pro.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class NaverLoginButton extends StatefulWidget {
   const NaverLoginButton({Key? key}) : super(key: key);
@@ -16,6 +17,16 @@ class _NaverLoginButtonState extends State<NaverLoginButton> {
   String? accessToken;
   String? refreshToken;
 
+  doNaverLogin() async {
+    final url =
+        Uri.parse('http://13.209.51.119:8080/oauth2/authorization/naver');
+    if (!await launchUrl(url)) {
+      throw Exception('Could not launch $url');
+    }
+
+    // final result = await Navigator.of(context).push(_createRoute());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Align(
@@ -27,7 +38,7 @@ class _NaverLoginButtonState extends State<NaverLoginButton> {
           child: ElevatedButton(
             onPressed: () {
               print('naver login');
-              signInWithNaver();
+              doNaverLogin();
             },
             style: ButtonStyle(
                 backgroundColor: MaterialStatePropertyAll<Color>(
@@ -77,7 +88,8 @@ class _NaverLoginButtonState extends State<NaverLoginButton> {
 // 페이지 전환 애니메이션
 Route _createRoute() {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => const RegisterProfileProtector(),
+    pageBuilder: (context, animation, secondaryAnimation) =>
+        const RegisterProfileProtector(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       const begin = Offset(0.0, 10.0);
       const end = Offset.zero;
