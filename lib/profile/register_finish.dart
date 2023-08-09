@@ -1,4 +1,5 @@
 import 'package:confetti/confetti.dart';
+import 'package:dasi_bom_client/MainPage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../WritingPage.dart';
@@ -134,7 +135,7 @@ class _RegisterFinishState extends State<RegisterFinish> {
   // 페이지 전환 애니메이션
   Route _createRoute() {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => const Writing(),
+      pageBuilder: (context, animation, secondaryAnimation) => const MainPage(),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         const begin = Offset(0.0, 10.0);
         const end = Offset.zero;
