@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_naver_login/flutter_naver_login.dart';
 import 'package:dasi_bom_client/profile/profile_register_pro.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_web_auth/flutter_web_auth.dart';
+import 'package:http/http.dart' as http;
+import 'dart:io';
+import 'dart:convert';
 
 class NaverLoginButton extends StatefulWidget {
   const NaverLoginButton({Key? key}) : super(key: key);
@@ -11,6 +16,13 @@ class NaverLoginButton extends StatefulWidget {
 }
 
 class _NaverLoginButtonState extends State<NaverLoginButton> {
+  final storage = FlutterSecureStorage();
+  final baseUrl = dotenv.env['BASE_URL'].toString();
+  final urlScheme = dotenv.env['URL_SCHEME'].toString();
+  final naverRedirectUri = dotenv.env['NAVER_REDIRECT_URI'].toString();
+  final naverAuthEndpoint =
+      dotenv.env['NAVER_AUTHORIZATION_ENDPOINT'].toString();
+
   bool isLogin = false;
   String? name;
   String? email;
@@ -18,13 +30,7 @@ class _NaverLoginButtonState extends State<NaverLoginButton> {
   String? refreshToken;
 
   doNaverLogin() async {
-    final url =
-        Uri.parse('http://13.209.51.119:8080/oauth2/authorization/naver');
-    if (!await launchUrl(url)) {
-      throw Exception('Could not launch $url');
-    }
-
-    // final result = await Navigator.of(context).push(_createRoute());
+    // 수정 예정
   }
 
   @override

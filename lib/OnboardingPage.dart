@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
+import 'package:liquid_swipe/liquid_swipe.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'widgets/Kakao_Login.dart';
 import 'widgets/main_view_model.dart';
@@ -7,11 +8,10 @@ import 'package:dasi_bom_client/widgets/NaverLogin.dart';
 import 'package:dasi_bom_client/MainPage.dart';
 import 'package:dasi_bom_client/profile/profile_register_pro.dart';
 
-import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_web_auth/flutter_web_auth.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({Key? key}) : super(key: key);
@@ -21,6 +21,13 @@ class OnboardingPage extends StatefulWidget {
 }
 
 class _OnboardingPageState extends State<OnboardingPage> {
+  final storage = FlutterSecureStorage(); // Create storage
+  final baseUrl = dotenv.env['BASE_URL'].toString();
+  final urlScheme = dotenv.env['URL_SCHEME'].toString();
+  final kakaoRedirectUri = dotenv.env['KAKAO_REDIRECT_URI'].toString();
+  final kakaoAuthEndpoint =
+      dotenv.env['KAKAO_AUTHORIZATION_ENDPOINT'].toString();
+
   // 로그인 생성자 생성
   final viewModel = MainViewModel(KakaoLogin());
 
@@ -45,6 +52,34 @@ class _OnboardingPageState extends State<OnboardingPage> {
     double screenHeightExcludingToolbar(BuildContext context,
         {double dividedBy = 1}) {
       return screenHeight(context, dividedBy: dividedBy);
+    }
+
+    Future<void> signIn() async {
+      final redirectUri = Uri.parse('$baseUrl$kakaoRedirectUri');
+      final authorizationEndpoint = Uri.parse('$baseUrl$kakaoAuthEndpoint');
+
+      final result = await FlutterWebAuth.authenticate(
+          url: '$authorizationEndpoint?redirect_uri=$redirectUri',
+          callbackUrlScheme: urlScheme);
+
+      if (result != null && result.isNotEmpty) {
+        final res = await http.get(Uri.parse('$redirectUri?token=$result'));
+
+        print('status ===>  ${res.statusCode}');
+        if (res.statusCode == 200) {
+          Uri tokenUrl = Uri.parse(result);
+          final accessToken = tokenUrl.queryParameters["token"]; // token 값 가져오기
+          final isNewMember = tokenUrl.queryParameters['isNewMember'];
+
+          await storage.write(
+              key: 'accessToken', value: accessToken.toString());
+          await storage.write(key: 'isNewMember', value: isNewMember);
+
+          final _next = await Navigator.of(context).push(_createRoute());
+        } else {}
+      } else {
+        print('cancel @@@@@@');
+      }
     }
 
     return Container(
@@ -125,8 +160,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   // await viewModel.login();
                   setState(() {});
                   // 로그인 되면 MainPage로 화면 이동
-                  final result =
-                      await Navigator.of(context).push(_createRoute());
+                  // final result =
+                  //     await Navigator.of(context).push(_createRoute());
                 },
                 child: Image.asset('assets/btn_kakao.png'),
               ),
@@ -195,45 +230,4 @@ PageDecoration getPageDecoration() {
       imageAlignment: Alignment.bottomRight,
       imagePadding: EdgeInsets.only(top: 45, bottom: 50),
       pageColor: Color(0xFFF8F8F9));
-}
-
-Future<void> signIn() async {
-  const client_key = "";
-  const native_key = "";
-
-  // 고유 redirect uri
-  const redirect_url = "http://13.209.51.119:8080/login/oauth2/code/kakao";
-  const APP_REDIRECT_URI = "http://13.209.51.119:8080/login/oauth2/code/kakao";
-
-  // 백엔드에서 미리 작성된 API 호출
-  // 로그인 http://13.209.51.119:8080/oauth2/authorization/kakao
-  final url = Uri.parse('http://13.209.51.119:8080/oauth2/authorization/kakao');
-  await launchUrl(url);
-
-  // 백엔드에서 제공한 로그인 페이지에서 로그인 후 callback 데이터 반환
-  // final result = await FlutterWebAuth.authenticate(
-  //     url: url.toString(), callbackUrlScheme: APP_REDIRECT_URI);
-  //
-  // print(result);
-
-  // 백엔드에서 redirect한 callback 데이터 파싱
-  // final accessToken = Uri
-  //     .parse(result)
-  //     .queryParameters['accessToken'];
-  // final refreshToken = Uri
-  //     .parse(result)
-  //     .queryParameters['refreshToken'];
-  // final isNew = Uri.parse(result).queryParameters['isNewMember'];
-  // print('isNew => $isNew');
-
-  var accessToken = "";
-  var refreshToken = "";
-  var isNewMember = false;
-
-  var storage = await SharedPreferences.getInstance();
-  storage.setString('accessToken', accessToken);
-  storage.setString('refreshToken', refreshToken);
-  storage.setBool('isNewMember', isNewMember);
-  // FlutterSecure or SharedPreferences 통한 token 저장 및 관리
-  // ...
 }
