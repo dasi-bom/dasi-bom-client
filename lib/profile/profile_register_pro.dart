@@ -1,16 +1,16 @@
-import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:remedi_kopo/remedi_kopo.dart';
 import 'package:dasi_bom_client/profile/profile_register_ani.dart';
-
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'dart:io';
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterProfileProtector extends StatefulWidget {
   const RegisterProfileProtector({Key? key}) : super(key: key);
@@ -21,6 +21,12 @@ class RegisterProfileProtector extends StatefulWidget {
 }
 
 class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
+  final storage = FlutterSecureStorage();
+  final baseUrl = dotenv.env['BASE_URL'].toString();
+  final createUserProfile = dotenv.env['CREATE_USER_PROFILE_API'].toString();
+  final uploadUserProfileImage =
+      dotenv.env['UPLOAD_USER_PROFILE_IMAGE_API'].toString();
+
   // 프로필 이미지 받아오기
   XFile? _pickedFile; // 이미지를 담을 변수 선언
   CroppedFile? _croppedFile; // 크롭된 이미지 담을 변수 선언
@@ -483,9 +489,13 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
 
   // 기본이미지 설정
   _getDefaultImage() async {
+    final ByteData img = await rootBundle.load('assets/ch_top_yellow.png');
+    final List<int> bytes = img.buffer.asUint8List();
+    uploadImage(bytes);
+
     setState(() {
       isDefault = true;
-      _pickedFile = Image.asset('assets/ch_top_yellow.png') as XFile?;
+      _pickedFile = XFile('assets/ch_top_yellow.png');
     });
   }
 
@@ -508,14 +518,12 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
 
   registerProtectorProfile(data) async {
     try {
-      final storage = await SharedPreferences.getInstance();
-      var token = storage.getString('accessToken');
-
-      final url = Uri.parse('http://13.209.51.119:8080/member/profile');
+      final accessToken = await storage.read(key: 'accessToken');
+      final url = Uri.parse('$baseUrl$createUserProfile');
       final headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Authorization': 'Bearer $token'
+        'Authorization': 'Bearer $accessToken'
       };
 
       final nickname = data['nickname'];
@@ -527,6 +535,7 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
       if (res.statusCode == 200) {
         final result = await Navigator.of(context).push(_createRoute());
       } else if (res.statusCode == 302) {
+        await storage.deleteAll();
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('로그인을 다시 해주세요.')));
         await Navigator.pushNamed(context, '/login');
@@ -547,18 +556,24 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
 
   uploadImage(image) async {
     try {
-      final storage = await SharedPreferences.getInstance();
-      var token = storage.getString('accessToken');
-
-      final url = Uri.parse('http://13.209.51.119:8080/member/profile/images');
+      final accessToken = await storage.read(key: 'accessToken');
+      final url = Uri.parse('$baseUrl$uploadUserProfileImage');
       final headers = {
         'Content-Type': 'multipart/form-data',
-        'Authorization': 'Bearer $token'
+        'Authorization': 'Bearer $accessToken'
       };
 
       var request = http.MultipartRequest('POST', url);
-      request.files
-          .add(await http.MultipartFile.fromPath('multipartFile', image));
+      if (image is List<int>) {
+        // 기본 이미지
+        request.files.add(http.MultipartFile.fromBytes('multipartFile', image,
+            filename: 'default.png'));
+      } else {
+        // 갤러리
+        request.files
+            .add(await http.MultipartFile.fromPath('multipartFile', image));
+      }
+
       request.headers.addAll(headers);
 
       var response = await request.send();

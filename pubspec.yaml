@@ -49,6 +49,8 @@ dependencies:
   url_launcher: ^6.1.12
   shared_preferences: ^2.2.0
   flutter_web_auth: ^0.5.0
+  flutter_secure_storage: ^8.0.0
+  flutter_dotenv: ^5.1.0
 
 flutter_native_splash:
   android: true
@@ -94,6 +96,7 @@ dev_dependencies:
 flutter:
   assets:
     - assets/
+    - .env
 #  fonts:
 #    - family: Pretendard
 #      fonts:

@@ -3,6 +3,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dasi_bom_client/widgets/Kakao_Login.dart';
 import 'package:dasi_bom_client/widgets/main_view_model.dart';
 import 'package:dasi_bom_client/WritingPage.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 // Page1의 _buildMiddle() 메서드에 들어갈 사진 url
 final dummyItems = [
@@ -19,6 +20,8 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  final storage = FlutterSecureStorage();
+
   // 로그인 생성자
   final viewModel = MainViewModel(KakaoLogin());
 
@@ -47,8 +50,9 @@ class _MainPageState extends State<MainPage> {
           IconButton(
             // 카카오 로그아웃 버튼
             onPressed: () async {
-              await viewModel.logout();
-              setState(() {});
+              await storage.deleteAll(); // Delete all
+              // await viewModel.logout();
+
               // 로그아웃 되면 로그인 화면으로 화면 이동
               final result = await Navigator.pushNamed(context, '/login');
             },
