@@ -1,5 +1,6 @@
 import 'dart:ffi';
 import 'package:dasi_bom_client/provider/user_provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,10 @@ import '../MainPage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 class RegisterProfileAnimal extends StatefulWidget {
   const RegisterProfileAnimal({Key? key}) : super(key: key);
 
@@ -19,6 +24,12 @@ class RegisterProfileAnimal extends StatefulWidget {
 }
 
 class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
+  final storage = FlutterSecureStorage();
+  final baseUrl = dotenv.env['BASE_URL'].toString();
+  final createPetProfile = dotenv.env['CREATE_PET_PROFILE_API'].toString();
+  final uploadPetProfileImage =
+      dotenv.env['UPLOAD_PET_PROFILE_IMAGE_API'].toString();
+
   // 프로필 이미지 받아오기
   XFile? _pickedFile; // 이미지를 담을 변수 선언
   final List<XFile?> _pickedImages = []; // 이미지 여러개 담을 변수 선언
@@ -35,11 +46,19 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
   String _intro = ''; // 소개
   String _kindinput = ''; // 종
 
+  var formData = {};
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _ageController = TextEditingController();
+  final TextEditingController _typeController = TextEditingController();
+  final TextEditingController _genderController = TextEditingController();
+  final TextEditingController _startDtController = TextEditingController();
+  final TextEditingController _introController = TextEditingController();
+
   // 이름 정규식
   final Pattern _validateName = RegExp('[a-z A-Z ㄱ-ㅎ|가-힣| ·|： ᆞ|ᆢ]');
 
   // 종류 콤보박스
-  final _animals = ['강아지', '고양이', '직접 입력'];
+  final _animals = ['강아지', '고양이', '염소', '여우', '기타', '직접 입력'];
   var _selectedValue = '강아지';
 
   // 성별 콤보박스
@@ -48,6 +67,53 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
 
   // 처음 만난 날 변수 선언
   DateTime date = DateTime.now();
+
+  registerPerProfile(data) async {
+    try {
+      final accessToken = await storage.read(key: 'accessToken');
+      final url = Uri.parse('$baseUrl$createPetProfile');
+      final headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $accessToken'
+      };
+
+      final age = int.parse(data['age']);
+      final type = data['type'] == '강아지'
+          ? 'DOG'
+          : data['type'] == '고양이'
+              ? 'CAT'
+              : data['type'] == '염소'
+                  ? 'GOAT'
+                  : data['type'] == '여우'
+                      ? 'FOX'
+                      : data['type'] == '기타'
+                          ? 'ETC'
+                          : data['type'];
+
+      final gender = data['gender'] == '남' ? 'MALE' : 'FEMALE';
+      final startDt = data['startDt'].substring(0, 10);
+
+      final body = jsonEncode({
+        'name': data['name'],
+        'age': age,
+        'type': type,
+        'sex': gender,
+        'startTempProtectedDate': startDt,
+        'bio': data['desc']
+      });
+      print('body =>  $body');
+
+      final res = await http.post(url, headers: headers, body: body);
+      print('statusCode =>  ${res.statusCode}');
+
+      if (res.statusCode == 200) {
+        print('success');
+      }
+    } catch (err) {
+      print(err);
+    }
+  }
 
   @override
   void initState() {
@@ -164,12 +230,12 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                         TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
                   ),
                 ),
-                // 이름 등록 - 20자 이내, 영문/한글만 가능
+                // 이름 등록 - 30자 이내, 영문/한글만 가능
                 Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                   child: TextFormField(
-                    maxLength: 20,
+                    maxLength: 30,
                     keyboardType: TextInputType.name,
                     inputFormatters: [
                       FilteringTextInputFormatter(
@@ -200,15 +266,19 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                     //   print(value);
                     // },
                     onSaved: (value) {
-                      context.read<UserStore>().setName(
-                          value.toString()); // UserStore에 있는 animalName 핸들링
-                      print(context
-                          .read<UserStore>()
-                          .animalName); // UserStore에 있는 animalName에 접근
-                      // setState(() {
-                      //   _name = value as String;
-                      // });
+                      setState(() {
+                        _name = value as String;
+                        _nameController.value = TextEditingValue(text: value);
+                        formData['name'] = value;
+                      });
+
+                      // context.read<UserStore>().setName(
+                      //     value.toString()); // UserStore에 있는 animalName 핸들링
+                      // print(context
+                      //     .read<UserStore>()
+                      //     .animalName); // UserStore에 있는 animalName에 접근
                     },
+                    controller: _nameController,
                     // 유효성 검사
                     validator: (value) {
                       if (value?.isEmpty ?? true) return '이름을 입력해 주세요.';
@@ -256,8 +326,11 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                     onSaved: (value) {
                       setState(() {
                         _age = value as String;
+                        _ageController.value = TextEditingValue(text: value);
+                        formData['age'] = value;
                       });
                     },
+                    controller: _ageController,
                   ),
                 ),
                 Container(
@@ -299,6 +372,13 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                     onChanged: (value) {
                       setState(() {
                         _selectedValue = value!;
+                        if (value != '직접 입력') {
+                          _typeController.value = TextEditingValue(text: value);
+                          formData['type'] = value;
+                        } else {
+                          _typeController.value = TextEditingValue(text: '');
+                          formData['type'] = '';
+                        }
                       });
                     },
                   ),
@@ -335,8 +415,11 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                       onSaved: (value) {
                         setState(() {
                           _kindinput = value as String;
+                          _typeController.value = TextEditingValue(text: value);
+                          formData['type'] = value;
                         });
                       },
+                      controller: _typeController,
                     ),
                   ),
                 const SizedBox(
@@ -369,6 +452,8 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                     onChanged: (value) {
                       setState(() {
                         _selectedKind = value!;
+                        _genderController.value = TextEditingValue(text: value);
+                        formData['gender'] = value;
                       });
                     },
                   ),
@@ -402,6 +487,9 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                           if (selectedDate != null) {
                             setState(() {
                               date = selectedDate;
+                              _startDtController.value = TextEditingValue(
+                                  text: selectedDate.toString());
+                              formData['startDt'] = selectedDate.toString();
                             });
                           }
                         },
@@ -434,6 +522,7 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                   child: TextFormField(
                     maxLines: 6,
+                    maxLength: 300,
                     keyboardType: TextInputType.text,
                     autovalidateMode: AutovalidateMode.always,
                     decoration: InputDecoration(
@@ -452,8 +541,11 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                     onSaved: (value) {
                       setState(() {
                         _intro = value as String;
+                        _introController.value = TextEditingValue(text: value);
+                        formData['desc'] = value;
                       });
                     },
+                    controller: _introController,
                   ),
                 ),
                 const SizedBox(
@@ -488,7 +580,7 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                             MaterialStateProperty.all(Color(0xFFFFED8E)),
                       ),
                       onPressed: () => setState(
-                        () async {
+                        () {
                           validationResult =
                               formKey.currentState?.validate() ?? false;
                           formKey.currentState!.save();
@@ -506,9 +598,11 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                                         _intro)),
                           );
 
+                          registerPerProfile(formData);
+
                           // 홈 화면으로 이동
-                          final result =
-                              await Navigator.of(context).push(_createRoute());
+                          // final result =
+                          //     await Navigator.of(context).push(_createRoute());
                         },
                       ),
                       child: Text(
@@ -565,7 +659,8 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
   // 페이지 전환 애니메이션
   Route _createRoute() {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => const RegisterFinish(),
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          const RegisterFinish(),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         const begin = Offset(0.0, 10.0);
         const end = Offset.zero;

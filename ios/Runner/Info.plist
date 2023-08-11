@@ -24,7 +24,7 @@
                 <string>Editor</string>
                 <key>CFBundleURLSchemes</key>
                 <array>
-                    <string>dasibomSocialLogin</string>
+                    <string>dasibomapp</string>
                 </array>
             </dict>
         </array>
