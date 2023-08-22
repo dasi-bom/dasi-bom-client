@@ -78,21 +78,38 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
         'Authorization': 'Bearer $accessToken'
       };
 
-      final age = int.parse(data['age']);
-      final type = data['type'] == '강아지'
-          ? 'DOG'
-          : data['type'] == '고양이'
-              ? 'CAT'
-              : data['type'] == '염소'
-                  ? 'GOAT'
-                  : data['type'] == '여우'
-                      ? 'FOX'
-                      : data['type'] == '기타'
-                          ? 'ETC'
-                          : data['type'];
+      var typeFormat;
+      if (data['type'] == null || data['type'] == '강아지') {
+        typeFormat = 'DOG';
+      } else if (data['type'] == '고양이') {
+        typeFormat = 'CAT';
+      } else if (data['type'] == '염소') {
+        typeFormat = 'GOAT';
+      } else if (data['type'] == '여우') {
+        typeFormat = 'FOX';
+      } else {
+        typeFormat = 'ETC';
+      }
 
-      final gender = data['gender'] == '남' ? 'MALE' : 'FEMALE';
-      final startDt = data['startDt'].substring(0, 10);
+      var genderFormat;
+      if ((data['gender'] == null) || (data['gender'] == '남')) {
+        genderFormat = 'MALE';
+      } else {
+        genderFormat = 'FEMALE';
+      }
+
+      var startDtFormat;
+      if (data['startDt'] != null) {
+        startDtFormat = data['startDt'].substring(0, 10);
+      } else {
+        startDtFormat = DateTime.now().toString().substring(0, 10);
+      }
+
+      final age = data['age'] != '' ? int.parse(data['age']) : 1;
+      final type = typeFormat;
+      final gender = genderFormat;
+      final startDt = startDtFormat;
+      final desc = data['desc'] ?? ' ';
 
       final body = jsonEncode({
         'name': data['name'],
@@ -100,16 +117,37 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
         'type': type,
         'sex': gender,
         'startTempProtectedDate': startDt,
-        'bio': data['desc']
+        'bio': desc
       });
       print('body =>  $body');
 
       final res = await http.post(url, headers: headers, body: body);
-      print('statusCode =>  ${res.statusCode}');
+      final status = res.statusCode;
+      final info = res.body;
+      print('${res.request}  =>  $status');
 
-      if (res.statusCode == 200) {
-        print('success');
+      if (status == 200) {
+        await Navigator.of(context).push(_createRoute(null));
+      } else if (status == 201) {
+        await Navigator.of(context).push(_createRoute(info));
+      } else if (status == 302) {
+        print('fail_1 => $status');
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('로그인을 다시 해주세요.')));
+        await Navigator.pushNamed(context, '/login');
+      } else if (status == 403) {
+        print('fail_2 => $status');
+        await storage.deleteAll();
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('관리자에게 문의해 주세요.')));
+        await Navigator.pushNamed(context, '/login');
+      } else {
+        print('fail_3 => $status');
+        print(status);
+        print(jsonDecode(res.body));
       }
+
+      return res;
     } catch (err) {
       print(err);
     }
@@ -452,8 +490,9 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                     onChanged: (value) {
                       setState(() {
                         _selectedKind = value!;
-                        _genderController.value = TextEditingValue(text: value);
-                        formData['gender'] = value;
+                        _genderController.value =
+                            TextEditingValue(text: value == '' ? '남' : value);
+                        formData['gender'] = value == '' ? '남' : value;
                       });
                     },
                   ),
@@ -491,6 +530,8 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                                   text: selectedDate.toString());
                               formData['startDt'] = selectedDate.toString();
                             });
+                          } else {
+                            formData['startDt'] = DateTime.now().toString();
                           }
                         },
                         child: Text("날짜 선택"),
@@ -632,8 +673,8 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                       ),
                       onPressed: () async {
                         // 홈 화면으로 이동
-                        final result =
-                            await Navigator.of(context).push(_createRoute());
+                        final result = await Navigator.of(context)
+                            .push(_createRoute(null));
                       },
                       child: Text(
                         "나중에 등록하기",
@@ -657,10 +698,10 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
   }
 
   // 페이지 전환 애니메이션
-  Route _createRoute() {
+  Route _createRoute(petInfo) {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) =>
-          const RegisterFinish(),
+          RegisterFinish(data: petInfo),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         const begin = Offset(0.0, 10.0);
         const end = Offset.zero;

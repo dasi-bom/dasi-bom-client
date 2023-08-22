@@ -530,16 +530,25 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
       final body = jsonEncode({'nickname': nickname});
 
       final res = await http.patch(url, headers: headers, body: body);
-      print(res.statusCode);
+      final status = res.statusCode;
+      print('${res.request}  =>  $status');
 
-      if (res.statusCode == 200) {
-        final result = await Navigator.of(context).push(_createRoute());
-      } else if (res.statusCode == 302) {
+      if (status == 200) {
+        await Navigator.of(context).push(_createRoute());
+      } else if (status == 201) {
+        await Navigator.of(context).push(_createRoute());
+      } else if (status == 302) {
+        print('fail_1 => $status');
         await storage.deleteAll();
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('로그인을 다시 해주세요.')));
         await Navigator.pushNamed(context, '/login');
+      } else if (status == 403) {
+        print('fail_2 => $status');
+        await storage.deleteAll();
+        await Navigator.pushNamed(context, '/login');
       } else {
+        print('fail_3 => $status');
         print(jsonDecode(res.body));
         setState(() {
           setState(() {
