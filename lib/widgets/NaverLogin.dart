@@ -29,8 +29,41 @@ class _NaverLoginButtonState extends State<NaverLoginButton> {
   String? accessToken;
   String? refreshToken;
 
-  doNaverLogin() async {
-    // 수정 예정
+  Future<void> doNaverLogin() async {
+    try {
+      final redirectUri = Uri.parse('$baseUrl$naverRedirectUri');
+      final authorizationEndpoint = Uri.parse('$baseUrl$naverAuthEndpoint');
+
+      final result = await FlutterWebAuth.authenticate(
+          url: '$authorizationEndpoint?redirect_uri=$redirectUri',
+          callbackUrlScheme: urlScheme);
+
+      if (result != null && result.isNotEmpty) {
+        final res = await http.get(Uri.parse('$redirectUri?token=$result'));
+        print('${res.request}  =>  ${res.statusCode}');
+
+        if (res.statusCode == 200) {
+          Uri tokenUrl = Uri.parse(result);
+          final accessToken = tokenUrl.queryParameters['token'];
+          final isNewMember = tokenUrl.queryParameters['isNewMember'];
+
+          await storage.write(
+              key: 'accessToken', value: accessToken.toString());
+          await storage.write(key: 'isNewMember', value: isNewMember);
+          await storage.write(key: 'loginType', value: 'naver');
+
+          if (isNewMember == 'true') {
+            await Navigator.of(context).push(_createRoute());
+          } else {
+            await Navigator.pushNamed(context, '/main');
+          }
+        }
+      } else {
+        print('naver login fail');
+      }
+    } catch (err) {
+      print('err ==> $err');
+    }
   }
 
   @override

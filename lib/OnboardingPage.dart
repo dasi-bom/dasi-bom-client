@@ -55,30 +55,41 @@ class _OnboardingPageState extends State<OnboardingPage> {
     }
 
     Future<void> signIn() async {
-      final redirectUri = Uri.parse('$baseUrl$kakaoRedirectUri');
-      final authorizationEndpoint = Uri.parse('$baseUrl$kakaoAuthEndpoint');
+      try {
+        final redirectUri = Uri.parse('$baseUrl$kakaoRedirectUri');
+        final authorizationEndpoint = Uri.parse('$baseUrl$kakaoAuthEndpoint');
 
-      final result = await FlutterWebAuth.authenticate(
-          url: '$authorizationEndpoint?redirect_uri=$redirectUri',
-          callbackUrlScheme: urlScheme);
+        final result = await FlutterWebAuth.authenticate(
+            url: '$authorizationEndpoint?redirect_uri=$redirectUri',
+            callbackUrlScheme: urlScheme);
 
-      if (result != null && result.isNotEmpty) {
-        final res = await http.get(Uri.parse('$redirectUri?token=$result'));
+        if (result != null && result.isNotEmpty) {
+          final res = await http.get(Uri.parse('$redirectUri?token=$result'));
+          print('status ===>  ${res.statusCode}');
 
-        print('status ===>  ${res.statusCode}');
-        if (res.statusCode == 200) {
-          Uri tokenUrl = Uri.parse(result);
-          final accessToken = tokenUrl.queryParameters["token"]; // token 값 가져오기
-          final isNewMember = tokenUrl.queryParameters['isNewMember'];
+          if (res.statusCode == 200) {
+            Uri tokenUrl = Uri.parse(result);
+            final accessToken =
+                tokenUrl.queryParameters["token"]; // token 값 가져오기
+            final isNewMember = tokenUrl.queryParameters['isNewMember'];
 
-          await storage.write(
-              key: 'accessToken', value: accessToken.toString());
-          await storage.write(key: 'isNewMember', value: isNewMember);
+            await storage.write(
+                key: 'accessToken', value: accessToken.toString());
+            await storage.write(key: 'isNewMember', value: isNewMember);
+            await storage.write(key: 'loginType', value: 'kakao');
 
-          final _next = await Navigator.of(context).push(_createRoute());
-        } else {}
-      } else {
-        print('cancel @@@@@@');
+            if (isNewMember == 'true') {
+              await Navigator.of(context).push(_createRoute());
+            } else {
+              await Navigator.of(context).push(_createRoute());
+              // await Navigator.pushNamed(context, '/main'); // 프로필 연동 완료시 사용
+            }
+          }
+        } else {
+          print('kakao login fail');
+        }
+      } catch (err) {
+        print('err ==> $err');
       }
     }
 
