@@ -5,6 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dasi_bom_client/MainPage.dart';
 import 'package:remedi_kopo/remedi_kopo.dart';
@@ -22,9 +24,22 @@ class Writing extends StatefulWidget {
 }
 
 class _WritingState extends State<Writing> {
+  final storage = FlutterSecureStorage();
+  final baseUrl = dotenv.env['BASE_URL'].toString();
+  final createDiaryUrl = dotenv.env['CREATE_DIARY'].toString();
+
+  final diaryForm = {};
+
+  // final TextEditingController _petIdController = TextEditingController();
+  // final TextEditingController _categoryController = TextEditingController();
+  // final TextEditingController _contentController = TextEditingController();
+  // final TextEditingController _stampsController = TextEditingController();
+  // final TextEditingController _isPublicController = TextEditingController();
+
   // 이미지 받아오기
   XFile? _pickedFile; // 이미지를 담을 변수 선언
   List<XFile?> _pickedImages = []; // 이미지 여러개 담을 변수 선언
+  List<XFile> imageFiles = [];
   final ImagePicker imagePicker = ImagePicker(); // ImagePicker 초기화
 
   // 이미지 여러개 pick
@@ -33,6 +48,7 @@ class _WritingState extends State<Writing> {
     if (images != null) {
       setState(() {
         _pickedImages = images;
+        imageFiles.addAll(images);
       });
     }
   }
@@ -46,7 +62,7 @@ class _WritingState extends State<Writing> {
   Map<String, String> formData = {};
 
   final TextEditingController _bodyController =
-  TextEditingController(); // 본문 저장 변수
+      TextEditingController(); // 본문 저장 변수
 
   late bool validationResult;
   String _body = ''; // 본문
@@ -62,13 +78,19 @@ class _WritingState extends State<Writing> {
   // 주제 다중 선택
   List<String> tags = [];
   List<String> options = [
-    '산책', '간식', '장난감', '목욕',
-    '소풍', '드라이브', '미용실',
-    '병원', '잠',
+    '산책',
+    '간식',
+    '장난감',
+    '목욕',
+    '소풍',
+    '드라이브',
+    '미용실',
+    '병원',
+    '잠',
   ];
 
   // 나만보기 토글
-  bool status = false;
+  bool isPublic = false;
 
   @override
   void initState() {
@@ -76,12 +98,105 @@ class _WritingState extends State<Writing> {
     super.initState();
   }
 
+  Future<void> createDiary(data, images) async {
+    // print(_pickedImages);
+    // print(imageFiles);
+    // if (data['petId'] == null) {
+    //   var petId = _write.indexOf(_selectedWrite);
+    //   data['petId'] = petId;
+    // } else {
+    //   data['petId'] = _write.indexOf(data['petId']);
+    // }
+    // if (data['category'] == null) {
+    //   data['category'] = _selectedcategory == '일기쓰기' ? 'daily' : 'challenge';
+    // } else {
+    //   data['category'] = data['category'] == '일기쓰기' ? 'daily' : 'challenge';
+    // }
+    // if (data['stamps'] == null) {
+    //   data['stamps'] = tags;
+    // }
+    // if (data['isPublic'] == null) {
+    //   data['isPublic'] = isPublic.toString();
+    // } else {
+    //   data['isPublic'] = data['isPublic'].toString();
+    // }
+    //
+    // print('data => ${jsonEncode(data)}');
+
+    try {
+      final accessToken = await storage.read(key: 'accessToken');
+      final url = Uri.parse('$baseUrl$createDiaryUrl');
+      final headers = {
+        // 'Content-Type': 'application/json',
+        'Content-Type': 'multipart/form-data',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $accessToken'
+      };
+
+      if (data['petId'] == null) {
+        var petId = _write.indexOf(_selectedWrite);
+        data['petId'] = int.parse('$petId');
+      } else {
+        data['petId'] = int.parse('${_write.indexOf(data['petId'])}');
+      }
+
+      if (data['category'] == null) {
+        data['category'] = _selectedcategory == '일기쓰기' ? 'daily' : 'challenge';
+      } else {
+        data['category'] = data['category'] == '일기쓰기' ? 'daily' : 'challenge';
+      }
+
+      if (data['stamps'] == null) {
+        data['stamps'] = tags;
+      }
+
+      if (data['isPublic'] == null) {
+        data['isPublic'] = isPublic.toString();
+      } else {
+        data['isPublic'] = data['isPublic'].toString();
+      }
+
+      final diaryForm = jsonEncode({
+        'petId': data['petId'],
+        'category': data['category'],
+        'challengeTopic': data['category'],
+        'content': data['content'],
+        'stamps': data['stamps'],
+        'isPublic': data['isPublic'].toString()
+      });
+      print('diaryForm => $diaryForm');
+
+      final req = http.MultipartRequest('POST', url);
+      req.headers.addAll(headers);
+      req.fields.addAll({'diarySaveRequest': diaryForm});
+
+      for (var file in images) {
+        String fileName = file.path.split('/').last;
+        req.files.add(await http.MultipartFile.fromPath(
+            'multipartFiles', file.path,
+            filename: fileName));
+      }
+
+      print('files => ${req.files}');
+      print('fields => ${req.fields}');
+
+      final res = await req.send();
+      final status = res.statusCode;
+      print('${res.request}  =>  $status');
+
+      if (status == 200) {
+        print('success');
+      } else {
+        print('fail');
+      }
+    } catch (err) {
+      print('err ==> $err');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    bool isPadMode = MediaQuery
-        .of(context)
-        .size
-        .width > 700;
+    bool isPadMode = MediaQuery.of(context).size.width > 700;
 
     // 사진 Gridview
     List<Widget> _boxContents = [
@@ -95,29 +210,25 @@ class _WritingState extends State<Writing> {
                   color: Colors.white.withOpacity(0.6), shape: BoxShape.circle),
               child: Icon(
                 CupertinoIcons.camera,
-                color: Theme
-                    .of(context)
-                    .colorScheme
-                    .primary,
+                color: Theme.of(context).colorScheme.primary,
               ))),
       Container(),
       Container(),
       _pickedImages.length <= 4
           ? Container()
           : FittedBox(
-          child: Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.6),
-                  shape: BoxShape.circle),
-              child: Text(
-                '+${(_pickedImages.length - 4).toString()}',
-                style: Theme
-                    .of(context)
-                    .textTheme
-                    .subtitle2
-                    ?.copyWith(fontWeight: FontWeight.w800),
-              ))),
+              child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.6),
+                      shape: BoxShape.circle),
+                  child: Text(
+                    '+${(_pickedImages.length - 4).toString()}',
+                    style: Theme.of(context)
+                        .textTheme
+                        .subtitle2
+                        ?.copyWith(fontWeight: FontWeight.w800),
+                  ))),
     ];
 
     return SafeArea(
@@ -133,12 +244,11 @@ class _WritingState extends State<Writing> {
                 ),
                 // 글 쓸 동물 친구 등록
                 Padding(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 150),
+                  padding: const EdgeInsets.symmetric(horizontal: 150),
                   child: DropdownButtonFormField(
                     value: _selectedWrite,
                     items: _write.map(
-                          (value) {
+                      (value) {
                         return DropdownMenuItem(
                           value: value,
                           child: Text(value),
@@ -148,6 +258,7 @@ class _WritingState extends State<Writing> {
                     onChanged: (value) {
                       setState(() {
                         _selectedWrite = value!;
+                        diaryForm['petId'] = value;
                       });
                     },
                   ),
@@ -161,7 +272,7 @@ class _WritingState extends State<Writing> {
                     '카테고리',
                     textAlign: TextAlign.left,
                     style:
-                    TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
+                        TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
                   ),
                 ),
                 // 카테고리 등록
@@ -170,7 +281,7 @@ class _WritingState extends State<Writing> {
                   child: DropdownButtonFormField(
                     value: _selectedcategory,
                     items: _category.map(
-                          (value) {
+                      (value) {
                         return DropdownMenuItem(
                           value: value,
                           child: Text(value),
@@ -193,6 +304,7 @@ class _WritingState extends State<Writing> {
                     onChanged: (value) {
                       setState(() {
                         _selectedcategory = value!;
+                        formData['category'] = value;
                       });
                     },
                   ),
@@ -206,7 +318,7 @@ class _WritingState extends State<Writing> {
                     '사진',
                     textAlign: TextAlign.left,
                     style:
-                    TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
+                        TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
                   ),
                 ),
                 // 사진 등록
@@ -218,23 +330,22 @@ class _WritingState extends State<Writing> {
                   crossAxisSpacing: 5,
                   children: List.generate(
                       4,
-                          (index) =>
-                          DottedBorder(
-                              child: Container(
-                                child: Center(child: _boxContents[index]),
-                                decoration: index <= _pickedImages.length - 1
-                                    ? BoxDecoration(
+                      (index) => DottedBorder(
+                          child: Container(
+                            child: Center(child: _boxContents[index]),
+                            decoration: index <= _pickedImages.length - 1
+                                ? BoxDecoration(
                                     borderRadius: BorderRadius.circular(8),
                                     image: DecorationImage(
                                         fit: BoxFit.cover,
                                         image: FileImage(
                                             File(_pickedImages[index]!.path))))
-                                    : null,
-                              ),
-                              color: Colors.grey,
-                              dashPattern: [8, 3],
-                              borderType: BorderType.RRect,
-                              radius: const Radius.circular(10))).toList(),
+                                : null,
+                          ),
+                          color: Colors.grey,
+                          dashPattern: [8, 3],
+                          borderType: BorderType.RRect,
+                          radius: const Radius.circular(10))).toList(),
                 ),
                 Container(
                   width: 340,
@@ -242,13 +353,13 @@ class _WritingState extends State<Writing> {
                     '본문',
                     textAlign: TextAlign.left,
                     style:
-                    TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
+                        TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
                   ),
                 ),
                 // 본문 등록
                 Padding(
                   padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                   child: TextFormField(
                     maxLines: 5,
                     keyboardType: TextInputType.text,
@@ -269,6 +380,7 @@ class _WritingState extends State<Writing> {
                     onSaved: (value) {
                       setState(() {
                         _body = value as String;
+                        diaryForm['content'] = value;
                       });
                     },
                     controller: _bodyController,
@@ -283,13 +395,16 @@ class _WritingState extends State<Writing> {
                     '주제',
                     textAlign: TextAlign.left,
                     style:
-                    TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
+                        TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
                   ),
                 ),
                 // 주제 해시태그 등록
                 ChipsChoice<String>.multiple(
                   value: tags,
-                  onChanged: (val) => setState(() => tags = val),
+                  onChanged: (val) => setState(() {
+                    tags = val;
+                    diaryForm['stamps'] = tags;
+                  }),
                   choiceItems: C2Choice.listFrom<String, String>(
                     source: options,
                     value: (i, v) => v,
@@ -308,7 +423,7 @@ class _WritingState extends State<Writing> {
                     '나만 보기 설정',
                     textAlign: TextAlign.left,
                     style:
-                    TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
+                        TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
                   ),
                 ),
                 // 나만 보기 설정
@@ -323,13 +438,14 @@ class _WritingState extends State<Writing> {
                         height: 30,
                         valueFontSize: 10,
                         toggleSize: 20,
-                        value: status,
+                        value: isPublic,
                         borderRadius: 30,
                         padding: 8,
                         showOnOff: true,
                         onToggle: (val) {
                           setState(() {
-                            status = val;
+                            isPublic = val;
+                            diaryForm['isPublic'] = val;
                           });
                         },
                       ),
@@ -358,47 +474,47 @@ class _WritingState extends State<Writing> {
                         shape: MaterialStateProperty.all(RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15))),
                         backgroundColor:
-                        MaterialStateProperty.all(const Color(0xFFFFED8E)),
+                            MaterialStateProperty.all(const Color(0xFFFFED8E)),
                       ),
                       onPressed: () {
                         setState(
-                              () async {
+                          () {
                             validationResult =
                                 formKey.currentState?.validate() ?? false;
                             formKey.currentState!.save();
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                  content:
-                                  Text('$_selectedcategory/$_body')),
+                                  content: Text('$_selectedcategory/$_body')),
                             );
 
                             // Writing(formData);
+                            createDiary(diaryForm, imageFiles);
 
                             // 일기쓰기 완료 팝업 메시지
-                            showDialog(
-                                context: context,
-                                barrierDismissible: false,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: const Text('완료'),
-                                    content: SingleChildScrollView(
-                                      child: ListBody(
-                                        children: const <Widget>[
-                                          Text('일기가 등록되었습니다:)'),
-                                        ],
-                                      ),
-                                    ),
-                                    actions: <Widget>[
-                                      ElevatedButton(
-                                        child: const Text('확인'),
-                                        onPressed: () {
-                                          Navigator.of(context)
-                                              .push(_createRoute());
-                                        },
-                                      )
-                                    ],
-                                  );
-                                });
+                            // showDialog(
+                            //     context: context,
+                            //     barrierDismissible: false,
+                            //     builder: (BuildContext context) {
+                            //       return AlertDialog(
+                            //         title: const Text('완료'),
+                            //         content: SingleChildScrollView(
+                            //           child: ListBody(
+                            //             children: const <Widget>[
+                            //               Text('일기가 등록되었습니다:)'),
+                            //             ],
+                            //           ),
+                            //         ),
+                            //         actions: <Widget>[
+                            //           ElevatedButton(
+                            //             child: const Text('확인'),
+                            //             onPressed: () {
+                            //               Navigator.of(context)
+                            //                   .push(_createRoute());
+                            //             },
+                            //           )
+                            //         ],
+                            //       );
+                            //     });
                           },
                         );
                       },
@@ -433,7 +549,7 @@ class _WritingState extends State<Writing> {
         const curve = Curves.ease;
 
         var tween =
-        Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
         return SlideTransition(
           position: animation.drive(tween),
@@ -515,4 +631,3 @@ class _WritingState extends State<Writing> {
     }
   }
 }
-
