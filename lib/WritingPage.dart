@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:dasi_bom_client/SeeingPage.dart';
 import 'package:dio/dio.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/cupertino.dart';
@@ -542,7 +543,7 @@ class _WritingState extends State<Writing> {
   // 페이지 전환 애니메이션
   Route _createRoute() {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => const MainPage(),
+      pageBuilder: (context, animation, secondaryAnimation) => const Seeing(),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         const begin = Offset(0.0, 10.0);
         const end = Offset.zero;

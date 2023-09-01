@@ -7,9 +7,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 // Page1의 _buildMiddle() 메서드에 들어갈 사진 url
 final dummyItems = [
-  'https://cdn.pixabay.com/photo/2016/11/22/23/44/porsche-1851246_960_720.jpg',
-  'https://cdn.pixabay.com/photo/2016/11/29/01/22/automotive-1866521_960_720.jpg',
-  'https://cdn.pixabay.com/photo/2016/03/11/02/08/speedometer-1249610_960_720.jpg',
+  'https://cdn.pixabay.com/photo/2016/02/18/18/37/puppy-1207816_960_720.jpg',
+  'https://cdn.pixabay.com/photo/2018/10/01/09/21/pets-3715733_960_720.jpg',
+  'https://cdn.pixabay.com/photo/2017/09/25/13/14/dog-2785077_960_720.jpg',
 ];
 
 class MainPage extends StatefulWidget {
@@ -62,13 +62,13 @@ class _MainPageState extends State<MainPage> {
           IconButton(
             // 채팅 버튼
             onPressed: () {},
-            icon: Image.asset('assets/ic_chat.png'),
+            icon: Icon(Icons.chat_outlined),
             color: Colors.black,
           ),
           IconButton(
             // 알림 버튼
             onPressed: () {},
-            icon: Image.asset('assets/ic_alarm.png'),
+            icon: Icon(Icons.add_alert_outlined),
             color: Colors.black,
           ),
           IconButton(
@@ -76,7 +76,7 @@ class _MainPageState extends State<MainPage> {
             onPressed: () {
               _scaffoldKey.currentState?.openEndDrawer();
             },
-            icon: Image.asset('assets/ic_menu.png'),
+            icon: Icon(Icons.menu),
             color: Colors.black,
           ),
         ],
@@ -132,21 +132,35 @@ class _MainPageState extends State<MainPage> {
         // 선택된 인덱스
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
+      // 하단 내비게이션 바
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.white,
+        selectedItemColor: Colors.orangeAccent,
+        unselectedItemColor: Colors.black,
+        onTap: (index) {
+          setState(() {
+            _index = index; // 선택된 탭의 인덱스로 _index를 변경
+          });
+        },
+        currentIndex: _index,
+        // 선택된 인덱스
+        items: <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
             // 하단 탭 아이템리스트 선언
-            label: '홈',
-            icon: Image.asset('assets/ic_bottom1.png'),
+            label: '',
+            icon: Icon(Icons.home_outlined),
           ),
           BottomNavigationBarItem(
-            label: '일기쓰기',
-            icon: Image.asset('assets/ic_bottom2.png'),
+            label: '',
+            icon: Icon(Icons.border_color_outlined),
           ),
           BottomNavigationBarItem(
-            label: '임시',
-            icon: Image.asset('assets/ic_bottom3.png'),
+            label: '',
+            icon: Icon(Icons.people_outline),
           ),
           BottomNavigationBarItem(
-            label: '나의 봄',
-            icon: Image.asset('assets/ic_bottom4.png'),
+            label: '',
+            icon: Icon(Icons.account_circle_outlined),
           ),
         ],
       ),

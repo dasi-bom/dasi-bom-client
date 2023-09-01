@@ -51,6 +51,9 @@ dependencies:
   flutter_web_auth: ^0.5.0
   flutter_secure_storage: ^8.0.0
   flutter_dotenv: ^5.1.0
+  expandable_text:
+  get:
+  like_button:
 
 flutter_native_splash:
   android: true
