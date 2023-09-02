@@ -99,30 +99,6 @@ class _WritingState extends State<Writing> {
   }
 
   Future<void> createDiary(data, images) async {
-    // print(_pickedImages);
-    // print(imageFiles);
-    // if (data['petId'] == null) {
-    //   var petId = _write.indexOf(_selectedWrite);
-    //   data['petId'] = petId;
-    // } else {
-    //   data['petId'] = _write.indexOf(data['petId']);
-    // }
-    // if (data['category'] == null) {
-    //   data['category'] = _selectedcategory == '일기쓰기' ? 'daily' : 'challenge';
-    // } else {
-    //   data['category'] = data['category'] == '일기쓰기' ? 'daily' : 'challenge';
-    // }
-    // if (data['stamps'] == null) {
-    //   data['stamps'] = tags;
-    // }
-    // if (data['isPublic'] == null) {
-    //   data['isPublic'] = isPublic.toString();
-    // } else {
-    //   data['isPublic'] = data['isPublic'].toString();
-    // }
-    //
-    // print('data => ${jsonEncode(data)}');
-
     try {
       final accessToken = await storage.read(key: 'accessToken');
       final url = Uri.parse('$baseUrl$createDiaryUrl');
@@ -169,16 +145,22 @@ class _WritingState extends State<Writing> {
       final req = http.MultipartRequest('POST', url);
       req.headers.addAll(headers);
       req.fields.addAll({'diarySaveRequest': diaryForm});
+      // req.fields['diarySaveRequest'] = json.encode(diaryForm);
 
-      for (var file in images) {
-        String fileName = file.path.split('/').last;
+      for (var i = 0; i < images.length; i++) {
+        final filePart =
+            await http.MultipartFile.fromPath('multipartFiles', images[i].path);
+        req.files.add(filePart);
+
+        String fileName = images[i].path.split('/').last;
         req.files.add(await http.MultipartFile.fromPath(
-            'multipartFiles', file.path,
+            'multipartFiles', images[i].path,
             filename: fileName));
       }
 
       print('files => ${req.files}');
       print('fields => ${req.fields}');
+      print('req => $req');
 
       final res = await req.send();
       final status = res.statusCode;
@@ -488,33 +470,33 @@ class _WritingState extends State<Writing> {
                             );
 
                             // Writing(formData);
-                            createDiary(diaryForm, imageFiles);
+                            // createDiary(diaryForm, imageFiles);
 
                             // 일기쓰기 완료 팝업 메시지
-                            // showDialog(
-                            //     context: context,
-                            //     barrierDismissible: false,
-                            //     builder: (BuildContext context) {
-                            //       return AlertDialog(
-                            //         title: const Text('완료'),
-                            //         content: SingleChildScrollView(
-                            //           child: ListBody(
-                            //             children: const <Widget>[
-                            //               Text('일기가 등록되었습니다:)'),
-                            //             ],
-                            //           ),
-                            //         ),
-                            //         actions: <Widget>[
-                            //           ElevatedButton(
-                            //             child: const Text('확인'),
-                            //             onPressed: () {
-                            //               Navigator.of(context)
-                            //                   .push(_createRoute());
-                            //             },
-                            //           )
-                            //         ],
-                            //       );
-                            //     });
+                            showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text('완료'),
+                                    content: SingleChildScrollView(
+                                      child: ListBody(
+                                        children: const <Widget>[
+                                          Text('일기가 등록되었습니다:)'),
+                                        ],
+                                      ),
+                                    ),
+                                    actions: <Widget>[
+                                      ElevatedButton(
+                                        child: const Text('확인'),
+                                        onPressed: () {
+                                          Navigator.of(context)
+                                              .push(_createRoute());
+                                        },
+                                      )
+                                    ],
+                                  );
+                                });
                           },
                         );
                       },

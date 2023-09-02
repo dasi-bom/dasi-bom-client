@@ -20,47 +20,8 @@ class _RegisterFinishState extends State<RegisterFinish> {
   final storage = FlutterSecureStorage();
   final baseUrl = dotenv.env['BASE_URL'].toString();
   final getCreateProfile = dotenv.env['GET_CREATE_PROFILE_API'].toString();
-  final createInfo = {};
-
-  Future<void> getCreateProfileInfo() async {
-    try {
-      final data = jsonDecode(widget.data);
-      final accessToken = await storage.read(key: 'accessToken');
-      final url = Uri.parse('$baseUrl$getCreateProfile');
-      final headers = {'Authorization': 'Bearer $accessToken'};
-
-      final res = await http.get(url, headers: headers);
-      final status = res.statusCode;
-      print('${res.request} ==> $status');
-      print(res);
-
-      final info = jsonDecode(res.body);
-      if (status == 200) {
-        createInfo['nickname'] = info['nickname'];
-        createInfo['profileImage'] = info['profileImage'];
-
-        if (info['petProfileResponses'] &&
-            info['petProfileResponses'].length > 0) {
-          var petId = data['petId'];
-          var findItemIdx = info['petProfileResponses'].indexOf(petId);
-          createInfo['petName'] =
-              info['petProfileResponses'][findItemIdx]['petInfo']['name'];
-          createInfo['petProfileImage'] =
-              info['petProfileResponses'][findItemIdx]; // 수정 필요
-        } else {
-          createInfo['petName'] = '';
-          createInfo['petProfileImage'] = null;
-        }
-
-        // createInfo['petProfileImage'] = info['petProfileImage'];
-        print(createInfo);
-      } else {
-        print('fail');
-      }
-    } catch (err) {
-      print('err => $err');
-    }
-  }
+  var count = 0;
+  Map createInfo = {};
 
   // 가입 완료 폭죽 효과
   bool isPlaying = false;
@@ -69,9 +30,10 @@ class _RegisterFinishState extends State<RegisterFinish> {
   @override
   void initState() {
     super.initState();
+    getCreateProfileInfo();
+
     _controller = ConfettiController(duration: const Duration(seconds: 5));
     _controller.play();
-    getCreateProfileInfo();
   }
 
   @override
@@ -92,16 +54,17 @@ class _RegisterFinishState extends State<RegisterFinish> {
               buildConfetti(),
             ],
           ),
-          Align(
-            alignment: Alignment.topCenter,
-            child: Text(
-              '''프로필 등록이 
+          if (createInfo.isNotEmpty)
+            Align(
+              alignment: Alignment.topCenter,
+              child: Text(
+                '''프로필 등록이 
 완료되었습니다!''',
-              style: TextStyle(color: Colors.black, fontSize: 25),
-              textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.black, fontSize: 25),
+                textAlign: TextAlign.center,
+              ),
             ),
-          ),
-          if (createInfo['nickname'] != null && createInfo['petName'] != null)
+          if (createInfo['nickname'] != null || createInfo['petName'] != null)
             Align(
               alignment: Alignment.topCenter,
               child: Text(
@@ -122,12 +85,11 @@ class _RegisterFinishState extends State<RegisterFinish> {
             children: <Widget>[
               createInfo['profileImage'] != null
                   ? SizedBox(
-                      child: Image.network(
-                        '${createInfo['profileImage']}',
-                        width: 100,
-                        height: 100,
-                      ),
-                    )
+                      child: ClipRRect(
+                      borderRadius: BorderRadius.circular(50),
+                      child: Image.network('${createInfo['profileImage']}',
+                          width: 100, height: 100, fit: BoxFit.cover),
+                    ))
                   : SizedBox(
                       height: 100,
                       width: 100,
@@ -140,12 +102,15 @@ class _RegisterFinishState extends State<RegisterFinish> {
               ),
               createInfo['petProfileImage'] != null
                   ? SizedBox(
+                      child: ClipRRect(
+                      borderRadius: BorderRadius.circular(50),
                       child: Image.network(
                         '${createInfo['petProfileImage']}',
                         width: 100,
                         height: 100,
+                        fit: BoxFit.cover,
                       ),
-                    )
+                    ))
                   : SizedBox(
                       height: 100,
                       width: 100,
@@ -162,10 +127,9 @@ class _RegisterFinishState extends State<RegisterFinish> {
                 backgroundColor: MaterialStateProperty.all(Color(0xFFFFED8E)),
               ),
               onPressed: () => setState(
-                () async {
+                () {
                   // 홈 화면으로 이동
-                  final result =
-                      await Navigator.of(context).push(_createRoute());
+                  final result = Navigator.of(context).push(_createRoute());
                   // getCreateProfileInfo();
                 },
               ),
@@ -219,5 +183,70 @@ class _RegisterFinishState extends State<RegisterFinish> {
         );
       },
     );
+  }
+
+  getCreateProfileInfo() async {
+    try {
+      final data = jsonDecode(widget.data);
+      final accessToken = await storage.read(key: 'accessToken');
+      final url = Uri.parse('$baseUrl$getCreateProfile');
+      final headers = {'Authorization': 'Bearer $accessToken'};
+
+      final res = await http.get(url, headers: headers);
+      final status = res.statusCode;
+      print('${res.request} ==> $status');
+
+      if (status == 200) {
+        if (jsonDecode(res.body) != null) {
+          final responseBody = await utf8.decode(res.bodyBytes);
+          final info = await jsonDecode(responseBody);
+          print('info ===> $info');
+
+          if (info != null) {
+            setState(() {
+              createInfo['nickname'] = info['nickname'].toString();
+              createInfo['profileImage'] = info['profileImage'].toString();
+
+              if (info['petProfileResponses'] != null) {
+                int petId = (data['petId']);
+                print(data['petId']);
+                var findItemIdx = info['petProfileResponses'].indexOf(petId);
+                print('=====> $findItemIdx');
+
+                // createInfo['petName'] = info['petProfileResponses'][findItemIdx]
+                //         ['petInfo']['name']
+                //     .toString();
+                createInfo['petName'] = '';
+
+                createInfo['petProfileImage'] = null;
+                // createInfo['petProfileImage'] =
+                // info['petProfileResponses'][findItemIdx]; // 수정 필요
+              } else {
+                setState(() {
+                  createInfo['petName'] = '';
+                  createInfo['petProfileImage'] = null;
+                });
+              }
+            });
+          }
+
+          // createInfo['petProfileImage'] = info['petProfileImage'];
+          print(createInfo);
+        }
+      } else {
+        setState(() {
+          createInfo['nickname'] = '';
+          createInfo['petName'] = '';
+        });
+
+        print('fail');
+      }
+
+      setState(() {
+        count++;
+      });
+    } catch (err) {
+      print('err => $err');
+    }
   }
 }
