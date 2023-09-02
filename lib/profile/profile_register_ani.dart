@@ -68,6 +68,36 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
   // 처음 만난 날 변수 선언
   DateTime date = DateTime.now();
 
+  uploadImage(image) async {
+    try {
+      final accessToken = await storage.read(key: 'accessToken');
+      final url = Uri.parse('$baseUrl$uploadPetProfileImage');
+      final headers = {
+        'Content-Type': 'multipart/form-data',
+        'Authorization': 'Bearer $accessToken'
+      };
+
+      final req = http.MultipartRequest('POST', url);
+      if (image is List<int>) {
+        // 기본 이미지
+        req.files.add(http.MultipartFile.fromBytes('multipartFile', image,
+            filename: 'default.png'));
+      } else {
+        // 갤러리
+        req.files
+            .add(await http.MultipartFile.fromPath('multipartFile', image));
+      }
+
+      req.headers.addAll(headers);
+
+      final res = await req.send();
+      final status = res.statusCode;
+      print('${res.request}  =>  $status');
+    } catch (err) {
+      print('err =>  $err');
+    }
+  }
+
   registerPerProfile(data) async {
     try {
       final accessToken = await storage.read(key: 'accessToken');
@@ -801,6 +831,10 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
         isDefault = false;
         _pickedFile = pickedFile;
       });
+
+      if (_pickedFile != null) {
+        uploadImage(_pickedFile!.path);
+      }
     } else {
       if (kDebugMode) {
         print('이미지 선택안함');
@@ -810,9 +844,13 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
 
 // 기본이미지 설정
   _getDefaultImage() async {
+    final ByteData img = await rootBundle.load('assets/pet_default.png');
+    final List<int> bytes = img.buffer.asUint8List();
+    uploadImage(bytes);
+
     setState(() {
       isDefault = true;
-      _pickedFile = Image.asset('assets/ch_top_yellow.png') as XFile?;
+      _pickedFile = XFile('assets/pet_default.png');
     });
   }
 }
