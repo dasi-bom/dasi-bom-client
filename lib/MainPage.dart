@@ -132,20 +132,6 @@ class _MainPageState extends State<MainPage> {
         // 선택된 인덱스
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-      // 하단 내비게이션 바
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.white,
-        selectedItemColor: Colors.orangeAccent,
-        unselectedItemColor: Colors.black,
-        onTap: (index) {
-          setState(() {
-            _index = index; // 선택된 탭의 인덱스로 _index를 변경
-          });
-        },
-        currentIndex: _index,
-        // 선택된 인덱스
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
             // 하단 탭 아이템리스트 선언
             label: '',
             icon: Icon(Icons.home_outlined),
