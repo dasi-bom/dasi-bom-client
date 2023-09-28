@@ -1,3 +1,4 @@
+import 'package:dasi_bom_client/SeeingPage.dart';
 import 'package:flutter/material.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:dasi_bom_client/SplashPage.dart';
@@ -40,6 +41,7 @@ void main() async {
             '/main': (context) => MainPage(),
             '/register1': (context) => RegisterProfileProtector(),
             '/register2': (context) => RegisterProfileAnimal(),
+            '/diary_detail': (context) => Seeing(),
           },
         )),
   );

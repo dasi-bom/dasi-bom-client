@@ -207,23 +207,16 @@ class _RegisterFinishState extends State<RegisterFinish> {
               createInfo['nickname'] = info['nickname'].toString();
               createInfo['profileImage'] = info['profileImage'].toString();
 
-              if (info['petProfileResponses'] != null) {
+              if (data != null) {
+                print('data => $data');
                 int petId = (data['petId']);
-                print(data['petId']);
-                var findItemIdx = info['petProfileResponses'].indexOf(petId);
-                print('=====> $findItemIdx');
 
-                // createInfo['petName'] = info['petProfileResponses'][findItemIdx]
-                //         ['petInfo']['name']
-                //     .toString();
-                createInfo['petName'] = '';
-
+                createInfo['petName'] = data['petInfo']['name'].toString();
                 createInfo['petProfileImage'] = null;
-                // createInfo['petProfileImage'] =
-                // info['petProfileResponses'][findItemIdx]; // 수정 필요
+
               } else {
                 setState(() {
-                  createInfo['petName'] = '';
+                  createInfo['petName'] = '-';
                   createInfo['petProfileImage'] = null;
                 });
               }

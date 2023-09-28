@@ -8,8 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dasi_bom_client/MainPage.dart';
+import 'package:mime/mime.dart';
 import 'package:remedi_kopo/remedi_kopo.dart';
 import 'package:chips_choice/chips_choice.dart';
 import 'package:flutter_switch/flutter_switch.dart';
@@ -100,13 +102,14 @@ class _WritingState extends State<Writing> {
   }
 
   Future<void> createDiary(data, images) async {
+    print('data => $data');
+    print('images => $images');
+
     try {
       final accessToken = await storage.read(key: 'accessToken');
       final url = Uri.parse('$baseUrl$createDiaryUrl');
       final headers = {
-        // 'Content-Type': 'application/json',
         'Content-Type': 'multipart/form-data',
-        'Accept': 'application/json',
         'Authorization': 'Bearer $accessToken'
       };
 
@@ -133,41 +136,56 @@ class _WritingState extends State<Writing> {
         data['isPublic'] = data['isPublic'].toString();
       }
 
-      final diaryForm = jsonEncode({
-        'petId': data['petId'],
-        'category': data['category'],
-        'challengeTopic': data['category'],
-        'content': data['content'],
-        'stamps': data['stamps'],
-        'isPublic': data['isPublic'].toString()
-      });
-      print('diaryForm => $diaryForm');
-
       final req = http.MultipartRequest('POST', url);
       req.headers.addAll(headers);
-      req.fields.addAll({'diarySaveRequest': diaryForm});
-      // req.fields['diarySaveRequest'] = json.encode(diaryForm);
 
-      for (var i = 0; i < images.length; i++) {
-        final filePart =
-            await http.MultipartFile.fromPath('multipartFiles', images[i].path);
-        req.files.add(filePart);
+      for (var imageFile in imageFiles) {
+        final mimeType =
+            lookupMimeType(imageFile.path) ?? 'application/octet-stream';
+        final fileStream = http.ByteStream(imageFile.openRead());
+        final length = await imageFile.length();
 
-        String fileName = images[i].path.split('/').last;
-        req.files.add(await http.MultipartFile.fromPath(
-            'multipartFiles', images[i].path,
-            filename: fileName));
+        final multipartFile = http.MultipartFile(
+          'multipartFiles',
+          fileStream,
+          length,
+          filename: imageFile.path.split('/').last,
+          contentType: MediaType.parse(mimeType),
+        );
+        req.files.add(multipartFile);
       }
+
+      // JSON 데이터를 멀티파트(form-data) 필드로 추가
+      req.fields['petId'] = data['petId'].toString();
+      req.fields['category'] = data['category'];
+      req.fields['challengeTopic'] = data['category'];
+      req.fields['content'] = data['content'];
+      req.fields['stamps'] = data['stamps'].join(', ');
+      req.fields['isPublic'] = data['isPublic'];
+
+      // req.fields['diarySaveRequest'] = jsonEncode({
+      //   'petId': data['petId'].toString(),
+      //   'category': data['category'],
+      //   'challengeTopic': data['category'],
+      //   'content': data['content'],
+      //   'stamps': data['stamps'].join(', '),
+      //   'isPublic': data['isPublic'],
+      // });
 
       print('files => ${req.files}');
       print('fields => ${req.fields}');
-      print('req => $req');
 
       final res = await req.send();
+      print('res => $res');
       final status = res.statusCode;
       print('${res.request}  =>  $status');
 
       if (status == 200) {
+        final data = await res.stream.bytesToString();
+        final parsedResponse = jsonDecode(data.toString());
+        print('data => $data');
+        print('parsedResponse => $parsedResponse');
+
         print('success');
       } else {
         print('fail');
@@ -471,33 +489,33 @@ class _WritingState extends State<Writing> {
                             );
 
                             // Writing(formData);
-                            // createDiary(diaryForm, imageFiles);
+                            createDiary(diaryForm, imageFiles);
 
                             // 일기쓰기 완료 팝업 메시지
-                            showDialog(
-                                context: context,
-                                barrierDismissible: false,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: const Text('완료'),
-                                    content: SingleChildScrollView(
-                                      child: ListBody(
-                                        children: const <Widget>[
-                                          Text('일기가 등록되었습니다:)'),
-                                        ],
-                                      ),
-                                    ),
-                                    actions: <Widget>[
-                                      ElevatedButton(
-                                        child: const Text('확인'),
-                                        onPressed: () {
-                                          Navigator.of(context)
-                                              .push(_createRoute());
-                                        },
-                                      )
-                                    ],
-                                  );
-                                });
+                            // showDialog(
+                            //     context: context,
+                            //     barrierDismissible: false,
+                            //     builder: (BuildContext context) {
+                            //       return AlertDialog(
+                            //         title: const Text('완료'),
+                            //         content: SingleChildScrollView(
+                            //           child: ListBody(
+                            //             children: const <Widget>[
+                            //               Text('일기가 등록되었습니다:)'),
+                            //             ],
+                            //           ),
+                            //         ),
+                            //         actions: <Widget>[
+                            //           ElevatedButton(
+                            //             child: const Text('확인'),
+                            //             onPressed: () {
+                            //               Navigator.of(context)
+                            //                   .push(_createRoute());
+                            //             },
+                            //           )
+                            //         ],
+                            //       );
+                            //     });
                           },
                         );
                       },
