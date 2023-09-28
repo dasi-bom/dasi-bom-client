@@ -177,9 +177,9 @@ class Page1 extends StatelessWidget {
       height: 200,
       decoration: const BoxDecoration(
           image: DecorationImage(
-            fit: BoxFit.cover,
-            image: AssetImage('assets/img_back.png'),
-          )),
+        fit: BoxFit.cover,
+        image: AssetImage('assets/img_back.png'),
+      )),
       child: Column(
         children: <Widget>[
           Padding(
@@ -484,7 +484,8 @@ class Page1 extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(15),
                                 color: Colors.green,
                               ),
-                              child: Text('산책왕',
+                              child: Text(
+                                '산책왕',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: Colors.white,
@@ -497,7 +498,8 @@ class Page1 extends StatelessWidget {
                             radius: 40,
                             backgroundImage: AssetImage('assets/dog.jpg'),
                           ),
-                          Text('곰곰이',
+                          Text(
+                            '곰곰이',
                           ),
                         ],
                       ),
@@ -521,7 +523,8 @@ class Page1 extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(15),
                                 color: Colors.orange,
                               ),
-                              child: Text('유쾌왕',
+                              child: Text(
+                                '유쾌왕',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: Colors.white,
@@ -534,7 +537,8 @@ class Page1 extends StatelessWidget {
                             radius: 40,
                             backgroundImage: AssetImage('assets/dog.jpg'),
                           ),
-                          Text('뭉치',
+                          Text(
+                            '뭉치',
                           ),
                         ],
                       ),
@@ -558,7 +562,8 @@ class Page1 extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(15),
                                 color: Colors.purple,
                               ),
-                              child: Text('드림왕',
+                              child: Text(
+                                '드림왕',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: Colors.white,
@@ -571,7 +576,8 @@ class Page1 extends StatelessWidget {
                             radius: 40,
                             backgroundImage: AssetImage('assets/dog.jpg'),
                           ),
-                          Text('카야',
+                          Text(
+                            '카야',
                           ),
                         ],
                       ),
@@ -613,7 +619,7 @@ class Page1 extends StatelessWidget {
                 children: <Widget>[
                   Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment:CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       SizedBox(
                         height: 180,
@@ -634,13 +640,15 @@ class Page1 extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Text('뭉치의 낮잠',
+                      Text(
+                        '뭉치의 낮잠',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 13,
                         ),
                       ),
-                      Text('''고양이는 하루에 10시간을 넘게
+                      Text(
+                        '''고양이는 하루에 10시간을 넘게
 잔다고 하는데...''',
                         textAlign: TextAlign.left,
                         style: TextStyle(
@@ -653,7 +661,7 @@ class Page1 extends StatelessWidget {
                   ),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment:CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       SizedBox(
                         height: 180,
@@ -674,13 +682,15 @@ class Page1 extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Text('샐리와 처음 만난 날',
+                      Text(
+                        '샐리와 처음 만난 날',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 13,
                         ),
                       ),
-                      Text('''운명처럼 만난 너무나 귀엽고
+                      Text(
+                        '''운명처럼 만난 너무나 귀엽고
 사람을 좋아하는 아이!''',
                         textAlign: TextAlign.left,
                         style: TextStyle(
@@ -698,7 +708,7 @@ class Page1 extends StatelessWidget {
                 children: <Widget>[
                   Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment:CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       SizedBox(
                         height: 180,
@@ -719,13 +729,15 @@ class Page1 extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Text('비누 이야기',
+                      Text(
+                        '비누 이야기',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 13,
                         ),
                       ),
-                      Text('''비누는 정말 똑똑합니다.
+                      Text(
+                        '''비누는 정말 똑똑합니다.
 제가 일어나는 시간을 딱 맞춰서...''',
                         textAlign: TextAlign.left,
                         style: TextStyle(
@@ -738,7 +750,7 @@ class Page1 extends StatelessWidget {
                   ),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment:CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       SizedBox(
                         height: 180,
@@ -759,13 +771,15 @@ class Page1 extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Text('웃는게 넘 귀여운 우리 애기',
+                      Text(
+                        '웃는게 넘 귀여운 우리 애기',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 13,
                         ),
                       ),
-                      Text('''강아지의 웃음은 너무나 무해하다.
+                      Text(
+                        '''강아지의 웃음은 너무나 무해하다.
 오늘은 특히나 산책하는데...''',
                         textAlign: TextAlign.left,
                         style: TextStyle(
@@ -814,7 +828,7 @@ class Page1 extends StatelessWidget {
                 shape: MaterialStateProperty.all(RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15))),
                 backgroundColor:
-                MaterialStateProperty.all(const Color(0xFFFF86B2)),
+                    MaterialStateProperty.all(const Color(0xFFFF86B2)),
               ),
               onPressed: () => {},
               child: Image.asset('assets/ic_guide1.png')),
@@ -830,7 +844,7 @@ class Page1 extends StatelessWidget {
                 shape: MaterialStateProperty.all(RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15))),
                 backgroundColor:
-                MaterialStateProperty.all(const Color(0xFFFDCC85)),
+                    MaterialStateProperty.all(const Color(0xFFFDCC85)),
               ),
               onPressed: () => {},
               child: Image.asset('assets/ic_guide2.png')),

@@ -8,8 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dasi_bom_client/MainPage.dart';
+import 'package:mime/mime.dart';
 import 'package:remedi_kopo/remedi_kopo.dart';
 import 'package:chips_choice/chips_choice.dart';
 import 'package:flutter_switch/flutter_switch.dart';
@@ -100,37 +102,14 @@ class _WritingState extends State<Writing> {
   }
 
   Future<void> createDiary(data, images) async {
-    // print(_pickedImages);
-    // print(imageFiles);
-    // if (data['petId'] == null) {
-    //   var petId = _write.indexOf(_selectedWrite);
-    //   data['petId'] = petId;
-    // } else {
-    //   data['petId'] = _write.indexOf(data['petId']);
-    // }
-    // if (data['category'] == null) {
-    //   data['category'] = _selectedcategory == '일기쓰기' ? 'daily' : 'challenge';
-    // } else {
-    //   data['category'] = data['category'] == '일기쓰기' ? 'daily' : 'challenge';
-    // }
-    // if (data['stamps'] == null) {
-    //   data['stamps'] = tags;
-    // }
-    // if (data['isPublic'] == null) {
-    //   data['isPublic'] = isPublic.toString();
-    // } else {
-    //   data['isPublic'] = data['isPublic'].toString();
-    // }
-    //
-    // print('data => ${jsonEncode(data)}');
+    print('data => $data');
+    print('images => $images');
 
     try {
       final accessToken = await storage.read(key: 'accessToken');
       final url = Uri.parse('$baseUrl$createDiaryUrl');
       final headers = {
-        // 'Content-Type': 'application/json',
         'Content-Type': 'multipart/form-data',
-        'Accept': 'application/json',
         'Authorization': 'Bearer $accessToken'
       };
 
@@ -157,35 +136,56 @@ class _WritingState extends State<Writing> {
         data['isPublic'] = data['isPublic'].toString();
       }
 
-      final diaryForm = jsonEncode({
-        'petId': data['petId'],
-        'category': data['category'],
-        'challengeTopic': data['category'],
-        'content': data['content'],
-        'stamps': data['stamps'],
-        'isPublic': data['isPublic'].toString()
-      });
-      print('diaryForm => $diaryForm');
-
       final req = http.MultipartRequest('POST', url);
       req.headers.addAll(headers);
-      req.fields.addAll({'diarySaveRequest': diaryForm});
 
-      for (var file in images) {
-        String fileName = file.path.split('/').last;
-        req.files.add(await http.MultipartFile.fromPath(
-            'multipartFiles', file.path,
-            filename: fileName));
+      for (var imageFile in imageFiles) {
+        final mimeType =
+            lookupMimeType(imageFile.path) ?? 'application/octet-stream';
+        final fileStream = http.ByteStream(imageFile.openRead());
+        final length = await imageFile.length();
+
+        final multipartFile = http.MultipartFile(
+          'multipartFiles',
+          fileStream,
+          length,
+          filename: imageFile.path.split('/').last,
+          contentType: MediaType.parse(mimeType),
+        );
+        req.files.add(multipartFile);
       }
+
+      // JSON 데이터를 멀티파트(form-data) 필드로 추가
+      req.fields['petId'] = data['petId'].toString();
+      req.fields['category'] = data['category'];
+      req.fields['challengeTopic'] = data['category'];
+      req.fields['content'] = data['content'];
+      req.fields['stamps'] = data['stamps'].join(', ');
+      req.fields['isPublic'] = data['isPublic'];
+
+      // req.fields['diarySaveRequest'] = jsonEncode({
+      //   'petId': data['petId'].toString(),
+      //   'category': data['category'],
+      //   'challengeTopic': data['category'],
+      //   'content': data['content'],
+      //   'stamps': data['stamps'].join(', '),
+      //   'isPublic': data['isPublic'],
+      // });
 
       print('files => ${req.files}');
       print('fields => ${req.fields}');
 
       final res = await req.send();
+      print('res => $res');
       final status = res.statusCode;
       print('${res.request}  =>  $status');
 
       if (status == 200) {
+        final data = await res.stream.bytesToString();
+        final parsedResponse = jsonDecode(data.toString());
+        print('data => $data');
+        print('parsedResponse => $parsedResponse');
+
         print('success');
       } else {
         print('fail');

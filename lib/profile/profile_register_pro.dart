@@ -489,13 +489,13 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
 
   // 기본이미지 설정
   _getDefaultImage() async {
-    final ByteData img = await rootBundle.load('assets/ch_top_yellow.png');
+    final ByteData img = await rootBundle.load('assets/user_default.png');
     final List<int> bytes = img.buffer.asUint8List();
     uploadImage(bytes);
 
     setState(() {
       isDefault = true;
-      _pickedFile = XFile('assets/ch_top_yellow.png');
+      _pickedFile = XFile('assets/user_default.png');
     });
   }
 
