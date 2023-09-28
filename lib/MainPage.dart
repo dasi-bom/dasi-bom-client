@@ -129,7 +129,6 @@ class _MainPageState extends State<MainPage> {
           });
         },
         currentIndex: _index,
-
         // 선택된 인덱스
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(

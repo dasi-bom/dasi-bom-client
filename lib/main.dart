@@ -41,7 +41,7 @@ void main() async {
             '/main': (context) => MainPage(),
             '/register1': (context) => RegisterProfileProtector(),
             '/register2': (context) => RegisterProfileAnimal(),
-            '/diary_detail': (context) => Seeing(),
+            '/seeing': (context) => Seeing(),
           },
         )),
   );

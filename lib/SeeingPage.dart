@@ -37,6 +37,8 @@ class _SeeingState extends State<Seeing> {
   final GlobalKey commentsHeaderKey = GlobalKey();
   double commentsHeaderHeight = 0;
 
+  DateTime date = DateTime.now();
+
   @override
   void initState() {
     super.initState();
@@ -60,65 +62,65 @@ class _SeeingState extends State<Seeing> {
     return SafeArea(
       key: scaffoldKey,
       child: Scaffold(
-        // 상단 앱 바
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          title: Image.asset('assets/ic_barlogo.png', width: 100, height: 100),
-          automaticallyImplyLeading: false, // appbar 뒤로가기 버튼 숨김
-          actions: <Widget>[
-            // actions 프로퍼티에는 어떠한 위젯도 리스트로 배치 가능
-            IconButton(
-              // 채팅 버튼
-              onPressed: () {},
-              icon: Icon(Icons.chat_outlined),
-              color: Colors.black,
-            ),
-            IconButton(
-              // 알림 버튼
-              onPressed: () {},
-              icon: Icon(Icons.add_alert_outlined),
-              color: Colors.black,
-            ),
-            IconButton(
-              // 햄버거 메뉴 버튼
-              onPressed: () {
-                scaffoldKey.currentState?.openEndDrawer();
-              },
-              icon: Icon(Icons.menu),
-              color: Colors.black,
-            ),
-          ],
-        ),
-        backgroundColor: Colors.white,
-        // 하단 내비게이션 바
-        bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: Colors.white,
-          selectedItemColor: Colors.orangeAccent,
-          unselectedItemColor: Colors.black,
-          onTap: (index) {
-            setState(() {});
-          },
-          // 선택된 인덱스
-          items: <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              // 하단 탭 아이템리스트 선언
-              label: '',
-              icon: Icon(Icons.home_outlined),
-            ),
-            BottomNavigationBarItem(
-              label: '',
-              icon: Icon(Icons.border_color_outlined),
-            ),
-            BottomNavigationBarItem(
-              label: '',
-              icon: Icon(Icons.people_outline),
-            ),
-            BottomNavigationBarItem(
-              label: '',
-              icon: Icon(Icons.account_circle_outlined),
-            ),
-          ],
-        ),
+        // // 상단 앱 바
+        // appBar: AppBar(
+        //   backgroundColor: Colors.white,
+        //   title: Image.asset('assets/ic_barlogo.png', width: 100, height: 100),
+        //   automaticallyImplyLeading: false, // appbar 뒤로가기 버튼 숨김
+        //   actions: <Widget>[
+        //     // actions 프로퍼티에는 어떠한 위젯도 리스트로 배치 가능
+        //     IconButton(
+        //       // 채팅 버튼
+        //       onPressed: () {},
+        //       icon: Icon(Icons.chat_outlined),
+        //       color: Colors.black,
+        //     ),
+        //     IconButton(
+        //       // 알림 버튼
+        //       onPressed: () {},
+        //       icon: Icon(Icons.add_alert_outlined),
+        //       color: Colors.black,
+        //     ),
+        //     IconButton(
+        //       // 햄버거 메뉴 버튼
+        //       onPressed: () {
+        //         scaffoldKey.currentState?.openEndDrawer();
+        //       },
+        //       icon: Icon(Icons.menu),
+        //       color: Colors.black,
+        //     ),
+        //   ],
+        // ),
+        // backgroundColor: Colors.white,
+        // // 하단 내비게이션 바
+        // bottomNavigationBar: BottomNavigationBar(
+        //   backgroundColor: Colors.white,
+        //   selectedItemColor: Colors.orangeAccent,
+        //   unselectedItemColor: Colors.black,
+        //   onTap: (index) {
+        //     setState(() {});
+        //   },
+        //   // 선택된 인덱스
+        //   items: <BottomNavigationBarItem>[
+        //     BottomNavigationBarItem(
+        //       // 하단 탭 아이템리스트 선언
+        //       label: '',
+        //       icon: Icon(Icons.home_outlined),
+        //     ),
+        //     BottomNavigationBarItem(
+        //       label: '',
+        //       icon: Icon(Icons.border_color_outlined),
+        //     ),
+        //     BottomNavigationBarItem(
+        //       label: '',
+        //       icon: Icon(Icons.people_outline),
+        //     ),
+        //     BottomNavigationBarItem(
+        //       label: '',
+        //       icon: Icon(Icons.account_circle_outlined),
+        //     ),
+        //   ],
+        // ),
         body: SingleChildScrollView(
           child: Column(
             children: [
@@ -178,7 +180,7 @@ class _SeeingState extends State<Seeing> {
 
   Widget _images() {
     return CarouselSlider.builder(
-      //이미지 갯수
+        //이미지 갯수
         itemCount: 1,
         //   itemCount: widget.images.length,
         //이미지 빌더
@@ -399,7 +401,44 @@ class _SeeingState extends State<Seeing> {
                       color: index % 2 == 0
                           ? const Color(0xffAAC4FF)
                           : const Color(0xffD2DAFF),
-                      child: ListTile(title: Text('Comment $index')),
+                      child: Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(18),
+                            child: CircleAvatar(
+                              radius: 30,
+                              backgroundImage: AssetImage('assets/user2.png'),
+                            ),
+                          ),
+                          Text('딩딩이'),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 140),
+                            child: SizedBox(
+                              height: 40,
+                              width: 100,
+                              child: ElevatedButton(
+                                style: ButtonStyle(
+                                  shape: MaterialStateProperty.all(
+                                      RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(5))),
+                                  backgroundColor: MaterialStateProperty.all(
+                                      Color(0xFFFFED8E)),
+                                ),
+                                onPressed: () => setState(
+                                  () async {},
+                                ),
+                                child: Text(
+                                  "팔로우",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 )
@@ -413,6 +452,8 @@ class _SeeingState extends State<Seeing> {
 
   // 댓글 bottomsheet
   _commentBottomSheet() {
+    const int numberOfLikes = 0;
+
     return showModalBottomSheet<dynamic>(
       isScrollControlled: true,
       context: context,
@@ -441,7 +482,71 @@ class _SeeingState extends State<Seeing> {
                       color: index % 2 == 0
                           ? const Color(0xffAAC4FF)
                           : const Color(0xffD2DAFF),
-                      child: ListTile(title: Text('Comment $index')),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(18),
+                            child: CircleAvatar(
+                              radius: 25,
+                              backgroundImage: AssetImage('assets/user2.png'),
+                            ),
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text('딩딩이'),
+                                  Padding(
+                                    padding: const EdgeInsets.all(15),
+                                    child: Text(
+                                      date.toString().split(" ")[0],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Text('카야 너무 귀여워요'),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  TextButton(
+                                    child: Text(
+                                      '답글달기',
+                                      textAlign: TextAlign.left,
+                                    ),
+                                    onPressed: () {},
+                                  ),
+                                  TextButton(
+                                    child: Text(
+                                      '좋아요 12개',
+                                      textAlign: TextAlign.left,
+                                    ),
+                                    onPressed: () {},
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 100),
+                            child: LikeButton(
+                              size: 33,
+                              animationDuration: Duration(milliseconds: 1000),
+                              likeCount: numberOfLikes,
+                              countPostion: CountPostion.bottom,
+                              likeBuilder: (isTapped) {
+                                return Icon(Icons.favorite_outlined,
+                                    color:
+                                        isTapped ? Colors.red : Colors.black);
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -450,7 +555,7 @@ class _SeeingState extends State<Seeing> {
                   children: [
                     const Padding(
                       padding:
-                      EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 15),
                       child: CircleAvatar(
                         radius: 15,
                         backgroundImage: AssetImage('assets/user2.png'),

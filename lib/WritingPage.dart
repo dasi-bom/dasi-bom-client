@@ -413,7 +413,7 @@ class _WritingState extends State<Writing> {
                     tooltip: (i, v) => v,
                   ),
                   choiceCheckmark: false,
-                  choiceStyle: C2ChipStyle.outlined(),
+                  choiceStyle: C2ChipStyle.filled(),
                 ),
                 const SizedBox(
                   height: 15,
@@ -492,30 +492,30 @@ class _WritingState extends State<Writing> {
                             createDiary(diaryForm, imageFiles);
 
                             // 일기쓰기 완료 팝업 메시지
-                            // showDialog(
-                            //     context: context,
-                            //     barrierDismissible: false,
-                            //     builder: (BuildContext context) {
-                            //       return AlertDialog(
-                            //         title: const Text('완료'),
-                            //         content: SingleChildScrollView(
-                            //           child: ListBody(
-                            //             children: const <Widget>[
-                            //               Text('일기가 등록되었습니다:)'),
-                            //             ],
-                            //           ),
-                            //         ),
-                            //         actions: <Widget>[
-                            //           ElevatedButton(
-                            //             child: const Text('확인'),
-                            //             onPressed: () {
-                            //               Navigator.of(context)
-                            //                   .push(_createRoute());
-                            //             },
-                            //           )
-                            //         ],
-                            //       );
-                            //     });
+                            showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text('완료'),
+                                    content: SingleChildScrollView(
+                                      child: ListBody(
+                                        children: const <Widget>[
+                                          Text('일기가 등록되었습니다:)'),
+                                        ],
+                                      ),
+                                    ),
+                                    actions: <Widget>[
+                                      ElevatedButton(
+                                        child: const Text('확인'),
+                                        onPressed: () {
+                                          Navigator.of(context)
+                                              .push(_createRoute());
+                                        },
+                                      )
+                                    ],
+                                  );
+                                });
                           },
                         );
                       },
