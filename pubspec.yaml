@@ -54,6 +54,8 @@ dependencies:
   expandable_text:
   get:
   like_button:
+  mime: ^1.0.4
+  http_parser: ^4.0.2
 
 flutter_native_splash:
   android: true
