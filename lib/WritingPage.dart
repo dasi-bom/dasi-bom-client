@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:io';
 import 'package:dasi_bom_client/SeeingPage.dart';
 import 'package:dio/dio.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:get/route_manager.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dasi_bom_client/MainPage.dart';
@@ -29,8 +31,11 @@ class Writing extends StatefulWidget {
 class _WritingState extends State<Writing> {
   final storage = FlutterSecureStorage();
   final baseUrl = dotenv.env['BASE_URL'].toString();
-  final createDiaryUrl = dotenv.env['CREATE_DIARY'].toString();
+  final createDiaryUrl = dotenv.env['CREATE_DIARY_API'].toString();
+  final uploadDiaryImagesUrl = dotenv.env['UPLOAD_DIARY_IMAGES_API'].toString();
+  final getUserInfoUrl = dotenv.env['GET_USER_INFO_API'].toString();
 
+  final userInfo = {};
   final diaryForm = {};
 
   // final TextEditingController _petIdController = TextEditingController();
@@ -71,8 +76,9 @@ class _WritingState extends State<Writing> {
   String _body = ''; // 본문
 
   // 동물 친구 콤보박스
-  final _write = ['카야', '소미'];
-  var _selectedWrite = '카야';
+  var write = <Map<String, dynamic>>[];
+  var _selectedWrite = null;
+  var test = [];
 
   // 카테고리 콤보박스
   final _category = ['일기쓰기', '챌린지 등록하기'];
@@ -95,101 +101,192 @@ class _WritingState extends State<Writing> {
   // 나만보기 토글
   bool isPublic = false;
 
+  getUserInfo() async {
+    try {
+      final accessToken = await storage.read(key: 'accessToken');
+      final url = Uri.parse('$baseUrl$getUserInfoUrl');
+      final headers = {'Authorization': 'Bearer $accessToken'};
+
+      final res = await http.get(url, headers: headers);
+      final status = res.statusCode;
+      print('${res.request} ==> $status');
+
+      if (status == 200) {
+        final responseBody = utf8.decode(res.bodyBytes);
+        final dynamic info = await jsonDecode(responseBody);
+        // print('info ===> $info');
+
+        if (info['petProfileResponses'] is List) {
+          List<dynamic> petProfileResponses = info['petProfileResponses'];
+
+          Set<String> uniqueName = Set();
+          write.clear();
+
+          petProfileResponses.forEach((petProfile) {
+            String petName = petProfile['petInfo']['name'];
+            int petId = petProfile['petId'];
+
+            var petData = {
+              'petId': petId,
+              'name': petName,
+            };
+
+            write.add(petData);
+            uniqueName.add(petName);
+          });
+
+          // 중복 제거
+          // Set<Map<String, dynamic>> uniqueData =
+          //     Set<Map<String, dynamic>>.from(write);
+          // write = uniqueData.toList();
+
+          if (!write.contains(_selectedWrite)) {
+            if (write.isNotEmpty) {
+              _selectedWrite = write[0];
+            } else {
+              _selectedWrite = '';
+            }
+          }
+
+          setState(() {});
+
+          // print('write ====> $write');
+        }
+      } else {
+        print('status != 200 ##');
+      }
+    } catch (err) {
+      print('error 11111 ==> $err');
+    }
+  }
+
   @override
   void initState() {
     validationResult = false;
+    getUserInfo();
+
     super.initState();
   }
 
-  Future<void> createDiary(data, images) async {
-    print('data => $data');
-    print('images => $images');
-
+  Future<void> uploadImages(images) async {
     try {
+      var diaryId;
       final accessToken = await storage.read(key: 'accessToken');
-      final url = Uri.parse('$baseUrl$createDiaryUrl');
+      final url = Uri.parse('$baseUrl$uploadDiaryImagesUrl/${diaryId}');
       final headers = {
         'Content-Type': 'multipart/form-data',
         'Authorization': 'Bearer $accessToken'
       };
 
-      if (data['petId'] == null) {
-        var petId = _write.indexOf(_selectedWrite);
-        data['petId'] = int.parse('$petId');
-      } else {
-        data['petId'] = int.parse('${_write.indexOf(data['petId'])}');
+      var request = http.MultipartRequest('POST', url);
+      request.files.add(await http.MultipartFile.fromPath('multipartFiles', images));
+      request.headers.addAll(headers);
+
+      var response = await request.send();
+      print('upload image ====> ${response.statusCode}');
+
+    } catch (err) {
+      print('err ====> $err');
+    }
+  }
+
+  Future<void> createDiary(data) async {
+    print('data => $data');
+
+    try {
+      final accessToken = await storage.read(key: 'accessToken');
+      final url = Uri.parse('$baseUrl$createDiaryUrl');
+      final headers = {
+        'Content-Type': 'application/json ',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $accessToken'
+      };
+
+      var petId;
+      var category;
+      var content;
+      var stamps = [];
+      var isPublic;
+
+      if (data['petId'] != null) {
+        petId = data['petId'];
       }
 
-      if (data['category'] == null) {
-        data['category'] = _selectedcategory == '일기쓰기' ? 'daily' : 'challenge';
+      if (data['category'] != null) {
+        category = data['category'] == '일기쓰기' ? '일상 기록' : '챌린지';
       } else {
-        data['category'] = data['category'] == '일기쓰기' ? 'daily' : 'challenge';
+        category = '일상 기록';
       }
 
-      if (data['stamps'] == null) {
-        data['stamps'] = tags;
+      content = data['content'] ?? ' ';
+
+      if (data['stamps'] != null) {
+        data['stamps'].forEach((val) {
+          String stamp = '';
+          if (val == '산책') {
+            stamp = 'WALK';
+          } else if (val == '간식') {
+            stamp = 'TREAT';
+          } else if (val == '장난감') {
+            stamp = 'TOY';
+          } else {
+            stamp = val;
+          }
+
+          stamps.add(stamp);
+        });
       }
 
       if (data['isPublic'] == null) {
-        data['isPublic'] = isPublic.toString();
+        isPublic = false;
       } else {
-        data['isPublic'] = data['isPublic'].toString();
+        isPublic = data['isPublic'];
       }
 
-      final req = http.MultipartRequest('POST', url);
-      req.headers.addAll(headers);
+      final body = jsonEncode({
+        'petId': petId,
+        'category': category,
+        'content': content,
+        'stamps': stamps,
+        'isPublic': isPublic
+      });
 
-      for (var imageFile in imageFiles) {
-        final mimeType =
-            lookupMimeType(imageFile.path) ?? 'application/octet-stream';
-        final fileStream = http.ByteStream(imageFile.openRead());
-        final length = await imageFile.length();
+      print('body =====> $body');
 
-        final multipartFile = http.MultipartFile(
-          'multipartFiles',
-          fileStream,
-          length,
-          filename: imageFile.path.split('/').last,
-          contentType: MediaType.parse(mimeType),
-        );
-        req.files.add(multipartFile);
-      }
-
-      // JSON 데이터를 멀티파트(form-data) 필드로 추가
-      req.fields['petId'] = data['petId'].toString();
-      req.fields['category'] = data['category'];
-      req.fields['challengeTopic'] = data['category'];
-      req.fields['content'] = data['content'];
-      req.fields['stamps'] = data['stamps'].join(', ');
-      req.fields['isPublic'] = data['isPublic'];
-
-      // req.fields['diarySaveRequest'] = jsonEncode({
-      //   'petId': data['petId'].toString(),
-      //   'category': data['category'],
-      //   'challengeTopic': data['category'],
-      //   'content': data['content'],
-      //   'stamps': data['stamps'].join(', '),
-      //   'isPublic': data['isPublic'],
-      // });
-
-      print('files => ${req.files}');
-      print('fields => ${req.fields}');
-
-      final res = await req.send();
-      print('res => $res');
+      final res = await http.post(url, headers: headers, body: body);
       final status = res.statusCode;
-      print('${res.request}  =>  $status');
+      final info = res.body;
+      print('${res.request} ==> $status');
 
       if (status == 200) {
-        final data = await res.stream.bytesToString();
-        final parsedResponse = jsonDecode(data.toString());
-        print('data => $data');
-        print('parsedResponse => $parsedResponse');
-
-        print('success');
+        print('success ##');
       } else {
-        print('fail');
+        print('fail ##');
       }
+
+      // for (var imageFile in imageFiles) {
+      //   final mimeType =
+      //       lookupMimeType(imageFile.path) ?? 'application/octet-stream';
+      //   final fileStream = http.ByteStream(imageFile.openRead());
+      //   final length = await imageFile.length();
+      //
+      //   final multipartFile = http.MultipartFile(
+      //     'multipartFiles',
+      //     fileStream,
+      //     length,
+      //     filename: imageFile.path.split('/').last,
+      //     contentType: MediaType.parse(mimeType),
+      //   );
+      //   req.files.add(multipartFile);
+      // }
+      //
+      // // JSON 데이터를 멀티파트(form-data) 필드로 추가
+      // req.fields['petId'] = data['petId'].toString();
+      // req.fields['category'] = data['category'];
+      // req.fields['challengeTopic'] = data['category'];
+      // req.fields['content'] = data['content'];
+      // req.fields['stamps'] = data['stamps'].join(', ');
+      // req.fields['isPublic'] = data['isPublic'];
     } catch (err) {
       print('err ==> $err');
     }
@@ -245,22 +342,30 @@ class _WritingState extends State<Writing> {
                 ),
                 // 글 쓸 동물 친구 등록
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 150),
+                  padding: const EdgeInsets.symmetric(horizontal: 100),
                   child: DropdownButtonFormField(
-                    value: _selectedWrite,
-                    items: _write.map(
+                    items: write.map(
                       (value) {
                         return DropdownMenuItem(
-                          value: value,
-                          child: Text(value),
+                          value: value['name'].toString(),
+                          child: Text(value['name'].toString()),
                         );
                       },
                     ).toList(),
+                    value: _selectedWrite != null
+                        ? _selectedWrite['name']
+                        : write[0]['name'],
                     onChanged: (value) {
                       setState(() {
-                        _selectedWrite = value!;
-                        diaryForm['petId'] = value;
+                        _selectedWrite =
+                            write.firstWhere((pet) => pet['name'] == value);
+
+                        diaryForm['petId'] = _selectedWrite['petId'];
+                        diaryForm['name'] = _selectedWrite['name'];
                       });
+                      print(value);
+
+                      print(diaryForm);
                     },
                   ),
                 ),
@@ -280,7 +385,6 @@ class _WritingState extends State<Writing> {
                 Padding(
                   padding: const EdgeInsets.only(right: 130, left: 20, top: 5),
                   child: DropdownButtonFormField(
-                    value: _selectedcategory,
                     items: _category.map(
                       (value) {
                         return DropdownMenuItem(
@@ -289,6 +393,7 @@ class _WritingState extends State<Writing> {
                         );
                       },
                     ).toList(),
+                    value: _selectedcategory,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(
                         borderSide: BorderSide(
@@ -303,9 +408,10 @@ class _WritingState extends State<Writing> {
                       ),
                     ),
                     onChanged: (value) {
+                      print(value);
                       setState(() {
                         _selectedcategory = value!;
-                        formData['category'] = value;
+                        diaryForm['category'] = _selectedcategory;
                       });
                     },
                   ),
@@ -326,7 +432,7 @@ class _WritingState extends State<Writing> {
                 GridView.count(
                   shrinkWrap: true,
                   padding: const EdgeInsets.all(20),
-                  crossAxisCount: isPadMode ? 1 : 4,
+                  crossAxisCount: isPadMode ? 2 : 4,
                   mainAxisSpacing: 5,
                   crossAxisSpacing: 5,
                   children: List.generate(
@@ -402,10 +508,19 @@ class _WritingState extends State<Writing> {
                 // 주제 해시태그 등록
                 ChipsChoice<String>.multiple(
                   value: tags,
-                  onChanged: (val) => setState(() {
-                    tags = val;
-                    diaryForm['stamps'] = tags;
-                  }),
+                  // onChanged: (val) => setState(() {
+                  //   print(val);
+                  //   tags = val;
+                  //   diaryForm['stamps'] = tags;
+                  // }),
+                  onChanged: (value) {
+                    print(value);
+                    setState(() {
+                      tags = value;
+                      diaryForm['stamps'] = tags;
+                    });
+                  },
+
                   choiceItems: C2Choice.listFrom<String, String>(
                     source: options,
                     value: (i, v) => v,
@@ -489,33 +604,34 @@ class _WritingState extends State<Writing> {
                             );
 
                             // Writing(formData);
-                            createDiary(diaryForm, imageFiles);
+                            // createDiary(diaryForm); // 일기 등록 테스트
+                            Navigator.of(context).push(_createRoute()); // 일기보기에서 홈화면으로 수정
 
                             // 일기쓰기 완료 팝업 메시지
-                            showDialog(
-                                context: context,
-                                barrierDismissible: false,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: const Text('완료'),
-                                    content: SingleChildScrollView(
-                                      child: ListBody(
-                                        children: const <Widget>[
-                                          Text('일기가 등록되었습니다:)'),
-                                        ],
-                                      ),
-                                    ),
-                                    actions: <Widget>[
-                                      ElevatedButton(
-                                        child: const Text('확인'),
-                                        onPressed: () {
-                                          Navigator.of(context)
-                                              .push(_createRoute());
-                                        },
-                                      )
-                                    ],
-                                  );
-                                });
+                            // showDialog(
+                            //     context: context,
+                            //     barrierDismissible: false,
+                            //     builder: (BuildContext context) {
+                            //       return AlertDialog(
+                            //         title: const Text('완료'),
+                            //         content: SingleChildScrollView(
+                            //           child: ListBody(
+                            //             children: const <Widget>[
+                            //               Text('일기가 등록되었습니다:)'),
+                            //             ],
+                            //           ),
+                            //         ),
+                            //         actions: <Widget>[
+                            //           ElevatedButton(
+                            //             child: const Text('확인'),
+                            //             onPressed: () {
+                            //               Navigator.of(context)
+                            //                   .push(_createRoute());
+                            //             },
+                            //           )
+                            //         ],
+                            //       );
+                            //     });
                           },
                         );
                       },
@@ -543,7 +659,8 @@ class _WritingState extends State<Writing> {
   // 페이지 전환 애니메이션
   Route _createRoute() {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => const Seeing(),
+      // pageBuilder: (context, animation, secondaryAnimation) => Seeing(),
+      pageBuilder: (context, animation, secondaryAnimation) => MainPage(),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         const begin = Offset(0.0, 10.0);
         const end = Offset.zero;
@@ -619,12 +736,14 @@ class _WritingState extends State<Writing> {
 
 // 갤러리로 이동
   _getPhotoLibraryImage() async {
-    final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
+    final pickedFile = await imagePicker.pickMultiImage();
+    if (pickedFile != null && pickedFile.isNotEmpty) {
       setState(() {
         isDefault = false;
-        _pickedImages = pickedFile as List<XFile?>;
+        _pickedImages = pickedFile;
       });
+
+      uploadImages(pickedFile);
     } else {
       if (kDebugMode) {
         print('이미지 선택안함');
