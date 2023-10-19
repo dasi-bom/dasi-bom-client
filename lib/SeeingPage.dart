@@ -10,6 +10,8 @@ import 'package:like_button/like_button.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class Seeing extends StatefulWidget {
+  final dynamic routeparam;
+
   // 서버에서 정보 받아올 때 변수 선언
   // final String userImage;
   // final String userName;
@@ -24,7 +26,7 @@ class Seeing extends StatefulWidget {
   //       required this.countLikes,
   //       required this.countComment});
 
-  const Seeing({Key? key}) : super(key: key);
+  const Seeing({Key? key, required this.routeparam}) : super(key: key);
 
   @override
   State<Seeing> createState() => _SeeingState();
