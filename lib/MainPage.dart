@@ -3,7 +3,11 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dasi_bom_client/widgets/Kakao_Login.dart';
 import 'package:dasi_bom_client/widgets/main_view_model.dart';
 import 'package:dasi_bom_client/WritingPage.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 // Page1의 _buildMiddle() 메서드에 들어갈 사진 url
 final dummyItems = [
@@ -21,6 +25,34 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   final storage = FlutterSecureStorage();
+  final baseUrl = dotenv.env['BASE_URL'].toString();
+  final getDiaryListUrl = dotenv.env['GET_DIARY_LIST_API'].toString();
+
+  var cursor = 20;
+  var diaryList = [];
+
+  Future<void> getDiaryList() async {
+    try {
+      final accessToken = await storage.read(key: 'accessToken');
+      final url = Uri.parse('$baseUrl$getDiaryListUrl?cursor=$cursor');
+      final headers = {
+        'Content-Type': 'application/json ',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $accessToken'
+      };
+
+      final res = await http.get(url, headers: headers);
+      final status = res.statusCode;
+      print('${res.request} ==> $status');
+
+      if (status == 200) {
+        var result = jsonDecode(res.body);
+        print(result);
+      }
+    } catch (err) {
+      print('err ===> $err');
+    }
+  }
 
   // 로그인 생성자
   final viewModel = MainViewModel(KakaoLogin());
@@ -34,6 +66,14 @@ class _MainPageState extends State<MainPage> {
     Page3(),
     Page4(),
   ];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    getDiaryList();
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -164,7 +204,7 @@ class Page1 extends StatelessWidget {
       // Column을 ListView로 변경하면 상하 스크롤이 생김
       children: <Widget>[
         _buildTop(),
-        _buildMiddle(),
+        _buildMiddle(context),
         _buildBottom(),
       ],
     );
@@ -244,7 +284,7 @@ class Page1 extends StatelessWidget {
   }
 
   // 홈 클래스 _ 중단
-  Widget _buildMiddle() {
+  Widget _buildMiddle(context) {
     var viewModel;
     return Column(
       children: [
@@ -604,7 +644,9 @@ class Page1 extends StatelessWidget {
                     fontSize: 16,
                     color: Colors.black),
               ),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushNamed(context, '/detail');
+              },
             ),
           ),
         ),
@@ -870,9 +912,14 @@ class _Page2State extends State<Page2> {
 }
 
 // 임시 클래스-> Scaffold의 body 프로퍼티에 코드 연동
-class Page3 extends StatelessWidget {
+class Page3 extends StatefulWidget {
   const Page3({Key? key}) : super(key: key);
 
+  @override
+  State<Page3> createState() => _Page3State();
+}
+
+class _Page3State extends State<Page3> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
