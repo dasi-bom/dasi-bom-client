@@ -36,12 +36,19 @@ void main() async {
           title: 'dasi-bom',
           theme: ThemeData(primaryColor: Colors.white),
           home: const MyApp(),
+          onGenerateRoute: (settings) {
+            var arguments = settings.arguments;
+            if (settings.name == '/detail') {
+              return MaterialPageRoute(builder: (context) => Seeing(routeparam: arguments));
+            }
+          },
           routes: {
             '/login': (context) => OnboardingPage(),
             '/main': (context) => MainPage(),
             '/register1': (context) => RegisterProfileProtector(),
             '/register2': (context) => RegisterProfileAnimal(),
-            '/seeing': (context) => Seeing(),
+            // '/seeing': (context) => Seeing(),
+            '/detail': (context, {arguments}) => Seeing(routeparam: arguments),
           },
         )),
   );

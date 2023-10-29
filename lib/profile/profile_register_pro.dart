@@ -529,7 +529,7 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
       final nickname = data['nickname'];
       final body = jsonEncode({'nickname': nickname});
 
-      final res = await http.patch(url, headers: headers, body: body);
+      final res = await http.put(url, headers: headers, body: body);
       final status = res.statusCode;
       print('${res.request}  =>  $status');
 
