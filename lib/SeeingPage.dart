@@ -36,6 +36,14 @@ class _SeeingState extends State<Seeing> {
   // 일기 이미지 인덱스
   int _current = 0;
 
+  // Textformfield 값 받아오기
+  GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  late bool validationResult;
+  String _comments = ''; // 댓글달기
+
+  var formData = {};
+  final TextEditingController _commentsController = TextEditingController();
+
   final GlobalKey commentsHeaderKey = GlobalKey();
   double commentsHeaderHeight = 0;
 
@@ -43,6 +51,7 @@ class _SeeingState extends State<Seeing> {
 
   @override
   void initState() {
+    validationResult = false;
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -156,12 +165,23 @@ class _SeeingState extends State<Seeing> {
             // 프로필 이름
             Padding(
               padding: const EdgeInsets.all(0),
-              child: Text(
-                '카야',
-                style: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '카야',
+                    style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 5),
+                    child: Text(
+                      date.toString().split(" ")[0],
+                    ),
+                  ),
+                ],
               ),
             )
           ],
@@ -571,16 +591,39 @@ class _SeeingState extends State<Seeing> {
                     SizedBox(
                       width: MediaQuery.of(context).size.width / 1.4,
                       child: GestureDetector(
-                        // onTap: showCommentModal,
-                        child: const Text(
-                          '댓글 달기...',
-                          style: TextStyle(color: Colors.grey),
+                        child: TextFormField(
+                          maxLines: 1,
+                          keyboardType: TextInputType.text,
+                          autovalidateMode: AutovalidateMode.always,
+                          decoration: InputDecoration(
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.black,
+                                  width: 1,
+                                ),
+                              ),
+                              hintText: '댓글 달기...'),
+                          onSaved: (value) {
+                            setState(() {
+                              _comments = value as String;
+                              _commentsController.value = TextEditingValue(text: value);
+                              formData['desc'] = value;
+                            });
+                          },
+                          controller: _commentsController,
                         ),
                       ),
                     ),
+                    // 댓글달기 업로드 버튼
                     IconButton(
-                      // 알림 버튼
-                      onPressed: () {},
+                      onPressed: () => setState(
+                            () {
+                          validationResult =
+                              formKey.currentState?.validate() ?? false;
+                          formKey.currentState!.save();
+                          // registerPerProfile(formData);
+                        },
+                      ),
                       icon: Icon(Icons.arrow_upward),
                       color: Colors.black,
                     ),

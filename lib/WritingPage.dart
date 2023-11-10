@@ -179,12 +179,12 @@ class _WritingState extends State<Writing> {
       };
 
       var request = http.MultipartRequest('POST', url);
-      request.files.add(await http.MultipartFile.fromPath('multipartFiles', images));
+      request.files
+          .add(await http.MultipartFile.fromPath('multipartFiles', images));
       request.headers.addAll(headers);
 
       var response = await request.send();
       print('upload image ====> ${response.statusCode}');
-
     } catch (err) {
       print('err ====> $err');
     }
@@ -295,6 +295,7 @@ class _WritingState extends State<Writing> {
   @override
   Widget build(BuildContext context) {
     bool isPadMode = MediaQuery.of(context).size.width > 700;
+    final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
     // 사진 Gridview
     List<Widget> _boxContents = [
@@ -331,6 +332,7 @@ class _WritingState extends State<Writing> {
 
     return SafeArea(
       child: Scaffold(
+        key: scaffoldKey,
         body: Form(
           // form으로 input 데이터 저장
           key: formKey,
@@ -375,7 +377,7 @@ class _WritingState extends State<Writing> {
                 Container(
                   width: 340,
                   child: const Text(
-                    '카테고리',
+                    '카테고리 선택하기',
                     textAlign: TextAlign.left,
                     style:
                         TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
@@ -422,7 +424,7 @@ class _WritingState extends State<Writing> {
                 Container(
                   width: 340,
                   child: const Text(
-                    '사진',
+                    '사진 등록하기',
                     textAlign: TextAlign.left,
                     style:
                         TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
@@ -457,7 +459,7 @@ class _WritingState extends State<Writing> {
                 Container(
                   width: 340,
                   child: const Text(
-                    '본문',
+                    '본문 작성하기',
                     textAlign: TextAlign.left,
                     style:
                         TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
@@ -496,14 +498,29 @@ class _WritingState extends State<Writing> {
                 const SizedBox(
                   height: 15,
                 ),
-                Container(
-                  width: 340,
-                  child: const Text(
-                    '주제',
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: 100,
+                      child: const Text(
+                        '텍스트 아이콘',
+                        textAlign: TextAlign.right,
+                        style: TextStyle(
+                            fontWeight: FontWeight.normal, fontSize: 13),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 40,
+                      width: 40,
+                      child: GestureDetector(
+                        child: Image.asset('assets/ic_addtexticon.png'),
+                        onTap: () {
+                          _texticonBottomSheet(context);
+                        },
+                      ),
+                    ),
+                  ],
                 ),
                 // 주제 해시태그 등록
                 ChipsChoice<String>.multiple(
@@ -605,7 +622,8 @@ class _WritingState extends State<Writing> {
 
                             // Writing(formData);
                             // createDiary(diaryForm); // 일기 등록 테스트
-                            Navigator.of(context).push(_createRoute()); // 일기보기에서 홈화면으로 수정
+                            Navigator.of(context)
+                                .push(_createRoute()); // 일기보기에서 홈화면으로 수정
 
                             // 일기쓰기 완료 팝업 메시지
                             // showDialog(
@@ -749,5 +767,71 @@ class _WritingState extends State<Writing> {
         print('이미지 선택안함');
       }
     }
+  }
+}
+
+// const TabController tabController;
+
+// texticon bottomsheet
+_texticonBottomSheet(BuildContext context) {
+  final GlobalKey texticonHeaderKey = GlobalKey();
+  return showModalBottomSheet<dynamic>(
+    isScrollControlled: true,
+    context: context,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(
+        top: Radius.circular(25),
+      ),
+    ),
+    builder: (BuildContext context) {
+      return DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.5,
+        minChildSize: 0.5,
+        maxChildSize: 0.9,
+        builder: (context, scrollController) {
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              _texticonHeader(
+                  key: texticonHeaderKey, scrollController: scrollController),
+            ],
+          );
+        },
+      );
+    },
+  );
+}
+
+// 텍스트 아이콘 헤더
+class _texticonHeader extends StatelessWidget {
+  const _texticonHeader({
+    Key? key,
+    required this.scrollController,
+  }) : super(key: key);
+
+  final ScrollController scrollController;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      physics: const ClampingScrollPhysics(),
+      controller: scrollController,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          const SizedBox(height: 10),
+          Image.asset('assets/ic_bottomsheetbar.png'),
+          const SizedBox(height: 10),
+          const Text(
+            '텍스트 아이콘',
+            style: TextStyle(fontSize: 18),
+          ),
+          const SizedBox(height: 15),
+          Divider(
+              color: Colors.black.withOpacity(0.5), height: 2, thickness: 2),
+        ],
+      ),
+    );
   }
 }
