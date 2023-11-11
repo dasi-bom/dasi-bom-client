@@ -76,7 +76,7 @@ class _WritingState extends State<Writing> {
   String _body = ''; // 본문
 
   // 동물 친구 콤보박스
-  var write = <Map<String, dynamic>>[];
+  var write = [];
   var _selectedWrite = null;
   var test = [];
 
@@ -99,7 +99,7 @@ class _WritingState extends State<Writing> {
   ];
 
   // 나만보기 토글
-  bool isPublic = false;
+  bool? isPublic = false;
 
   getUserInfo() async {
     try {
@@ -112,45 +112,37 @@ class _WritingState extends State<Writing> {
       print('${res.request} ==> $status');
 
       if (status == 200) {
-        final responseBody = utf8.decode(res.bodyBytes);
-        final dynamic info = await jsonDecode(responseBody);
+        final info = json.decode(res.body);
         // print('info ===> $info');
 
         if (info['petProfileResponses'] is List) {
-          List<dynamic> petProfileResponses = info['petProfileResponses'];
+          setState(() {
+            var petProfileResponses = info['petProfileResponses'];
 
-          Set<String> uniqueName = Set();
-          write.clear();
+            if (petProfileResponses.isNotEmpty) {
+              petProfileResponses.forEach((petProfile) {
+                String petName = petProfile['petInfo']['name'];
+                int petId = petProfile['petId'];
 
-          petProfileResponses.forEach((petProfile) {
-            String petName = petProfile['petInfo']['name'];
-            int petId = petProfile['petId'];
+                var petData = {
+                  'petId': petId,
+                  'name': petName,
+                };
 
-            var petData = {
-              'petId': petId,
-              'name': petName,
-            };
+                write.add(petData);
+              });
 
-            write.add(petData);
-            uniqueName.add(petName);
-          });
-
-          // 중복 제거
-          // Set<Map<String, dynamic>> uniqueData =
-          //     Set<Map<String, dynamic>>.from(write);
-          // write = uniqueData.toList();
-
-          if (!write.contains(_selectedWrite)) {
-            if (write.isNotEmpty) {
-              _selectedWrite = write[0];
-            } else {
-              _selectedWrite = '';
+              if (!write.contains(_selectedWrite)) {
+                if (write.isNotEmpty) {
+                  _selectedWrite = write[0];
+                } else {
+                  _selectedWrite = null;
+                }
+              }
+              // setState(() {});
+              print('write ====> $write');
             }
-          }
-
-          setState(() {});
-
-          // print('write ====> $write');
+          });
         }
       } else {
         print('status != 200 ##');
@@ -169,6 +161,7 @@ class _WritingState extends State<Writing> {
   }
 
   Future<void> uploadImages(images) async {
+    print('12121');
     try {
       var diaryId;
       final accessToken = await storage.read(key: 'accessToken');
@@ -179,12 +172,12 @@ class _WritingState extends State<Writing> {
       };
 
       var request = http.MultipartRequest('POST', url);
-      request.files.add(await http.MultipartFile.fromPath('multipartFiles', images));
+      request.files
+          .add(await http.MultipartFile.fromPath('multipartFiles', images));
       request.headers.addAll(headers);
 
       var response = await request.send();
       print('upload image ====> ${response.statusCode}');
-
     } catch (err) {
       print('err ====> $err');
     }
@@ -222,13 +215,13 @@ class _WritingState extends State<Writing> {
 
       if (data['stamps'] != null) {
         data['stamps'].forEach((val) {
-          String stamp = '';
+          var stamp;
           if (val == '산책') {
-            stamp = 'WALK';
+            stamp = 1;
           } else if (val == '간식') {
-            stamp = 'TREAT';
+            stamp = 2;
           } else if (val == '장난감') {
-            stamp = 'TOY';
+            stamp = 3;
           } else {
             stamp = val;
           }
@@ -258,7 +251,7 @@ class _WritingState extends State<Writing> {
       final info = res.body;
       print('${res.request} ==> $status');
 
-      if (status == 200) {
+      if (status == 201) {
         print('success ##');
       } else {
         print('fail ##');
@@ -352,6 +345,10 @@ class _WritingState extends State<Writing> {
                         );
                       },
                     ).toList(),
+                    // _selectedWrite ?? write.isNotEmpty
+                    //     ? write[0]['name']
+                    //     : null
+
                     value: _selectedWrite != null
                         ? _selectedWrite['name']
                         : write[0]['name'],
@@ -359,9 +356,13 @@ class _WritingState extends State<Writing> {
                       setState(() {
                         _selectedWrite =
                             write.firstWhere((pet) => pet['name'] == value);
-
                         diaryForm['petId'] = _selectedWrite['petId'];
                         diaryForm['name'] = _selectedWrite['name'];
+
+                        // _selectedWrite =
+                        //     write.firstWhere((pet) => pet['name'] == value);
+                        // diaryForm['petId'] = _selectedWrite['petId'];
+                        // diaryForm['name'] = _selectedWrite['name'];
                       });
                       print(value);
 
@@ -554,7 +555,7 @@ class _WritingState extends State<Writing> {
                         height: 30,
                         valueFontSize: 10,
                         toggleSize: 20,
-                        value: isPublic,
+                        value: isPublic ?? false,
                         borderRadius: 30,
                         padding: 8,
                         showOnOff: true,
@@ -604,8 +605,9 @@ class _WritingState extends State<Writing> {
                             );
 
                             // Writing(formData);
-                            // createDiary(diaryForm); // 일기 등록 테스트
-                            Navigator.of(context).push(_createRoute()); // 일기보기에서 홈화면으로 수정
+                            createDiary(diaryForm); // 일기 등록 테스트
+                            // Navigator.of(context)
+                            //     .push(_createRoute()); // 일기보기에서 홈화면으로 수정
 
                             // 일기쓰기 완료 팝업 메시지
                             // showDialog(
