@@ -97,49 +97,220 @@ class _OnboardingPageState extends State<OnboardingPage> {
       color: Colors.white,
       child: Column(
         children: <Widget>[
-          // 온보딩
-          SizedBox(
-            height: 535,
-            child: Container(
+          // 온보딩 페이지
+          Flexible(
+            flex: 10,
+            child: SizedBox(
+              width: double.infinity,
+              height: double.infinity,
               child: IntroductionScreen(
+                globalBackgroundColor: Colors.white,
                 pages: [
                   PageViewModel(
                       reverse: true,
-                      title: '안녕하세요!',
-                      body: '''건강하고 재밌게,
-  동물 친구들과 하루를 기록하는                
-  임시보호 일지 다시, 봄입니다.''',
-                      image: Image.asset('assets/onboard_1.png'),
-                      decoration: getPageDecoration()),
+                      titleWidget: Padding(
+                        padding: const EdgeInsets.only(left: 16, top: 50),
+                        child: Container(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              '안녕하세요!',
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            )),
+                      ),
+                      bodyWidget: Padding(
+                        padding: const EdgeInsets.only(left: 16),
+                        child: Container(
+                          alignment: Alignment.centerLeft,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '건강하고 재밌게',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal),
+                              ),
+                              Text(
+                                '동물 친구들과 하루를 기록하는 ',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal),
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    '임시보호 일지',
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.normal),
+                                  ),
+                                  Text(
+                                    ' 다시, 봄',
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.orange),
+                                  ),
+                                  Text(
+                                    '입니다.',
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.normal),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      image: Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: Image.asset('assets/onboard_1.png'),
+                      ),
+                      decoration: PageDecoration(
+                          pageColor: Colors.white,
+                          imageAlignment: Alignment.bottomCenter)),
                   PageViewModel(
                       reverse: true,
-                      title: '기록하기',
-                      body: '''일상을 기록하거나
-  다시, 봄 챌린지에서 
-                 동물 친구들의 귀여운 모습을 
-마음껏 자랑해요!''',
-                      image: Image.asset('assets/onboard_2.png'),
-                      decoration: getPageDecoration()),
+                      titleWidget: Padding(
+                        padding: const EdgeInsets.only(left: 16, top: 50),
+                        child: Container(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              '기록하기',
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            )),
+                      ),
+                      bodyWidget: Padding(
+                        padding: const EdgeInsets.only(left: 16),
+                        child: Container(
+                          alignment: Alignment.centerLeft,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '일상을 기록하거나',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal),
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    '다시, 봄',
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.orange),
+                                  ),
+                                  Text(
+                                    ' 챌린지에서',
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.normal),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                '동물 친구들의 귀여운 모습을',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal),
+                              ),
+                              Text(
+                                '마음껏 자랑해요',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      image: Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: Image.asset('assets/onboard_2.png'),
+                      ),
+                      decoration: PageDecoration(
+                          pageColor: Colors.white,
+                          imageAlignment: Alignment.bottomCenter)),
                   PageViewModel(
                       reverse: true,
-                      title: '추억하기',
-                      body: '''임시보호가 끝나도 
- 추억을 다시 돌아봐요
-              어떤 재밌는 일들이 일어날지
-        지금 바로 시작해 보세요!''',
-                      image: Image.asset('assets/onboard_3.png'),
-                      decoration: getPageDecoration()),
+                      titleWidget: Padding(
+                        padding: const EdgeInsets.only(left: 16, top: 50),
+                        child: Container(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              '추억하기',
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            )),
+                      ),
+                      bodyWidget: Padding(
+                        padding: const EdgeInsets.only(left: 16),
+                        child: Container(
+                          alignment: Alignment.centerLeft,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '임시보호가 끝나도',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal),
+                              ),
+                              Text(
+                                '추억을 다시 돌아봐요',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal),
+                              ),
+                              Text(
+                                '어떤 재밌는 일들이 일어날지',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal),
+                              ),
+                              Text(
+                                '지금 바로 시작해 보세요!',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      image: Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: Image.asset('assets/onboard_3.png'),
+                      ),
+                      decoration: PageDecoration(
+                          pageColor: Colors.white,
+                          imageAlignment: Alignment.bottomCenter)),
                 ],
-                done: const Text('done'),
-                // Onboarding page가 끝나면 어떻게 할 지
-                onDone: () {
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(
-                      builder: (context) => const MainPage()));
-                },
-                next: const Icon(Icons.arrow_forward),
-                // skip 버튼 추가
-                showSkipButton: true,
-                skip: Text('skip'),
+                showSkipButton: false,
+                showDoneButton: false,
+                showNextButton: false,
                 // page 표시하는 dot 꾸미기
                 dotsDecorator: DotsDecorator(
                     color: Colors.grey,
@@ -155,45 +326,52 @@ class _OnboardingPageState extends State<OnboardingPage> {
             ),
           ),
           // 카카오 로그인
-          SizedBox(
-            child: Container(
-              height: 45,
-              width: 280,
-              margin: EdgeInsets.only(top: 40, bottom: 10),
-              child: ElevatedButton(
-                style: ButtonStyle(
-                  shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15))),
-                  backgroundColor: MaterialStateProperty.all(Color(0xFFFCE301)),
+          Flexible(
+            flex: 2,
+            child: SizedBox(
+              child: Container(
+                width: 280,
+                margin: EdgeInsets.only(top: 40, bottom: 10),
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                    shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15))),
+                    backgroundColor:
+                        MaterialStateProperty.all(Color(0xFFFCE301)),
+                  ),
+                  onPressed: () async {
+                    signIn();
+                    // await viewModel.login();
+                    setState(() {});
+                    // 로그인 되면 MainPage로 화면 이동
+                    // final result =
+                    //     await Navigator.of(context).push(_createRoute());
+                  },
+                  child: Image.asset('assets/btn_kakao.png'),
                 ),
-                onPressed: () async {
-                  signIn();
-                  // await viewModel.login();
-                  setState(() {});
-                  // 로그인 되면 MainPage로 화면 이동
-                  // final result =
-                  //     await Navigator.of(context).push(_createRoute());
-                },
-                child: Image.asset('assets/btn_kakao.png'),
               ),
             ),
           ),
           // 네이버 로그인
-          SizedBox(
-            child: NaverLoginButton(),
+          Flexible(
+            child: SizedBox(
+              child: NaverLoginButton(),
+            ),
           ),
           // 둘러보기
-          SizedBox(
-            child: Container(
-              height: 25,
-              color: Colors.white,
-              margin: EdgeInsets.only(top: 30),
-              child: TextButton(
-                onPressed: () {},
-                child: Text(
-                  "둘러보기",
-                  style: TextStyle(
-                      color: Colors.black, fontWeight: FontWeight.w600),
+          Flexible(
+            flex: 1,
+            child: SizedBox(
+              child: Container(
+                color: Colors.white,
+                margin: EdgeInsets.only(top: 30),
+                child: TextButton(
+                  onPressed: () {},
+                  child: Text(
+                    "둘러보기",
+                    style: TextStyle(
+                        color: Colors.black, fontWeight: FontWeight.w600),
+                  ),
                 ),
               ),
             ),
@@ -222,23 +400,4 @@ Route _createRoute() {
       );
     },
   );
-}
-
-// PageViewModel의 이미지 decoration 인자 값으로 주기 위한 메서드
-PageDecoration getPageDecoration() {
-  return PageDecoration(
-      // title 스타일
-      titlePadding: EdgeInsets.only(top: 60),
-      bodyAlignment: Alignment.topLeft,
-      titleTextStyle: TextStyle(
-          fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
-      // 본문 스타일
-      bodyPadding: EdgeInsets.only(top: 15),
-      bodyTextStyle: TextStyle(
-        fontSize: 15,
-        color: Colors.black,
-      ),
-      imageAlignment: Alignment.bottomRight,
-      imagePadding: EdgeInsets.only(top: 45, bottom: 50),
-      pageColor: Color(0xFFF8F8F9));
 }
