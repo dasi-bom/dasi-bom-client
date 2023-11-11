@@ -8,15 +8,15 @@ import '../WritingPage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class RegisterFinish extends StatefulWidget {
-  const RegisterFinish({Key? key, this.data}) : super(key: key);
+class RegisterWithoutFinish extends StatefulWidget {
+  const RegisterWithoutFinish({Key? key, this.data}) : super(key: key);
   final data;
 
   @override
-  State<RegisterFinish> createState() => _RegisterFinishState();
+  State<RegisterWithoutFinish> createState() => _RegisterWithoutFinishState();
 }
 
-class _RegisterFinishState extends State<RegisterFinish> {
+class _RegisterWithoutFinishState extends State<RegisterWithoutFinish> {
   final storage = FlutterSecureStorage();
   final baseUrl = dotenv.env['BASE_URL'].toString();
   final getCreateProfile = dotenv.env['GET_CREATE_PROFILE_API'].toString();
@@ -68,9 +68,7 @@ class _RegisterFinishState extends State<RegisterFinish> {
             Align(
               alignment: Alignment.topCenter,
               child: Text(
-                '''${createInfo['nickname']}님 반가워요!
-오늘부터 ${createInfo['petName']}와 
-소중한 일상을 나눠주세요!''',
+                '''${createInfo['nickname']}님 반가워요!''',
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 18,

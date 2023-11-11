@@ -37,17 +37,14 @@ class _OnboardingPageState extends State<OnboardingPage> {
     Size screenSize(BuildContext context) {
       return MediaQuery.of(context).size;
     }
-
     // 화면 높이
     double screenHeight(BuildContext context, {double dividedBy = 1}) {
       return screenSize(context).height / dividedBy;
     }
-
     // 화면 너비
     double screenWidth(BuildContext context, {double dividedBy = 1}) {
       return screenSize(context).width / dividedBy;
     }
-
     //상단 툴바를 제외한 화면 높이
     double screenHeightExcludingToolbar(BuildContext context,
         {double dividedBy = 1}) {
@@ -127,7 +124,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '건강하고 재밌게',
+                                '건강하고 재밌게,',
                                 textAlign: TextAlign.left,
                                 style: TextStyle(
                                     fontSize: 15,
@@ -172,7 +169,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                       ),
                       image: Padding(
                         padding: const EdgeInsets.only(top: 10),
-                        child: Image.asset('assets/onboard_1.png'),
+                        child: Image.asset('assets/onboard_3.png'),
                       ),
                       decoration: PageDecoration(
                           pageColor: Colors.white,
@@ -302,7 +299,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                       ),
                       image: Padding(
                         padding: const EdgeInsets.only(top: 10),
-                        child: Image.asset('assets/onboard_3.png'),
+                        child: Image.asset('assets/onboard_1.png'),
                       ),
                       decoration: PageDecoration(
                           pageColor: Colors.white,
@@ -328,10 +325,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
           // 카카오 로그인
           Flexible(
             flex: 2,
-            child: SizedBox(
-              child: Container(
-                width: 280,
-                margin: EdgeInsets.only(top: 40, bottom: 10),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: SizedBox(
+                width: double.infinity,
                 child: ElevatedButton(
                   style: ButtonStyle(
                     shape: MaterialStateProperty.all(RoundedRectangleBorder(
@@ -341,11 +338,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   ),
                   onPressed: () async {
                     signIn();
-                    // await viewModel.login();
                     setState(() {});
-                    // 로그인 되면 MainPage로 화면 이동
-                    // final result =
-                    //     await Navigator.of(context).push(_createRoute());
                   },
                   child: Image.asset('assets/btn_kakao.png'),
                 ),
@@ -354,17 +347,17 @@ class _OnboardingPageState extends State<OnboardingPage> {
           ),
           // 네이버 로그인
           Flexible(
-            child: SizedBox(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: NaverLoginButton(),
             ),
           ),
           // 둘러보기
           Flexible(
-            flex: 1,
             child: SizedBox(
               child: Container(
                 color: Colors.white,
-                margin: EdgeInsets.only(top: 30),
+                margin: EdgeInsets.only(top: 10),
                 child: TextButton(
                   onPressed: () {},
                   child: Text(

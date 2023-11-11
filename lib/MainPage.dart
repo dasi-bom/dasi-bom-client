@@ -69,9 +69,7 @@ class _MainPageState extends State<MainPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     getDiaryList();
-
     super.initState();
   }
 
@@ -82,6 +80,7 @@ class _MainPageState extends State<MainPage> {
       key: _scaffoldKey,
       // 상단 앱 바
       appBar: AppBar(
+        elevation: 0.0,
         backgroundColor: Colors.white,
         title: Image.asset('assets/ic_barlogo.png', width: 100, height: 100),
         automaticallyImplyLeading: false, // appbar 뒤로가기 버튼 숨김

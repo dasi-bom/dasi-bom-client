@@ -44,15 +44,14 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
   Map<String, String> formData = {};
 
   final TextEditingController _nicknameController = TextEditingController();
-  final TextEditingController _timesController = TextEditingController();
 
   late bool validationResult;
   String _nickname = ''; // 내 닉네임
-  String _times = ''; // 임시보호 횟수
-  String _address = '';
 
+  // String _times = ''; // 임시보호 횟수
+  // String _address = ''; // 내 동네
   // 내 동네 카카오 API 값 컨트롤러
-  TextEditingController _AddressController = TextEditingController();
+  // TextEditingController _AddressController = TextEditingController();
 
   @override
   void initState() {
@@ -67,6 +66,7 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
+          elevation: 0.0,
           centerTitle: true,
           backgroundColor: Colors.white,
           title: const Text(
@@ -85,16 +85,19 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
                 Container(
                   color: Color(0xffFFF5BF),
                   height: 110,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      SizedBox(
-                        child: Image.asset('assets/ch_top_orange.png'),
-                      ),
-                      SizedBox(
-                        child: Image.asset('assets/ic_balloon_pr.png'),
-                      ),
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        SizedBox(
+                          child: Image.asset('assets/ch_top_orange.png'),
+                        ),
+                        SizedBox(
+                          child: Image.asset('assets/ic_balloon_pr.png'),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 SizedBox(
@@ -326,14 +329,15 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: SizedBox(
                     height: 60,
-                    width: 350,
+                    width: double.infinity,
                     child: Container(
                       color: Colors.white,
                       margin: EdgeInsets.only(top: 20),
                       child: ElevatedButton(
                         style: ButtonStyle(
-                          shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15))),
+                          shape: MaterialStateProperty.all(
+                              RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15))),
                           backgroundColor:
                               MaterialStateProperty.all(Color(0xFFFFED8E)),
                         ),
@@ -344,16 +348,10 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
                                   formKey.currentState?.validate() ?? false;
                               formKey.currentState!.save();
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                    content:
-                                        Text(_nickname + '/' + '/' + _times)),
+                                SnackBar(content: Text('$_nickname/')),
                               );
 
                               registerProtectorProfile(formData);
-
-                              // 동물 프로필 등록 화면으로 이동
-                              // final result = await Navigator.of(context)
-                              //     .push(_createRoute());
                             },
                           );
                         },

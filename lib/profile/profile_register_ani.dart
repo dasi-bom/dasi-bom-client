@@ -196,6 +196,7 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
+          elevation: 0.0,
           centerTitle: true,
           backgroundColor: Colors.white,
           title: const Text(
@@ -213,16 +214,19 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                 Container(
                   color: Color(0xffFFF5BF),
                   height: 110,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      SizedBox(
-                        child: Image.asset('assets/ch_top_orange.png'),
-                      ),
-                      SizedBox(
-                        child: Image.asset('assets/ic_balloon_an.png'),
-                      ),
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        SizedBox(
+                          child: Image.asset('assets/ch_top_orange.png'),
+                        ),
+                        SizedBox(
+                          child: Image.asset('assets/ic_balloon_an.png'),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 SizedBox(
@@ -731,7 +735,7 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: SizedBox(
                     height: 60,
-                    width: 350,
+                    width: double.infinity,
                     child: Container(
                       color: Colors.white,
                       margin: EdgeInsets.only(top: 20),
@@ -750,22 +754,10 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                   content: Text(
-                                      context.read<UserStore>().animalName +
-                                          '/' +
-                                          _age +
-                                          '/' +
-                                          _selectedKind +
-                                          '/' +
-                                          _selectedValue +
-                                          '/' +
-                                          _intro)),
+                                      '${context.read<UserStore>().animalName}/$_age/$_selectedKind/$_selectedValue/$_intro')),
                             );
 
                             registerPerProfile(formData);
-
-                            // 홈 화면으로 이동
-                            // final result =
-                            //     await Navigator.of(context).push(_createRoute());
                           },
                         ),
                         child: Text(
@@ -784,7 +776,7 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: SizedBox(
                     height: 60,
-                    width: 350,
+                    width: double.infinity,
                     child: Container(
                       color: Colors.white,
                       margin: EdgeInsets.only(top: 20),
@@ -822,7 +814,7 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
     );
   }
 
-  // 페이지 전환 애니메이션
+  // 페이지 전환 애니메이션 - 등록 완료하기
   Route _createRoute(petInfo) {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) =>
@@ -843,6 +835,7 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
     );
   }
 
+  // 페이지 전환 애니메이션 - 나중에 등록하기
   Route _createRouteWithout(petInfo) {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) =>
