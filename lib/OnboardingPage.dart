@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:dasi_bom_client/profile/profile_register_ani.dart';
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:liquid_swipe/liquid_swipe.dart';
@@ -27,6 +30,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
   final kakaoRedirectUri = dotenv.env['KAKAO_REDIRECT_URI'].toString();
   final kakaoAuthEndpoint =
       dotenv.env['KAKAO_AUTHORIZATION_ENDPOINT'].toString();
+  final getUserInfoUrl = dotenv.env['GET_USER_INFO_API'].toString();
+
+  var user_name = '';
 
   // 로그인 생성자 생성
   final viewModel = MainViewModel(KakaoLogin());
@@ -66,6 +72,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
           if (res.statusCode == 200) {
             Uri tokenUrl = Uri.parse(result);
+            print('tokenUrl ==> $tokenUrl');
             final accessToken =
                 tokenUrl.queryParameters["token"]; // token 값 가져오기
             final isNewMember = tokenUrl.queryParameters['isNewMember'];
@@ -75,11 +82,32 @@ class _OnboardingPageState extends State<OnboardingPage> {
             await storage.write(key: 'isNewMember', value: isNewMember);
             await storage.write(key: 'loginType', value: 'kakao');
 
-            if (isNewMember == 'true') {
-              await Navigator.of(context).push(_createRoute());
+            // ======================
+            final userToken = await storage.read(key: 'accessToken');
+            final url = Uri.parse('$baseUrl$getUserInfoUrl');
+            final headers = {'Authorization': 'Bearer $userToken'};
+
+            final userInfoResponse = await http.get(url, headers: headers);
+            final userInfoStatus = userInfoResponse.statusCode;
+            print('${userInfoResponse.request} ==> $userInfoStatus');
+
+            if (userInfoStatus == 200) {
+              final responseBody = utf8.decode(userInfoResponse.bodyBytes);
+              final dynamic info = await jsonDecode(responseBody);
+              print('유저 정보 ==> $info');
+
+              if (info['nickname'] == null) {
+                await Navigator.of(context).push(_createRoute());
+              } else {
+                setState(() {
+                  user_name = info['nickname'];
+                });
+
+                await Navigator.of(context).push(_createRoute());
+                // await Navigator.pushNamed(context, '/main');
+              }
             } else {
-              await Navigator.of(context).push(_createRoute());
-              // await Navigator.pushNamed(context, '/main'); // 프로필 연동 완료시 사용
+              print('유저 정보 조회 Error ## ');
             }
           }
         } else {
@@ -373,24 +401,45 @@ class _OnboardingPageState extends State<OnboardingPage> {
       ),
     );
   }
-}
 
-// 페이지 전환 애니메이션
-Route _createRoute() {
-  return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) =>
-        const RegisterProfileProtector(),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      const begin = Offset(0.0, 10.0);
-      const end = Offset.zero;
-      const curve = Curves.ease;
+  // 페이지 전환 애니메이션
+  Route _createRoute() {
+    if (user_name == '') {
+      return PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const RegisterProfileProtector(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(0.0, 10.0);
+          const end = Offset.zero;
+          const curve = Curves.ease;
 
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+          var tween =
+              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
-      return SlideTransition(
-        position: animation.drive(tween),
-        child: child,
+          return SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          );
+        },
       );
-    },
-  );
+    } else {
+      return PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const RegisterProfileAnimal(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(0.0, 10.0);
+          const end = Offset.zero;
+          const curve = Curves.ease;
+
+          var tween =
+              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+          return SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          );
+        },
+      );
+    }
+  }
 }

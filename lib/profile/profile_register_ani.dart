@@ -70,8 +70,10 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
 
   uploadImage(image) async {
     try {
+      var petId;
+
       final accessToken = await storage.read(key: 'accessToken');
-      final url = Uri.parse('$baseUrl$uploadPetProfileImage');
+      final url = Uri.parse('$baseUrl$uploadPetProfileImage?petId=$petId');
       final headers = {
         'Content-Type': 'multipart/form-data',
         'Authorization': 'Bearer $accessToken'
