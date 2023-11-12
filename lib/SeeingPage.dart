@@ -36,6 +36,14 @@ class _SeeingState extends State<Seeing> {
   // 일기 이미지 인덱스
   int _current = 0;
 
+  // Textformfield 값 받아오기
+  GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  late bool validationResult;
+  String _comments = ''; // 댓글달기
+
+  var formData = {};
+  final TextEditingController _commentsController = TextEditingController();
+
   final GlobalKey commentsHeaderKey = GlobalKey();
   double commentsHeaderHeight = 0;
 
@@ -43,6 +51,7 @@ class _SeeingState extends State<Seeing> {
 
   @override
   void initState() {
+    validationResult = false;
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -126,7 +135,7 @@ class _SeeingState extends State<Seeing> {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              _header(), // 사용자 정보
+              _header(), // 헤더 사용자 정보
               _images(), // 일기 사진
               _comment(), // 일기 내용
               _options(), // 댓글, 쓰다듬기, 공유하기
@@ -147,28 +156,36 @@ class _SeeingState extends State<Seeing> {
           children: [
             // 프로필 사진
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               child: CircleAvatar(
                 radius: 25,
                 backgroundImage: AssetImage('assets/user1.png'),
               ),
             ),
-            // 프로필 이름
-            Padding(
-              padding: const EdgeInsets.all(0),
-              child: Text(
-                '카야',
-                style: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500),
-              ),
-            )
+            // 프로필 이름 & 작성 시간
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '카야',
+                  style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 5),
+                  child: Text(
+                    date.toString().split(" ")[0],
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
         // 더보기 버튼
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: GestureDetector(
             child: Image.asset('assets/ic_more.png'),
             onTap: () {
@@ -220,15 +237,13 @@ class _SeeingState extends State<Seeing> {
   }
 
   Widget _comment() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: Column(
+    return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // 쓰다듬기 count
           GestureDetector(
             child: const Padding(
-              padding: EdgeInsets.all(10),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               child: Text(
                 '123번 쓰다듬받았어요!',
                 // '좋아요 ${widget.countLikes}개',
@@ -241,7 +256,7 @@ class _SeeingState extends State<Seeing> {
           ),
           // 본문 내용
           const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10),
+            padding: EdgeInsets.symmetric(horizontal: 16),
             child: ExpandableText(
               // 피드 내용
               '카야랑 오늘은 한강을 따라 산책을 갔다.\n흙냄새가 좋은지..마구 달리던 카야\n너무 귀여웠다.\n오늘의 산책 완료!',
@@ -254,15 +269,14 @@ class _SeeingState extends State<Seeing> {
           ),
           // 챌린지 주제
           const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 15),
             child: Text(
               '[챌린지] 날도 좋은데, 기분 좋은 산책 일기',
               style: TextStyle(color: Colors.grey),
             ),
           ),
         ],
-      ),
-    );
+      );
   }
 
   Widget _options() {
@@ -275,7 +289,7 @@ class _SeeingState extends State<Seeing> {
           children: [
             // 쓰다듬기
             Padding(
-              padding: const EdgeInsets.only(left: 25, right: 10),
+              padding: const EdgeInsets.only(left: 16),
               child: GestureDetector(
                 child: LikeButton(
                   size: 33,
@@ -291,7 +305,7 @@ class _SeeingState extends State<Seeing> {
             ),
             // 댓글
             Padding(
-              padding: const EdgeInsets.only(left: 10, right: 10),
+              padding: const EdgeInsets.only(left: 16),
               child: GestureDetector(
                 child: Image.asset('assets/ic_comment.png'),
                 onTap: () {
@@ -308,7 +322,7 @@ class _SeeingState extends State<Seeing> {
           children: [
             // 공유하기
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               child: GestureDetector(
                 child: Image.asset('assets/ic_share.png'),
               ),
@@ -319,7 +333,7 @@ class _SeeingState extends State<Seeing> {
     );
   }
 
-  // 더보기 버튼 확장 메뉴
+  // 더보기 bottomsheet
   _moreBottomSheet() {
     return showModalBottomSheet(
       context: context,
@@ -335,33 +349,39 @@ class _SeeingState extends State<Seeing> {
             const SizedBox(
               height: 20,
             ),
-            SizedBox(
-              height: 50,
-              width: 350,
-              child: OutlinedButton(
-                style: ButtonStyle(
-                    side: MaterialStateProperty.all(const BorderSide(
-                        color: Colors.black,
-                        width: 1,
-                        style: BorderStyle.solid))),
-                onPressed: () => {},
-                child: Image.asset('assets/ic_edit.png'),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: SizedBox(
+                height: 50,
+                width: double.infinity,
+                child: OutlinedButton(
+                  style: ButtonStyle(
+                      side: MaterialStateProperty.all(const BorderSide(
+                          color: Colors.black,
+                          width: 1,
+                          style: BorderStyle.solid))),
+                  onPressed: () => {},
+                  child: Image.asset('assets/ic_edit.png'),
+                ),
               ),
             ),
             const SizedBox(
               height: 10,
             ),
-            SizedBox(
-              height: 50,
-              width: 350,
-              child: OutlinedButton(
-                style: ButtonStyle(
-                    side: MaterialStateProperty.all(const BorderSide(
-                        color: Colors.black,
-                        width: 1,
-                        style: BorderStyle.solid))),
-                onPressed: () => {},
-                child: Image.asset('assets/ic_delete.png'),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: SizedBox(
+                height: 50,
+                width: double.infinity,
+                child: OutlinedButton(
+                  style: ButtonStyle(
+                      side: MaterialStateProperty.all(const BorderSide(
+                          color: Colors.black,
+                          width: 1,
+                          style: BorderStyle.solid))),
+                  onPressed: () => {},
+                  child: Image.asset('assets/ic_delete.png'),
+                ),
               ),
             ),
             const SizedBox(
@@ -406,7 +426,7 @@ class _SeeingState extends State<Seeing> {
                       child: Row(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.all(18),
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: CircleAvatar(
                               radius: 30,
                               backgroundImage: AssetImage('assets/user2.png'),
@@ -414,7 +434,7 @@ class _SeeingState extends State<Seeing> {
                           ),
                           Text('딩딩이'),
                           Padding(
-                            padding: const EdgeInsets.only(left: 140),
+                            padding: const EdgeInsets.only(right: 16,left: 135),
                             child: SizedBox(
                               height: 40,
                               width: 100,
@@ -488,7 +508,7 @@ class _SeeingState extends State<Seeing> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Padding(
-                            padding: const EdgeInsets.all(18),
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: CircleAvatar(
                               radius: 25,
                               backgroundImage: AssetImage('assets/user2.png'),
@@ -502,7 +522,7 @@ class _SeeingState extends State<Seeing> {
                                 children: [
                                   Text('딩딩이'),
                                   Padding(
-                                    padding: const EdgeInsets.all(15),
+                                    padding: const EdgeInsets.all(10),
                                     child: Text(
                                       date.toString().split(" ")[0],
                                     ),
@@ -557,7 +577,7 @@ class _SeeingState extends State<Seeing> {
                   children: [
                     const Padding(
                       padding:
-                          EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 15),
                       child: CircleAvatar(
                         radius: 15,
                         backgroundImage: AssetImage('assets/user2.png'),
@@ -569,20 +589,41 @@ class _SeeingState extends State<Seeing> {
                       // ),
                     ),
                     SizedBox(
-                      width: MediaQuery.of(context).size.width / 1.4,
+                      width: MediaQuery.of(context).size.width / 1.5,
                       child: GestureDetector(
-                        // onTap: showCommentModal,
-                        child: const Text(
-                          '댓글 달기...',
-                          style: TextStyle(color: Colors.grey),
+                        child: TextFormField(
+                          maxLines: 1,
+                          keyboardType: TextInputType.text,
+                          autovalidateMode: AutovalidateMode.always,
+                          decoration: InputDecoration(
+                              hintText: '댓글 달기...'),
+                          onSaved: (value) {
+                            setState(() {
+                              _comments = value as String;
+                              _commentsController.value =
+                                  TextEditingValue(text: value);
+                              formData['desc'] = value;
+                            });
+                          },
+                          controller: _commentsController,
                         ),
                       ),
                     ),
-                    IconButton(
-                      // 알림 버튼
-                      onPressed: () {},
-                      icon: Icon(Icons.arrow_upward),
-                      color: Colors.black,
+                    // 댓글달기 업로드 버튼
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: IconButton(
+                        onPressed: () => setState(
+                          () {
+                            validationResult =
+                                formKey.currentState?.validate() ?? false;
+                            formKey.currentState!.save();
+                            // registerPerProfile(formData);
+                          },
+                        ),
+                        icon: Icon(Icons.arrow_upward),
+                        color: Colors.black,
+                      ),
                     ),
                   ],
                 ),
@@ -595,7 +636,7 @@ class _SeeingState extends State<Seeing> {
   }
 }
 
-// 쓰다듬기
+// 쓰다듬기 header
 class _LikesHeader extends StatelessWidget {
   const _LikesHeader({
     Key? key,
@@ -628,7 +669,7 @@ class _LikesHeader extends StatelessWidget {
   }
 }
 
-// 댓글
+// 댓글 header
 class _CommentsHeader extends StatelessWidget {
   const _CommentsHeader({
     Key? key,

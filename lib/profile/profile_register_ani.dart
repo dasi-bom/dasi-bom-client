@@ -198,6 +198,7 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
+          elevation: 0.0,
           centerTitle: true,
           backgroundColor: Colors.white,
           title: const Text(
@@ -215,31 +216,53 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                 Container(
                   color: Color(0xffFFF5BF),
                   height: 110,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      SizedBox(
-                        child: Image.asset('assets/ch_top_orange.png'),
-                      ),
-                      SizedBox(
-                        child: Image.asset('assets/ic_balloon_an.png'),
-                      ),
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        SizedBox(
+                          child: Image.asset('assets/ch_top_orange.png'),
+                        ),
+                        SizedBox(
+                          child: Image.asset('assets/ic_balloon_an.png'),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 SizedBox(
                   height: 30,
                 ),
-                Container(
-                  width: 300,
-                  child: Text(
-                    '함께하는 동물 친구 프로필',
-                    textAlign: TextAlign.left,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Text(
+                      '함께하는 동물 친구 프로필',
+                      textAlign: TextAlign.left,
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                    ),
                   ),
                 ),
                 const SizedBox(
-                  height: 25,
+                  height: 20,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Text(
+                      '동물 친구 프로필 사진',
+                      textAlign: TextAlign.left,
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
                 ),
                 // 사진 등록
                 if (_pickedFile == null)
@@ -289,21 +312,36 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                                   )),
                             )),
                 const SizedBox(
-                  height: 10,
+                  height: 20,
                 ),
-                Container(
-                  width: 340,
-                  child: Text(
-                    '이름 *',
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Row(
+                      children: [
+                        Text(
+                          '이름',
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 13),
+                        ),
+                        Text(
+                          '*',
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                              color: Colors.orange,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 // 이름 등록 - 30자 이내, 영문/한글만 가능
                 Padding(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   child: TextFormField(
                     maxLength: 30,
                     keyboardType: TextInputType.name,
@@ -315,7 +353,7 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                     ],
                     autovalidateMode: AutovalidateMode.always,
                     decoration: InputDecoration(
-                        // counterText: '',
+                        counterText: '',
                         border: OutlineInputBorder(
                           borderSide: BorderSide(
                             color: Colors.black,
@@ -359,21 +397,24 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                   ),
                 ),
                 const SizedBox(
-                  height: 15,
+                  height: 20,
                 ),
-                Container(
-                  width: 340,
-                  child: Text(
-                    '나이',
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Text(
+                      '나이',
+                      textAlign: TextAlign.left,
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    ),
                   ),
                 ),
                 // 나이 등록
                 Padding(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   child: TextFormField(
                     keyboardType: TextInputType.number,
                     inputFormatters: [
@@ -403,31 +444,49 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                     controller: _ageController,
                   ),
                 ),
-                Container(
-                  width: 340,
-                  child: Text(
-                    '연 단위로 입력해 주세요. 12개월 미만의 친구들은 1을 입력해 주세요.',
-                    textAlign: TextAlign.center,
-                    style:
-                        TextStyle(fontWeight: FontWeight.normal, fontSize: 11),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Text(
+                      '연 단위로 입력해 주세요. 12개월 미만의 친구들은 1을 입력해 주세요.',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                          fontWeight: FontWeight.normal, fontSize: 10),
+                    ),
                   ),
                 ),
                 const SizedBox(
-                  height: 15,
+                  height: 20,
                 ),
-                Container(
-                  width: 340,
-                  child: Text(
-                    '종류 *',
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Row(
+                      children: [
+                        Text(
+                          '종류',
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 13),
+                        ),
+                        Text(
+                          '*',
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                              color: Colors.orange,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 // 종류 등록
                 Padding(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 1),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   child: DropdownButtonFormField(
                     hint: Text('동물 친구의 종은 무엇인가요?'),
                     value: _selectedValue,
@@ -457,7 +516,7 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                 if (_selectedValue == '직접 입력')
                   Padding(
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     child: TextFormField(
                       maxLength: 10,
                       keyboardType: TextInputType.text,
@@ -493,21 +552,36 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                     ),
                   ),
                 const SizedBox(
-                  height: 15,
+                  height: 20,
                 ),
-                Container(
-                  width: 340,
-                  child: Text(
-                    '성별 *',
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Row(
+                      children: [
+                        Text(
+                          '성별',
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 13),
+                        ),
+                        Text(
+                          '*',
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                              color: Colors.orange,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 // 성별 등록
                 Padding(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 1),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   child: DropdownButtonFormField(
                     hint: Text('동물 친구의 성은 무엇인가요?'),
                     value: _selectedKind,
@@ -530,20 +604,35 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                   ),
                 ),
                 const SizedBox(
-                  height: 15,
+                  height: 20,
                 ),
-                Container(
-                  width: 340,
-                  child: Text(
-                    '처음 만난 날 *',
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Row(
+                      children: [
+                        Text(
+                          '처음 만난 날',
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 13),
+                        ),
+                        Text(
+                          '*',
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                              color: Colors.orange,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 // 처음 만난 날 등록
                 Padding(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -578,21 +667,24 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                   ),
                 ),
                 const SizedBox(
-                  height: 15,
+                  height: 20,
                 ),
-                Container(
-                  width: 340,
-                  child: Text(
-                    '소개',
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Text(
+                      '소개',
+                      textAlign: TextAlign.left,
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    ),
                   ),
                 ),
                 // 소개 등록
                 Padding(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   child: TextFormField(
                     maxLines: 6,
                     maxLength: 300,
@@ -610,6 +702,7 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                             width: 1,
                           ),
                         ),
+                        counterText: '',
                         hintText: '외적인 특징이나 좋아하는 것, 성격, 별명 등을 자유롭게 소개해 주세요:)'),
                     onSaved: (value) {
                       setState(() {
@@ -622,97 +715,91 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                   ),
                 ),
                 const SizedBox(
-                  height: 20,
+                  height: 10,
                 ),
-                Container(
-                  width: 340,
-                  child: Text(
-                    '동물 프로필은 마이페이지에서 추가로 등록할 수 있습니다!',
-                    textAlign: TextAlign.center,
-                    style:
-                        TextStyle(fontWeight: FontWeight.normal, fontSize: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Text(
+                      '동물 프로필은 마이페이지에서 추가로 등록할 수 있어요!',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                          fontWeight: FontWeight.normal, fontSize: 10),
+                    ),
                   ),
                 ),
                 const SizedBox(
-                  height: 25,
+                  height: 30,
                 ),
                 // 등록 완료하기
-                // Text(validationResult ? 'Success' : 'Failed'),
-                SizedBox(
-                  height: 60,
-                  width: 350,
-                  child: Container(
-                    height: 30,
-                    color: Colors.white,
-                    margin: EdgeInsets.only(top: 20),
-                    child: ElevatedButton(
-                      style: ButtonStyle(
-                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15))),
-                        backgroundColor:
-                            MaterialStateProperty.all(Color(0xFFFFED8E)),
-                      ),
-                      onPressed: () => setState(
-                        () {
-                          validationResult =
-                              formKey.currentState?.validate() ?? false;
-                          formKey.currentState!.save();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                                content: Text(
-                                    context.read<UserStore>().animalName +
-                                        '/' +
-                                        _age +
-                                        '/' +
-                                        _selectedKind +
-                                        '/' +
-                                        _selectedValue +
-                                        '/' +
-                                        _intro)),
-                          );
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SizedBox(
+                    height: 60,
+                    width: double.infinity,
+                    child: Container(
+                      color: Colors.white,
+                      margin: EdgeInsets.only(top: 20),
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                          shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15))),
+                          backgroundColor:
+                              MaterialStateProperty.all(Color(0xFFFFED8E)),
+                        ),
+                        onPressed: () => setState(
+                          () {
+                            validationResult =
+                                formKey.currentState?.validate() ?? false;
+                            formKey.currentState!.save();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text(
+                                      '${context.read<UserStore>().animalName}/$_age/$_selectedKind/$_selectedValue/$_intro')),
+                            );
 
-                          registerPerProfile(formData);
-
-                          // 홈 화면으로 이동
-                          // final result =
-                          //     await Navigator.of(context).push(_createRoute());
-                        },
-                      ),
-                      child: Text(
-                        "등록 완료하기",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
+                            registerPerProfile(formData);
+                          },
+                        ),
+                        child: Text(
+                          "등록 완료하기",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
                 // 나중에 등록하기
-                SizedBox(
-                  height: 60,
-                  width: 350,
-                  child: Container(
-                    height: 30,
-                    color: Colors.white,
-                    margin: EdgeInsets.only(top: 20),
-                    child: ElevatedButton(
-                      style: ButtonStyle(
-                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15))),
-                        backgroundColor:
-                            MaterialStateProperty.all(Color(0xFFF8F8F9)),
-                      ),
-                      onPressed: () async {
-                        // 홈 화면으로 이동
-                        final result = await Navigator.of(context)
-                            .push(_createRoute(null));
-                      },
-                      child: Text(
-                        "나중에 등록하기",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SizedBox(
+                    height: 60,
+                    width: double.infinity,
+                    child: Container(
+                      color: Colors.white,
+                      margin: EdgeInsets.only(top: 20),
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                          shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15))),
+                          backgroundColor:
+                              MaterialStateProperty.all(Color(0xFFF8F8F9)),
+                        ),
+                        onPressed: () async {
+                          // 홈 화면으로 이동
+                          final result = await Navigator.of(context)
+                              .push(_createRouteWithout(null));
+                        },
+                        child: Text(
+                          "나중에 등록하기",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
@@ -729,7 +816,7 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
     );
   }
 
-  // 페이지 전환 애니메이션
+  // 페이지 전환 애니메이션 - 등록 완료하기
   Route _createRoute(petInfo) {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) =>
@@ -741,6 +828,27 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
 
         var tween =
             Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
+        );
+      },
+    );
+  }
+
+  // 페이지 전환 애니메이션 - 나중에 등록하기
+  Route _createRouteWithout(petInfo) {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          RegisterFinish(data: petInfo),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(0.0, 10.0);
+        const end = Offset.zero;
+        const curve = Curves.ease;
+
+        var tween =
+        Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
         return SlideTransition(
           position: animation.drive(tween),

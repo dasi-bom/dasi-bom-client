@@ -96,10 +96,8 @@ class _NaverLoginButtonState extends State<NaverLoginButton> {
   Widget build(BuildContext context) {
     return Align(
         alignment: Alignment.bottomCenter,
-        child: Container(
-          height: 45,
-          width: 280,
-          margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+        child: SizedBox(
+          width: double.infinity,
           child: ElevatedButton(
             onPressed: () {
               print('naver login');

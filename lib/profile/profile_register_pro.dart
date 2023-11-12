@@ -44,15 +44,14 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
   Map<String, String> formData = {};
 
   final TextEditingController _nicknameController = TextEditingController();
-  final TextEditingController _timesController = TextEditingController();
 
   late bool validationResult;
   String _nickname = ''; // 내 닉네임
-  String _times = ''; // 임시보호 횟수
-  String _address = '';
 
+  // String _times = ''; // 임시보호 횟수
+  // String _address = ''; // 내 동네
   // 내 동네 카카오 API 값 컨트롤러
-  TextEditingController _AddressController = TextEditingController();
+  // TextEditingController _AddressController = TextEditingController();
 
   @override
   void initState() {
@@ -67,6 +66,7 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
+          elevation: 0.0,
           centerTitle: true,
           backgroundColor: Colors.white,
           title: const Text(
@@ -85,31 +85,53 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
                 Container(
                   color: Color(0xffFFF5BF),
                   height: 110,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      SizedBox(
-                        child: Image.asset('assets/ch_top_orange.png'),
-                      ),
-                      SizedBox(
-                        child: Image.asset('assets/ic_balloon_pr.png'),
-                      ),
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        SizedBox(
+                          child: Image.asset('assets/ch_top_orange.png'),
+                        ),
+                        SizedBox(
+                          child: Image.asset('assets/ic_balloon_pr.png'),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 SizedBox(
                   height: 30,
                 ),
-                Container(
-                  width: 300,
-                  child: Text(
-                    '보호자 프로필',
-                    textAlign: TextAlign.left,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Text(
+                      '보호자 프로필',
+                      textAlign: TextAlign.left,
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                    ),
                   ),
                 ),
                 const SizedBox(
-                  height: 25,
+                  height: 20,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Text(
+                      '내 프로필 사진',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                          fontWeight: FontWeight.normal, fontSize: 13),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
                 ),
                 // 사진 등록
                 if (_pickedFile == null)
@@ -159,21 +181,36 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
                               ),
                             )),
                 const SizedBox(
-                  height: 10,
+                  height: 20,
                 ),
-                Container(
-                  width: 340,
-                  child: Text(
-                    '내 닉네임 *',
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Row(
+                      children: [
+                        Text(
+                          '내 닉네임',
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                              fontWeight: FontWeight.normal, fontSize: 13),
+                        ),
+                        Text(
+                          '*',
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                              color: Colors.orange,
+                              fontWeight: FontWeight.normal,
+                              fontSize: 13),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 // 내 닉네임 등록
                 Padding(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   child: TextFormField(
                     maxLength: 14,
                     keyboardType: TextInputType.name,
@@ -224,145 +261,110 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
                   ),
                 ),
                 const SizedBox(
-                  height: 15,
+                  height: 30,
                 ),
-                Container(
-                  width: 340,
-                  child: Text(
-                    '내 동네 *',
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
-                  ),
-                ),
+
                 // 내 동네 등록
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                  child: GestureDetector(
-                    onTap: () {
-                      HapticFeedback.mediumImpact();
-                      _addressAPI(); // 카카오 주소 API
-                    },
-                    child: TextFormField(
-                      enabled: false,
-                      autovalidateMode: AutovalidateMode.always,
-                      decoration: InputDecoration(
-                          isDense: false,
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.black,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.black,
-                              width: 1,
-                            ),
-                          ),
-                          prefixIcon: Icon(
-                            Icons.search,
-                            color: Colors.black,
-                          ),
-                          hintText: '주소 검색'),
-                      controller: _AddressController,
-                      style: TextStyle(fontSize: 15),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                Container(
-                  width: 340,
-                  child: Text(
-                    '임시보호 횟수',
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
-                  ),
-                ),
-                // 임시보호 횟수 등록
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                  child: TextFormField(
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                    ],
-                    autovalidateMode: AutovalidateMode.always,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.black,
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.black,
-                            width: 1,
-                          ),
-                        ),
-                        hintText: '없으셨다면 0으로 적어주세요!'),
-                    onSaved: (value) {
-                      setState(() {
-                        _times = value as String;
-                        _timesController.value = TextEditingValue(text: value);
-                        formData['times'] = value;
-                      });
-                    },
-                    controller: _timesController,
-                  ),
-                ),
+                // Padding(
+                //   padding: const EdgeInsets.symmetric(horizontal: 16),
+                //   child: SizedBox(
+                //     width: double.infinity,
+                //     child: Row(
+                //       children: [
+                //         Text(
+                //           '내 동네',
+                //           textAlign: TextAlign.left,
+                //           style: TextStyle(
+                //               fontWeight: FontWeight.normal, fontSize: 13),
+                //         ),
+                //         Text(
+                //           '*',
+                //           textAlign: TextAlign.left,
+                //           style: TextStyle(
+                //               color: Colors.orange,
+                //               fontWeight: FontWeight.normal,
+                //               fontSize: 13),
+                //         ),
+                //       ],
+                //     ),
+                //   ),
+                // ),
+                // Padding(
+                //   padding:
+                //       const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+                //   child: GestureDetector(
+                //     onTap: () {
+                //       HapticFeedback.mediumImpact();
+                //       _addressAPI(); // 카카오 주소 API
+                //     },
+                //     child: TextFormField(
+                //       enabled: false,
+                //       autovalidateMode: AutovalidateMode.always,
+                //       decoration: InputDecoration(
+                //           isDense: false,
+                //           border: OutlineInputBorder(
+                //             borderSide: BorderSide(
+                //               color: Colors.black,
+                //             ),
+                //           ),
+                //           focusedBorder: OutlineInputBorder(
+                //             borderSide: BorderSide(
+                //               color: Colors.black,
+                //               width: 1,
+                //             ),
+                //           ),
+                //           prefixIcon: Icon(
+                //             Icons.search,
+                //             color: Colors.black,
+                //           ),
+                //           hintText: '주소 검색'),
+                //       controller: _AddressController,
+                //       style: TextStyle(fontSize: 15),
+                //     ),
+                //   ),
+                // ),
+
                 // 다음 단계로 이동하기
-                // Text(validationResult ? 'Success' : 'Failed'),
-                SizedBox(
-                  height: 60,
-                  width: 350,
-                  child: Container(
-                    height: 30,
-                    color: Colors.white,
-                    margin: EdgeInsets.only(top: 20),
-                    child: ElevatedButton(
-                      style: ButtonStyle(
-                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15))),
-                        backgroundColor:
-                            MaterialStateProperty.all(Color(0xFFFFED8E)),
-                      ),
-                      onPressed: () {
-                        setState(
-                          () async {
-                            validationResult =
-                                formKey.currentState?.validate() ?? false;
-                            formKey.currentState!.save();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                  content:
-                                      Text(_nickname + '/' + '/' + _times)),
-                            );
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SizedBox(
+                    height: 60,
+                    width: double.infinity,
+                    child: Container(
+                      color: Colors.white,
+                      margin: EdgeInsets.only(top: 20),
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                          shape: MaterialStateProperty.all(
+                              RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15))),
+                          backgroundColor:
+                              MaterialStateProperty.all(Color(0xFFFFED8E)),
+                        ),
+                        onPressed: () {
+                          setState(
+                            () async {
+                              validationResult =
+                                  formKey.currentState?.validate() ?? false;
+                              formKey.currentState!.save();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('$_nickname/')),
+                              );
 
-                            registerProtectorProfile(formData);
-
-                            // 동물 프로필 등록 화면으로 이동
-                            // final result = await Navigator.of(context)
-                            //     .push(_createRoute());
-                          },
-                        );
-                      },
-                      child: Text(
-                        "다음 단계로 이동하기",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
+                              registerProtectorProfile(formData);
+                            },
+                          );
+                        },
+                        child: Text(
+                          "다음 단계로 이동하기",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(
-                  height: 50,
                 ),
               ],
             ),
@@ -500,21 +502,21 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
   }
 
   // 카카오주소 API
-  _addressAPI() async {
-    KopoModel model = await Navigator.push(
-      context,
-      CupertinoPageRoute(
-        builder: (context) => RemediKopo(),
-      ),
-    );
-
-    _AddressController.text =
-        '${model.sido!} ${model.sigungu!} ${model.bname!}';
-
-    final address = '${model.sido!} ${model.sigungu!} ${model.bname!}';
-    _AddressController.value = TextEditingValue(text: address);
-    formData['address'] = address;
-  }
+  // _addressAPI() async {
+  //   KopoModel model = await Navigator.push(
+  //     context,
+  //     CupertinoPageRoute(
+  //       builder: (context) => RemediKopo(),
+  //     ),
+  //   );
+  //
+  //   _AddressController.text =
+  //       '${model.sido!} ${model.sigungu!} ${model.bname!}';
+  //
+  //   final address = '${model.sido!} ${model.sigungu!} ${model.bname!}';
+  //   _AddressController.value = TextEditingValue(text: address);
+  //   formData['address'] = address;
+  // }
 
   registerProtectorProfile(data) async {
     try {
