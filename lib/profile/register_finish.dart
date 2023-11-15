@@ -188,6 +188,7 @@ class _RegisterFinishState extends State<RegisterFinish> {
   getCreateProfileInfo() async {
     try {
       final data = jsonDecode(widget.data);
+      print('data ===> $data');
       final accessToken = await storage.read(key: 'accessToken');
       final url = Uri.parse('$baseUrl$getCreateProfile');
       final headers = {'Authorization': 'Bearer $accessToken'};
@@ -211,14 +212,23 @@ class _RegisterFinishState extends State<RegisterFinish> {
                 print('data => $data');
                 int petId = (data['petId']);
 
-                createInfo['petName'] = data['petInfo']['name'].toString();
-                createInfo['petProfileImage'] = null;
-
+                List<Map<String, dynamic>>? petResponses =
+                    info['petProfileResponses']?.cast<Map<String, dynamic>>();
+                if (petResponses != null) {
+                  for (Map<String, dynamic> petData in petResponses) {
+                    if (data['petId'] == petData['petId']) {
+                      createInfo['petProfileImage'] =
+                          petData['imageUrl'].toString();
+                      createInfo['petName'] =
+                          petData['petInfo']['name'].toString();
+                    }
+                  }
+                } else {
+                  print('pet list xxxxx');
+                }
               } else {
-                setState(() {
-                  createInfo['petName'] = '-';
-                  createInfo['petProfileImage'] = null;
-                });
+                createInfo['petName'] = '-';
+                createInfo['petProfileImage'] = null;
               }
             });
           }
