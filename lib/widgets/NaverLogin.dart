@@ -1,3 +1,4 @@
+import 'package:dasi_bom_client/MainPage.dart';
 import 'package:dasi_bom_client/profile/profile_register_ani.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -26,6 +27,7 @@ class _NaverLoginButtonState extends State<NaverLoginButton> {
   final getUserInfoUrl = dotenv.env['GET_USER_INFO_API'].toString();
 
   var user_name = '';
+  var pet_list = 0;
 
   bool isLogin = false;
   String? name;
@@ -72,9 +74,12 @@ class _NaverLoginButtonState extends State<NaverLoginButton> {
 
             if (info['nickname'] == null) {
               await Navigator.of(context).push(_createRoute());
+            } else if (info['petProfileResponses'].length == 0) {
+              await Navigator.of(context).push(_createRoute());
             } else {
               setState(() {
                 user_name = info['nickname'];
+                pet_list = info['petProfileResponses'].length;
               });
 
               await Navigator.of(context).push(_createRoute());
@@ -167,10 +172,28 @@ class _NaverLoginButtonState extends State<NaverLoginButton> {
           );
         },
       );
-    } else {
+    } else if (pet_list == 0) {
       return PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
             const RegisterProfileAnimal(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(0.0, 10.0);
+          const end = Offset.zero;
+          const curve = Curves.ease;
+
+          var tween =
+              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+          return SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          );
+        },
+      );
+    } else {
+      return PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const MainPage(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           const begin = Offset(0.0, 10.0);
           const end = Offset.zero;
