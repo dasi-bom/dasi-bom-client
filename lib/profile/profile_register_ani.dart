@@ -68,16 +68,37 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
   // 처음 만난 날 변수 선언
   DateTime date = DateTime.now();
 
+  var initPetId;
+
+  getInitPetId() async {
+    // petId 발급
+    final accessToken = await storage.read(key: 'accessToken');
+    final getInit = Uri.parse('$baseUrl/pet/issue-id');
+    final initRes = await http.get(getInit, headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $accessToken'
+    });
+    final initResStatus = initRes.statusCode;
+    print('${initRes.request} ==> $initResStatus');
+
+    if (initResStatus == 200) {
+      var initData = json.decode(initRes.body);
+      setState(() {
+        initPetId = initData['petId'];
+      });
+      print('petId ==> $initPetId');
+    }
+  }
+
   uploadImage(image) async {
     try {
-      var petId;
-
       final accessToken = await storage.read(key: 'accessToken');
-      final url = Uri.parse('$baseUrl$uploadPetProfileImage?petId=$petId');
       final headers = {
         'Content-Type': 'multipart/form-data',
         'Authorization': 'Bearer $accessToken'
       };
+
+      final url = Uri.parse('$baseUrl$uploadPetProfileImage/$initPetId');
 
       final req = http.MultipartRequest('POST', url);
       if (image is List<int>) {
@@ -103,7 +124,7 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
   registerPerProfile(data) async {
     try {
       final accessToken = await storage.read(key: 'accessToken');
-      final url = Uri.parse('$baseUrl$createPetProfile');
+      final url = Uri.parse('$baseUrl$createPetProfile/$initPetId');
       final headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -157,6 +178,7 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
       final status = res.statusCode;
       final info = res.body;
       print('${res.request}  =>  $status');
+      print('동물 프로필 등록 완료 =>  $info');
 
       if (status == 200) {
         await Navigator.of(context).push(_createRoute(null));
@@ -188,6 +210,7 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
   @override
   void initState() {
     validationResult = false;
+    getInitPetId();
     super.initState();
   }
 
@@ -295,7 +318,13 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                                           .primary),
                                   image: DecorationImage(
                                       image: FileImage(File(_pickedFile!.path)),
-                                      fit: BoxFit.cover)))
+                                      fit: BoxFit.cover)),
+                              child: GestureDetector(
+                                onTap: () {
+                                  _showBottomSheet();
+                                },
+                              ),
+                            )
                           : Container(
                               width: _imageSize,
                               height: _imageSize,
@@ -310,6 +339,11 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                                     image: AssetImage(defaultImg),
                                     fit: BoxFit.contain,
                                   )),
+                              child: GestureDetector(
+                                onTap: () {
+                                  _showBottomSheet();
+                                },
+                              ),
                             )),
                 const SizedBox(
                   height: 20,
@@ -515,8 +549,8 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                 // 종류 직접 입력시 등록(직접 입력 시에만 뜨도록 구현해야 합니다!)
                 if (_selectedValue == '직접 입력')
                   Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 10),
                     child: TextFormField(
                       maxLength: 10,
                       keyboardType: TextInputType.text,
@@ -743,8 +777,9 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                       margin: EdgeInsets.only(top: 20),
                       child: ElevatedButton(
                         style: ButtonStyle(
-                          shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15))),
+                          shape: MaterialStateProperty.all(
+                              RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15))),
                           backgroundColor:
                               MaterialStateProperty.all(Color(0xFFFFED8E)),
                         ),
@@ -784,8 +819,9 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
                       margin: EdgeInsets.only(top: 20),
                       child: ElevatedButton(
                         style: ButtonStyle(
-                          shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15))),
+                          shape: MaterialStateProperty.all(
+                              RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15))),
                           backgroundColor:
                               MaterialStateProperty.all(Color(0xFFF8F8F9)),
                         ),
@@ -848,7 +884,7 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
         const curve = Curves.ease;
 
         var tween =
-        Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
         return SlideTransition(
           position: animation.drive(tween),
@@ -920,7 +956,8 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
 
 // 카메라로 이동
   _getCameraImage() async {
-    final pickedFile = await imagePicker.pickImage(source: ImageSource.camera);
+    final pickedFile = await imagePicker.pickImage(
+        source: ImageSource.camera, imageQuality: 30);
     if (pickedFile != null) {
       setState(() {
         isDefault = false;
@@ -935,7 +972,8 @@ class _RegisterProfileAnimalState extends State<RegisterProfileAnimal> {
 
 // 갤러리로 이동
   _getPhotoLibraryImage() async {
-    final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+    final pickedFile = await imagePicker.pickImage(
+        source: ImageSource.gallery, imageQuality: 30);
     if (pickedFile != null) {
       setState(() {
         isDefault = false;
