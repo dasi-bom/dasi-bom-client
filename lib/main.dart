@@ -17,6 +17,9 @@ void main() async {
   KakaoSdk.init(
     nativeAppKey: dotenv.env['KAKAO_SDK'].toString(),
   );
+
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
   // 로고 스플래시 호출
   await initialization(null);
   // FlutterNativeSplash.removeAfter(initialization);
@@ -32,6 +35,7 @@ void main() async {
           )
         ],
         child: MaterialApp(
+          navigatorKey: navigatorKey,
           debugShowCheckedModeBanner: false,
           title: 'dasi-bom',
           theme: ThemeData(primaryColor: Colors.white),
