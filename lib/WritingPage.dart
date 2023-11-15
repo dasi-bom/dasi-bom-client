@@ -100,13 +100,48 @@ class _WritingState extends State<Writing> {
 
   // 나만보기 토글
   bool? isPublic = false;
+  var diaryId;
+
+  getInitDiaryId() async {
+    final accessToken = await storage.read(key: 'accessToken');
+
+    String currentRoute = ModalRoute.of(context)!.settings.name ?? "";
+    print("Current Route: $currentRoute");
+
+    final getInit = Uri.parse('$baseUrl/diary/issue-id');
+    final res = await http.get(
+      getInit,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken'
+      },
+    );
+
+    final initResStatus = res.statusCode;
+    print('${res.request} ==> $initResStatus');
+
+    if (initResStatus == 200) {
+      var initData = json.decode(res.body);
+      setState(() {
+        diaryId = initData['diaryId'];
+      });
+      print('diaryId ==> $diaryId');
+    }
+  }
 
   getUserInfo() async {
     try {
       final accessToken = await storage.read(key: 'accessToken');
-      final url = Uri.parse('$baseUrl$getUserInfoUrl');
-      final headers = {'Authorization': 'Bearer $accessToken'};
 
+      if (accessToken == null) {
+        return;
+      }
+
+      final url = Uri.parse('$baseUrl$getUserInfoUrl');
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken'
+      };
       final res = await http.get(url, headers: headers);
       final status = res.statusCode;
       print('${res.request} ==> $status');
@@ -115,34 +150,53 @@ class _WritingState extends State<Writing> {
         final info = json.decode(res.body);
         // print('info ===> $info');
 
-        if (info['petProfileResponses'] is List) {
+        if (info != null && info['petProfileResponses'] is List) {
           setState(() {
-            var petProfileResponses = info['petProfileResponses'];
+            List<dynamic> petProfileResponses = info['petProfileResponses'];
 
-            if (petProfileResponses.isNotEmpty) {
-              petProfileResponses.forEach((petProfile) {
-                String petName = petProfile['petInfo']['name'];
-                int petId = petProfile['petId'];
+            petProfileResponses.forEach((petProfile) {
+              String? petName = petProfile?['petInfo']?['name'];
+              int? petId = petProfile?['petId'];
 
+              if (petName != null && petId != null) {
                 var petData = {
                   'petId': petId,
                   'name': petName,
                 };
 
                 write.add(petData);
-              });
-
-              if (!write.contains(_selectedWrite)) {
-                if (write.isNotEmpty) {
-                  _selectedWrite = write[0];
-                } else {
-                  _selectedWrite = null;
-                }
               }
-              // setState(() {});
-              print('write ====> $write');
-            }
+            });
           });
+
+          Set<String> uniqueData = Set<String>();
+          var result = write.where((pet) {
+            return uniqueData.add(pet['name']);
+          }).toList();
+
+          print('petList => $result');
+
+          setState(() {
+            write = result;
+          });
+          if (!write.contains(_selectedWrite)) {
+            if (write.isNotEmpty) {
+              _selectedWrite = write[0];
+            } else {
+              _selectedWrite = null;
+            }
+          }
+
+          print('_selectedWrite ==> $_selectedWrite');
+          print('write ====> $write');
+
+          if (diaryForm.isEmpty) {
+            setState(() {
+              diaryForm['petId'] = _selectedWrite['petId'];
+              diaryForm['name'] = _selectedWrite['name'];
+              diaryForm['challengeId'] = null;
+            });
+          }
         }
       } else {
         print('status != 200 ##');
@@ -155,31 +209,44 @@ class _WritingState extends State<Writing> {
   @override
   void initState() {
     validationResult = false;
+
+    getInitDiaryId();
     getUserInfo();
 
     super.initState();
   }
 
-  Future<void> uploadImages(images) async {
-    print('12121');
+  uploadImages(List<XFile?> images) async {
+    print('images ==> $images');
+
     try {
-      var diaryId;
       final accessToken = await storage.read(key: 'accessToken');
-      final url = Uri.parse('$baseUrl$uploadDiaryImagesUrl/${diaryId}');
+      final url = Uri.parse('$baseUrl$uploadDiaryImagesUrl/$diaryId');
       final headers = {
         'Content-Type': 'multipart/form-data',
         'Authorization': 'Bearer $accessToken'
       };
 
       var request = http.MultipartRequest('POST', url);
-      request.files
-          .add(await http.MultipartFile.fromPath('multipartFiles', images));
       request.headers.addAll(headers);
 
-      var response = await request.send();
-      print('upload image ====> ${response.statusCode}');
+      for (int i = 0; i < images.length; i++) {
+        final image = images[i];
+        if (image != null) {
+          // final byteData = await File(image.path).readAsBytes();
+          // final multipartFile =
+          //     http.MultipartFile.fromBytes('multipartFiles', byteData);
+          // request.files.add(multipartFile);
+          request.files.add(
+              await http.MultipartFile.fromPath('multipartFiles', image!.path));
+        }
+      }
+
+      final res = await request.send();
+      final status = res.statusCode;
+      print('image upload status ==> $status');
     } catch (err) {
-      print('err ====> $err');
+      print('image upload err ==> $err');
     }
   }
 
@@ -188,7 +255,7 @@ class _WritingState extends State<Writing> {
 
     try {
       final accessToken = await storage.read(key: 'accessToken');
-      final url = Uri.parse('$baseUrl$createDiaryUrl');
+      final url = Uri.parse('$baseUrl$createDiaryUrl/$diaryId');
       final headers = {
         'Content-Type': 'application/json ',
         'Accept': 'application/json',
@@ -196,19 +263,21 @@ class _WritingState extends State<Writing> {
       };
 
       var petId;
-      var category;
+      var challengeId;
       var content;
       var stamps = [];
       var isPublic;
 
       if (data['petId'] != null) {
         petId = data['petId'];
+      } else {
+        petId = _selectedWrite['petId'];
       }
 
-      if (data['category'] != null) {
-        category = data['category'] == '일기쓰기' ? '일상 기록' : '챌린지';
+      if (data['challengeId'] != null && data['challengeId'] != '일기쓰기') {
+        challengeId = '1';
       } else {
-        category = '일상 기록';
+        challengeId = null;
       }
 
       content = data['content'] ?? ' ';
@@ -227,18 +296,23 @@ class _WritingState extends State<Writing> {
           }
 
           stamps.add(stamp);
+          setState(() {});
+        });
+      } else {
+        setState(() {
+          stamps = [];
         });
       }
 
       if (data['isPublic'] == null) {
-        isPublic = false;
+        isPublic = 'False';
       } else {
-        isPublic = data['isPublic'];
+        isPublic = 'True';
       }
 
       final body = jsonEncode({
         'petId': petId,
-        'category': category,
+        'challengeId': challengeId,
         'content': content,
         'stamps': stamps,
         'isPublic': isPublic
@@ -252,34 +326,29 @@ class _WritingState extends State<Writing> {
       print('${res.request} ==> $status');
 
       if (status == 201) {
-        print('success ##');
+        print('create diary ===> $info');
+        await Navigator.pushNamed(context, '/main');
+      } else if (status == 404) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('사진 등록 필요'),
+              content: Text('사진을 등록해 주세요.'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('확인'),
+                ),
+              ],
+            );
+          },
+        );
       } else {
         print('fail ##');
       }
-
-      // for (var imageFile in imageFiles) {
-      //   final mimeType =
-      //       lookupMimeType(imageFile.path) ?? 'application/octet-stream';
-      //   final fileStream = http.ByteStream(imageFile.openRead());
-      //   final length = await imageFile.length();
-      //
-      //   final multipartFile = http.MultipartFile(
-      //     'multipartFiles',
-      //     fileStream,
-      //     length,
-      //     filename: imageFile.path.split('/').last,
-      //     contentType: MediaType.parse(mimeType),
-      //   );
-      //   req.files.add(multipartFile);
-      // }
-      //
-      // // JSON 데이터를 멀티파트(form-data) 필드로 추가
-      // req.fields['petId'] = data['petId'].toString();
-      // req.fields['category'] = data['category'];
-      // req.fields['challengeTopic'] = data['category'];
-      // req.fields['content'] = data['content'];
-      // req.fields['stamps'] = data['stamps'].join(', ');
-      // req.fields['isPublic'] = data['isPublic'];
     } catch (err) {
       print('err ==> $err');
     }
@@ -294,7 +363,8 @@ class _WritingState extends State<Writing> {
     List<Widget> _boxContents = [
       IconButton(
           onPressed: () {
-            _pickImg();
+            // _pickImg();
+            _showBottomSheet();
           },
           icon: Container(
               alignment: Alignment.center,
@@ -347,27 +417,18 @@ class _WritingState extends State<Writing> {
                         );
                       },
                     ).toList(),
-                    // _selectedWrite ?? write.isNotEmpty
-                    //     ? write[0]['name']
-                    //     : null
-
-                    value: _selectedWrite != null
-                        ? _selectedWrite['name']
-                        : write[0]['name'],
+                    value: _selectedWrite != null &&
+                            _selectedWrite['name'] != null
+                        ? _selectedWrite['name'].toString()
+                        : (write.isNotEmpty ? write[0]['name'].toString() : ''),
                     onChanged: (value) {
+                      print('@@ => $value');
                       setState(() {
                         _selectedWrite =
                             write.firstWhere((pet) => pet['name'] == value);
-                        diaryForm['petId'] = _selectedWrite['petId'];
-                        diaryForm['name'] = _selectedWrite['name'];
-
-                        // _selectedWrite =
-                        //     write.firstWhere((pet) => pet['name'] == value);
-                        // diaryForm['petId'] = _selectedWrite['petId'];
-                        // diaryForm['name'] = _selectedWrite['name'];
+                        diaryForm['petId'] = _selectedWrite['petId'].toString();
+                        diaryForm['name'] = _selectedWrite['name'].toString();
                       });
-                      print(value);
-
                       print(diaryForm);
                     },
                   ),
@@ -414,7 +475,7 @@ class _WritingState extends State<Writing> {
                       print(value);
                       setState(() {
                         _selectedcategory = value!;
-                        diaryForm['category'] = _selectedcategory;
+                        diaryForm['challengeId'] = _selectedcategory;
                       });
                     },
                   ),
@@ -439,23 +500,29 @@ class _WritingState extends State<Writing> {
                   mainAxisSpacing: 5,
                   crossAxisSpacing: 5,
                   children: List.generate(
-                      4,
-                      (index) => DottedBorder(
-                          child: Container(
-                            child: Center(child: _boxContents[index]),
-                            decoration: index <= _pickedImages.length - 1
-                                ? BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    image: DecorationImage(
-                                        fit: BoxFit.cover,
-                                        image: FileImage(
-                                            File(_pickedImages[index]!.path))))
-                                : null,
-                          ),
-                          color: Colors.grey,
-                          dashPattern: [8, 3],
-                          borderType: BorderType.RRect,
-                          radius: const Radius.circular(10))).toList(),
+                    4,
+                    (index) => GestureDetector(
+                        onTap: () {
+                          print('upload ###############');
+                          _showBottomSheet();
+                        },
+                        child: DottedBorder(
+                            child: Container(
+                              child: Center(child: _boxContents[index]),
+                              decoration: index <= _pickedImages.length - 1
+                                  ? BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      image: DecorationImage(
+                                          fit: BoxFit.cover,
+                                          image: FileImage(File(
+                                              _pickedImages[index]!.path))))
+                                  : null,
+                            ),
+                            color: Colors.grey,
+                            dashPattern: [8, 3],
+                            borderType: BorderType.RRect,
+                            radius: const Radius.circular(10))),
+                  ),
                 ),
                 Container(
                   width: 340,
@@ -741,7 +808,8 @@ class _WritingState extends State<Writing> {
 
 // 카메라로 이동
   _getCameraImage() async {
-    final pickedFile = await imagePicker.pickImage(source: ImageSource.camera);
+    final pickedFile = await imagePicker.pickImage(
+        source: ImageSource.camera, imageQuality: 50);
     if (pickedFile != null) {
       setState(() {
         isDefault = false;
@@ -756,14 +824,19 @@ class _WritingState extends State<Writing> {
 
 // 갤러리로 이동
   _getPhotoLibraryImage() async {
-    final pickedFile = await imagePicker.pickMultiImage();
-    if (pickedFile != null && pickedFile.isNotEmpty) {
+    // final pickedFile = await imagePicker.pickImage(
+    //     source: ImageSource.gallery, imageQuality: 50);
+    final pickedFile = await imagePicker.pickMultiImage(imageQuality: 50);
+    if (pickedFile != null) {
       setState(() {
         isDefault = false;
-        _pickedImages = pickedFile;
+        // _pickedImages.add(pickedFile as XFile?);
+        _pickedImages.addAll(pickedFile);
       });
 
-      uploadImages(pickedFile);
+      if (_pickedImages.isNotEmpty) {
+        uploadImages(_pickedImages);
+      }
     } else {
       if (kDebugMode) {
         print('이미지 선택안함');
