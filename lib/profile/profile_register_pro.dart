@@ -165,6 +165,11 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
                                     image: FileImage(File(_pickedFile!.path)),
                                     fit: BoxFit.cover),
                               ),
+                              child: GestureDetector(
+                                onTap: () {
+                                  _showBottomSheet();
+                                },
+                              ),
                             )
                           : Container(
                               width: _imageSize,
@@ -178,6 +183,11 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
                                 image: DecorationImage(
                                     image: AssetImage(defaultImg),
                                     fit: BoxFit.contain),
+                              ),
+                              child: GestureDetector(
+                                onTap: () {
+                                  _showBottomSheet();
+                                },
                               ),
                             )),
                 const SizedBox(
@@ -457,7 +467,8 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
 
 // 카메라로 이동
   _getCameraImage() async {
-    final pickedFile = await imagePicker.pickImage(source: ImageSource.camera);
+    final pickedFile = await imagePicker.pickImage(
+        source: ImageSource.camera, imageQuality: 30);
     if (pickedFile != null) {
       setState(() {
         isDefault = false;
@@ -472,7 +483,8 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
 
 // 갤러리로 이동
   _getPhotoLibraryImage() async {
-    final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+    final pickedFile = await imagePicker.pickImage(
+        source: ImageSource.gallery, imageQuality: 30);
     if (pickedFile != null) {
       setState(() {
         isDefault = false;

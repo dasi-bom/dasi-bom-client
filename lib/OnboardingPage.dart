@@ -33,6 +33,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
   final getUserInfoUrl = dotenv.env['GET_USER_INFO_API'].toString();
 
   var user_name = '';
+  var pet_list = 0;
 
   // 로그인 생성자 생성
   final viewModel = MainViewModel(KakaoLogin());
@@ -43,14 +44,17 @@ class _OnboardingPageState extends State<OnboardingPage> {
     Size screenSize(BuildContext context) {
       return MediaQuery.of(context).size;
     }
+
     // 화면 높이
     double screenHeight(BuildContext context, {double dividedBy = 1}) {
       return screenSize(context).height / dividedBy;
     }
+
     // 화면 너비
     double screenWidth(BuildContext context, {double dividedBy = 1}) {
       return screenSize(context).width / dividedBy;
     }
+
     //상단 툴바를 제외한 화면 높이
     double screenHeightExcludingToolbar(BuildContext context,
         {double dividedBy = 1}) {
@@ -98,9 +102,12 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
               if (info['nickname'] == null) {
                 await Navigator.of(context).push(_createRoute());
+              } else if (info['petProfileResponses'].length == 0) {
+                await Navigator.of(context).push(_createRoute());
               } else {
                 setState(() {
                   user_name = info['nickname'];
+                  pet_list = info['petProfileResponses'].length;
                 });
 
                 await Navigator.of(context).push(_createRoute());
@@ -422,10 +429,28 @@ class _OnboardingPageState extends State<OnboardingPage> {
           );
         },
       );
-    } else {
+    } else if (pet_list == 0) {
       return PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
             const RegisterProfileAnimal(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(0.0, 10.0);
+          const end = Offset.zero;
+          const curve = Curves.ease;
+
+          var tween =
+              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+          return SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          );
+        },
+      );
+    } else {
+      return PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const MainPage(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           const begin = Offset(0.0, 10.0);
           const end = Offset.zero;
