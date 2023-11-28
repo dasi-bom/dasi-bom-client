@@ -644,7 +644,7 @@ class Page1 extends StatelessWidget {
                     color: Colors.black),
               ),
               onPressed: () {
-                Navigator.pushNamed(context, '/detail');
+                Navigator.of(context).pushNamed('/detail');
               },
             ),
           ),

@@ -73,65 +73,7 @@ class _SeeingState extends State<Seeing> {
     return SafeArea(
       key: scaffoldKey,
       child: Scaffold(
-        // // 상단 앱 바
-        // appBar: AppBar(
-        //   backgroundColor: Colors.white,
-        //   title: Image.asset('assets/ic_barlogo.png', width: 100, height: 100),
-        //   automaticallyImplyLeading: false, // appbar 뒤로가기 버튼 숨김
-        //   actions: <Widget>[
-        //     // actions 프로퍼티에는 어떠한 위젯도 리스트로 배치 가능
-        //     IconButton(
-        //       // 채팅 버튼
-        //       onPressed: () {},
-        //       icon: Icon(Icons.chat_outlined),
-        //       color: Colors.black,
-        //     ),
-        //     IconButton(
-        //       // 알림 버튼
-        //       onPressed: () {},
-        //       icon: Icon(Icons.add_alert_outlined),
-        //       color: Colors.black,
-        //     ),
-        //     IconButton(
-        //       // 햄버거 메뉴 버튼
-        //       onPressed: () {
-        //         scaffoldKey.currentState?.openEndDrawer();
-        //       },
-        //       icon: Icon(Icons.menu),
-        //       color: Colors.black,
-        //     ),
-        //   ],
-        // ),
-        // backgroundColor: Colors.white,
-        // // 하단 내비게이션 바
-        // bottomNavigationBar: BottomNavigationBar(
-        //   backgroundColor: Colors.white,
-        //   selectedItemColor: Colors.orangeAccent,
-        //   unselectedItemColor: Colors.black,
-        //   onTap: (index) {
-        //     setState(() {});
-        //   },
-        //   // 선택된 인덱스
-        //   items: <BottomNavigationBarItem>[
-        //     BottomNavigationBarItem(
-        //       // 하단 탭 아이템리스트 선언
-        //       label: '',
-        //       icon: Icon(Icons.home_outlined),
-        //     ),
-        //     BottomNavigationBarItem(
-        //       label: '',
-        //       icon: Icon(Icons.border_color_outlined),
-        //     ),
-        //     BottomNavigationBarItem(
-        //       label: '',
-        //       icon: Icon(Icons.people_outline),
-        //     ),
-        //     BottomNavigationBarItem(
-        //       label: '',
-        //       icon: Icon(Icons.account_circle_outlined),
-        //     ),
-        //   ],
-        // ),
+        resizeToAvoidBottomInset: false,
         body: SingleChildScrollView(
           child: Column(
             children: [
@@ -238,45 +180,59 @@ class _SeeingState extends State<Seeing> {
 
   Widget _comment() {
     return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // 쓰다듬기 count
-          GestureDetector(
-            child: const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              child: Text(
-                '123번 쓰다듬받았어요!',
-                // '좋아요 ${widget.countLikes}개',
-                style: TextStyle(fontWeight: FontWeight.bold),
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // 쓰다듬기 count
+        GestureDetector(
+          child: Row(
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(left: 16, top: 10, bottom: 10),
+                child: Text(
+                  '123',
+                  // '좋아요 ${widget.countLikes}개',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.orange),
+                ),
               ),
-            ),
-            onTap: () {
-              _likeBottomSheet();
-            },
+              Padding(
+                padding: EdgeInsets.only(top: 10, bottom: 10),
+                child: Text(
+                  '번 쓰다듬었어요!',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
           ),
-          // 본문 내용
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: ExpandableText(
-              // 피드 내용
-              '카야랑 오늘은 한강을 따라 산책을 갔다.\n흙냄새가 좋은지..마구 달리던 카야\n너무 귀여웠다.\n오늘의 산책 완료!',
-              expandText: '더보기', //더보기 글자
-              linkColor: Colors.grey, //더보기 글자 색 지정
-              prefixText: '글린다', // 작성자의 이름
-              // 작성자의 이름 스타일
-              prefixStyle: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-            ),
+          onTap: () {
+            _likeBottomSheet();
+          },
+        ),
+        // 본문 내용
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          child: ExpandableText(
+            // 피드 내용
+            '카야랑 오늘은 한강을 따라 산책을 갔다.\n흙냄새가 좋은지..마구 달리던 카야\n너무 귀여웠다.\n오늘의 산책 완료!',
+            expandText: '더보기', //더보기 글자
+            linkColor: Colors.grey, //더보기 글자 색 지정
+            prefixText: '글린다', // 작성자의 이름
+            // 작성자의 이름 스타일
+            prefixStyle: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
           ),
-          // 챌린지 주제
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 15),
-            child: Text(
-              '[챌린지] 날도 좋은데, 기분 좋은 산책 일기',
-              style: TextStyle(color: Colors.grey),
-            ),
+        ),
+        // 챌린지 주제
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+          child: Text(
+            '[챌린지] 날도 좋은데, 기분 좋은 산책 일기',
+            style: TextStyle(color: Colors.grey),
           ),
-        ],
-      );
+        ),
+        Divider(
+            color: Colors.black.withOpacity(0.5), height: 2, thickness: 0.3),
+      ],
+    );
   }
 
   Widget _options() {
@@ -313,8 +269,11 @@ class _SeeingState extends State<Seeing> {
                 },
               ),
             ),
-            const Text(
-              '(10)',
+            Padding(
+              padding: const EdgeInsets.only(left: 5),
+              child: const Text(
+                '(10)',
+              ),
             ),
           ],
         ),
@@ -396,6 +355,7 @@ class _SeeingState extends State<Seeing> {
   // 쓰다듬기 bottomsheet
   _likeBottomSheet() {
     return showModalBottomSheet<dynamic>(
+      backgroundColor: Colors.white,
       isScrollControlled: true,
       context: context,
       shape: const RoundedRectangleBorder(
@@ -415,14 +375,34 @@ class _SeeingState extends State<Seeing> {
               children: [
                 _LikesHeader(
                     key: commentsHeaderKey, scrollController: scrollController),
+                Row(
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(left: 16, top: 10, bottom: 10),
+                      child: Text(
+                        '123',
+                        // '좋아요 ${widget.countLikes}개',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, color: Colors.orange),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 10, bottom: 10),
+                      child: Text(
+                        '번 쓰다듬었어요!',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
                 Expanded(
                   child: ListView.builder(
-                    padding: EdgeInsets.zero,
+                    padding: EdgeInsets.symmetric(vertical: 5),
                     itemCount: 30,
                     itemBuilder: (context, index) => Container(
                       color: index % 2 == 0
-                          ? const Color(0xffAAC4FF)
-                          : const Color(0xffD2DAFF),
+                          ? const Color(0xffffffff)
+                          : const Color(0xffffffff),
                       child: Row(
                         children: [
                           Padding(
@@ -434,7 +414,8 @@ class _SeeingState extends State<Seeing> {
                           ),
                           Text('딩딩이'),
                           Padding(
-                            padding: const EdgeInsets.only(right: 16,left: 135),
+                            padding:
+                                const EdgeInsets.only(right: 16, left: 135),
                             child: SizedBox(
                               height: 40,
                               width: 100,
@@ -477,6 +458,7 @@ class _SeeingState extends State<Seeing> {
     const int numberOfLikes = 0;
 
     return showModalBottomSheet<dynamic>(
+      backgroundColor: Colors.white,
       isScrollControlled: true,
       context: context,
       shape: const RoundedRectangleBorder(
@@ -498,12 +480,12 @@ class _SeeingState extends State<Seeing> {
                     key: commentsHeaderKey, scrollController: scrollController),
                 Expanded(
                   child: ListView.builder(
-                    padding: EdgeInsets.zero,
+                    padding: EdgeInsets.symmetric(vertical: 5),
                     itemCount: 30,
                     itemBuilder: (context, index) => Container(
                       color: index % 2 == 0
-                          ? const Color(0xffAAC4FF)
-                          : const Color(0xffD2DAFF),
+                          ? const Color(0xffffffff)
+                          : const Color(0xffffffff),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
@@ -572,61 +554,69 @@ class _SeeingState extends State<Seeing> {
                     ),
                   ),
                 ),
+                Divider(
+                    color: Colors.black.withOpacity(0.5),
+                    height: 2,
+                    thickness: 0.3),
                 // 댓글 달기 영역
-                Row(
-                  children: [
-                    const Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 16, vertical: 15),
-                      child: CircleAvatar(
-                        radius: 15,
-                        backgroundImage: AssetImage('assets/user2.png'),
+                Padding(
+                  padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom),
+                  child: Row(
+                    children: [
+                      const Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+                        child: CircleAvatar(
+                          radius: 15,
+                          backgroundImage: AssetImage('assets/user2.png'),
+                        ),
+                        // child: ImageAvatar(
+                        //   url:
+                        //   'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnnnObTCNg1QJoEd9Krwl3kSUnPYTZrxb5Ig&usqp=CAU',
+                        //   type: AvatarType.BASIC,
+                        // ),
                       ),
-                      // child: ImageAvatar(
-                      //   url:
-                      //   'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnnnObTCNg1QJoEd9Krwl3kSUnPYTZrxb5Ig&usqp=CAU',
-                      //   type: AvatarType.BASIC,
-                      // ),
-                    ),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width / 1.5,
-                      child: GestureDetector(
-                        child: TextFormField(
-                          maxLines: 1,
-                          keyboardType: TextInputType.text,
-                          autovalidateMode: AutovalidateMode.always,
-                          decoration: InputDecoration(
-                              hintText: '댓글 달기...'),
-                          onSaved: (value) {
-                            setState(() {
-                              _comments = value as String;
-                              _commentsController.value =
-                                  TextEditingValue(text: value);
-                              formData['desc'] = value;
-                            });
-                          },
-                          controller: _commentsController,
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width / 1.5,
+                        child: GestureDetector(
+                          child: TextFormField(
+                            maxLines: 1,
+                            keyboardType: TextInputType.text,
+                            autovalidateMode: AutovalidateMode.always,
+                            decoration: InputDecoration(hintText: '댓글 달기...'),
+                            onSaved: (value) {
+                              setState(() {
+                                _comments = value as String;
+                                _commentsController.value =
+                                    TextEditingValue(text: value);
+                                formData['desc'] = value;
+                              });
+                            },
+                            controller: _commentsController,
+                          ),
                         ),
                       ),
-                    ),
-                    // 댓글달기 업로드 버튼
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: IconButton(
-                        onPressed: () => setState(
-                          () {
-                            validationResult =
-                                formKey.currentState?.validate() ?? false;
-                            formKey.currentState!.save();
-                            // registerPerProfile(formData);
-                          },
+                      // 댓글달기 업로드 버튼
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: IconButton(
+                          onPressed: () => setState(
+                            () {
+                              validationResult =
+                                  formKey.currentState?.validate() ?? false;
+                              formKey.currentState!.save();
+                              // registerPerProfile(formData);
+                            },
+                          ),
+                          icon: Icon(Icons.arrow_upward),
+                          color: Colors.black,
                         ),
-                        icon: Icon(Icons.arrow_upward),
-                        color: Colors.black,
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
+                const SizedBox(height: 20),
               ],
             );
           },
@@ -662,7 +652,7 @@ class _LikesHeader extends StatelessWidget {
           ),
           const SizedBox(height: 15),
           Divider(
-              color: Colors.black.withOpacity(0.5), height: 2, thickness: 2),
+              color: Colors.black.withOpacity(0.5), height: 2, thickness: 0.3),
         ],
       ),
     );
@@ -695,7 +685,7 @@ class _CommentsHeader extends StatelessWidget {
           ),
           const SizedBox(height: 15),
           Divider(
-              color: Colors.black.withOpacity(0.5), height: 2, thickness: 2),
+              color: Colors.black.withOpacity(0.5), height: 2, thickness: 0.3),
         ],
       ),
     );

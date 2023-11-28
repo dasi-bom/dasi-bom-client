@@ -28,7 +28,7 @@ class Writing extends StatefulWidget {
   State<Writing> createState() => _WritingState();
 }
 
-class _WritingState extends State<Writing> {
+class _WritingState extends State<Writing> with SingleTickerProviderStateMixin {
   final storage = FlutterSecureStorage();
   final baseUrl = dotenv.env['BASE_URL'].toString();
   final createDiaryUrl = dotenv.env['CREATE_DIARY_API'].toString();
@@ -206,6 +206,8 @@ class _WritingState extends State<Writing> {
     }
   }
 
+  late TabController _controller;
+
   @override
   void initState() {
     validationResult = false;
@@ -214,6 +216,7 @@ class _WritingState extends State<Writing> {
     getUserInfo();
 
     super.initState();
+    _controller = TabController(vsync: this, length: 7);
   }
 
   uploadImages(List<XFile?> images) async {
@@ -275,7 +278,7 @@ class _WritingState extends State<Writing> {
       }
 
       if (data['challengeId'] != null && data['challengeId'] != '일기쓰기') {
-        challengeId = '1';
+        challengeId = 2;
       } else {
         challengeId = null;
       }
@@ -436,18 +439,23 @@ class _WritingState extends State<Writing> {
                 const SizedBox(
                   height: 15,
                 ),
-                Container(
-                  width: 340,
-                  child: const Text(
-                    '카테고리 선택하기',
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: const Text(
+                      '카테고리 선택하기',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                          fontWeight: FontWeight.normal, fontSize: 13),
+                    ),
                   ),
                 ),
                 // 카테고리 등록
                 Padding(
-                  padding: const EdgeInsets.only(right: 130, left: 20, top: 5),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   child: DropdownButtonFormField(
                     items: _category.map(
                       (value) {
@@ -481,22 +489,39 @@ class _WritingState extends State<Writing> {
                   ),
                 ),
                 const SizedBox(
-                  height: 15,
+                  height: 10,
                 ),
-                Container(
-                  width: 340,
-                  child: const Text(
-                    '사진 등록하기',
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        child: const Text(
+                          '사진 등록하기',
+                          textAlign: TextAlign.right,
+                          style: TextStyle(
+                              fontWeight: FontWeight.normal, fontSize: 13),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 40,
+                        width: 40,
+                        child: GestureDetector(
+                          child: Image.asset('assets/ic_addtexticon.png'),
+                          onTap: () {
+                            _showBottomSheet();
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 // 사진 등록
                 GridView.count(
                   shrinkWrap: true,
-                  padding: const EdgeInsets.all(20),
-                  crossAxisCount: isPadMode ? 2 : 4,
+                  padding: const EdgeInsets.all(16),
+                  crossAxisCount: isPadMode ? 1 : 4,
                   mainAxisSpacing: 5,
                   crossAxisSpacing: 5,
                   children: List.generate(
@@ -524,19 +549,23 @@ class _WritingState extends State<Writing> {
                             radius: const Radius.circular(10))),
                   ),
                 ),
-                Container(
-                  width: 340,
-                  child: const Text(
-                    '본문 작성하기',
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: const Text(
+                      '본문 작성하기',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                          fontWeight: FontWeight.normal, fontSize: 13),
+                    ),
                   ),
                 ),
                 // 본문 등록
                 Padding(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   child: TextFormField(
                     maxLines: 5,
                     keyboardType: TextInputType.text,
@@ -564,31 +593,33 @@ class _WritingState extends State<Writing> {
                   ),
                 ),
                 const SizedBox(
-                  height: 15,
+                  height: 10,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: 100,
-                      child: const Text(
-                        '텍스트 아이콘',
-                        textAlign: TextAlign.right,
-                        style: TextStyle(
-                            fontWeight: FontWeight.normal, fontSize: 13),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        child: const Text(
+                          '텍스트 아이콘',
+                          textAlign: TextAlign.right,
+                          style: TextStyle(
+                              fontWeight: FontWeight.normal, fontSize: 13),
+                        ),
                       ),
-                    ),
-                    SizedBox(
-                      height: 40,
-                      width: 40,
-                      child: GestureDetector(
-                        child: Image.asset('assets/ic_addtexticon.png'),
-                        onTap: () {
-                          _texticonBottomSheet(context);
-                        },
+                      SizedBox(
+                        height: 40,
+                        width: 40,
+                        child: GestureDetector(
+                          child: Image.asset('assets/ic_addtexticon.png'),
+                          onTap: () {
+                            _texticonBottomSheet(context);
+                          },
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 // 주제 해시태그 등록
                 ChipsChoice<String>.multiple(
@@ -616,20 +647,24 @@ class _WritingState extends State<Writing> {
                   choiceStyle: C2ChipStyle.filled(),
                 ),
                 const SizedBox(
-                  height: 15,
+                  height: 10,
                 ),
-                Container(
-                  width: 340,
-                  child: const Text(
-                    '나만 보기 설정',
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: const Text(
+                      '나만 보기 설정',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                          fontWeight: FontWeight.normal, fontSize: 13),
+                    ),
                   ),
                 ),
                 // 나만 보기 설정
                 Padding(
-                  padding: const EdgeInsets.only(top: 15),
+                  padding: const EdgeInsets.only(top: 10),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -660,80 +695,56 @@ class _WritingState extends State<Writing> {
                   ),
                 ),
                 const SizedBox(
-                  height: 15,
+                  height: 10,
                 ),
                 // 일기 등록하기
-                SizedBox(
-                  height: 60,
-                  width: 350,
-                  child: Container(
-                    height: 30,
-                    color: Colors.white,
-                    margin: const EdgeInsets.only(top: 20),
-                    child: ElevatedButton(
-                      style: ButtonStyle(
-                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15))),
-                        backgroundColor:
-                            MaterialStateProperty.all(const Color(0xFFFFED8E)),
-                      ),
-                      onPressed: () {
-                        setState(
-                          () {
-                            validationResult =
-                                formKey.currentState?.validate() ?? false;
-                            formKey.currentState!.save();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                  content: Text('$_selectedcategory/$_body')),
-                            );
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  child: SizedBox(
+                    height: 60,
+                    width: double.infinity,
+                    child: Container(
+                      color: Colors.white,
+                      margin: const EdgeInsets.only(top: 20),
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                          shape: MaterialStateProperty.all(
+                              RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15))),
+                          backgroundColor: MaterialStateProperty.all(
+                              const Color(0xFFFFED8E)),
+                        ),
+                        onPressed: () {
+                          setState(
+                            () {
+                              validationResult =
+                                  formKey.currentState?.validate() ?? false;
+                              formKey.currentState!.save();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                    content: Text('$_selectedcategory/$_body')),
+                              );
 
-                            // Writing(formData);
+                              // Writing(formData);
 
-                            createDiary(diaryForm); // 일기 등록 테스트
-                            // Navigator.of(context)
-                            //     .push(_createRoute()); // 일기보기에서 홈화면으로 수정
-
-                            // 일기쓰기 완료 팝업 메시지
-                            // showDialog(
-                            //     context: context,
-                            //     barrierDismissible: false,
-                            //     builder: (BuildContext context) {
-                            //       return AlertDialog(
-                            //         title: const Text('완료'),
-                            //         content: SingleChildScrollView(
-                            //           child: ListBody(
-                            //             children: const <Widget>[
-                            //               Text('일기가 등록되었습니다:)'),
-                            //             ],
-                            //           ),
-                            //         ),
-                            //         actions: <Widget>[
-                            //           ElevatedButton(
-                            //             child: const Text('확인'),
-                            //             onPressed: () {
-                            //               Navigator.of(context)
-                            //                   .push(_createRoute());
-                            //             },
-                            //           )
-                            //         ],
-                            //       );
-                            //     });
-                          },
-                        );
-                      },
-                      child: const Text(
-                        "일기 등록하기",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
+                              createDiary(diaryForm); // 일기 등록 테스트
+                            },
+                          );
+                        },
+                        child: const Text(
+                          "일기 등록하기",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
                 const SizedBox(
-                  height: 40,
+                  height: 20,
                 ),
               ],
             ),
@@ -845,11 +856,55 @@ class _WritingState extends State<Writing> {
   }
 }
 
-// const TabController tabController;
-
-// texticon bottomsheet
+// 텍스트아이콘 bottomsheet
 _texticonBottomSheet(BuildContext context) {
-  final GlobalKey texticonHeaderKey = GlobalKey();
+  List<String> tags = [];
+  List<String> options1 = [
+    '산책',
+    '간식',
+    '밥',
+    '장난감',
+    '목욕',
+    '소풍',
+    '드라이브',
+    '데이트',
+    '미용실',
+    '병원',
+    '다이어트',
+    '친구',
+    '수면',
+    'TMI',
+  ];
+  List<String> options2 = [
+    '행복',
+    '사랑',
+    '즐거움',
+    '설렘',
+    '호기심',
+    '슬픔',
+    '화남',
+    '질투',
+  ];
+  List<String> options3 = [
+    '특기',
+    '취미',
+    '건강',
+    '패션',
+    '매력포인트',
+  ];
+  List<String> options4 = [
+    '맑음',
+    '바람',
+    '더움',
+    '비',
+    '눈',
+    '흐림',
+  ];
+  List<String> options5 = [
+    '세계강아지의날',
+    '세계고양이의날',
+    '지구의날',
+  ];
   return showModalBottomSheet<dynamic>(
     isScrollControlled: true,
     context: context,
@@ -859,54 +914,223 @@ _texticonBottomSheet(BuildContext context) {
       ),
     ),
     builder: (BuildContext context) {
-      return DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: 0.5,
-        minChildSize: 0.5,
-        maxChildSize: 0.9,
-        builder: (context, scrollController) {
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              _texticonHeader(
-                  key: texticonHeaderKey, scrollController: scrollController),
-            ],
-          );
-        },
+      return SingleChildScrollView(
+        child: Padding(
+          padding: MediaQuery.of(context).viewInsets,
+          child: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+            var controller;
+            return Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height/2,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(18.0),
+                  topRight: const Radius.circular(18.0),
+                ),
+              ),
+              child: DefaultTabController(
+                length: 7,
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 15),
+                            const Text(
+                              '텍스트 아이콘',
+                              style: TextStyle(fontSize: 18),
+                            ),
+                            const SizedBox(height: 15),
+                            Divider(
+                                color: Colors.black.withOpacity(0.5), height: 2, thickness: 0.3),
+                          ],
+                        ),
+                        TabBar(
+                          isScrollable: true,
+                          labelStyle: TextStyle(fontWeight: FontWeight.bold),
+                          unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),
+                          indicator: UnderlineTabIndicator(
+                            borderSide: BorderSide(color: Colors.orange, width: 5), // Indicator height
+                            insets: EdgeInsets.symmetric(horizontal: 5), // Indicator width
+                          ),
+                          tabs: [
+                            Tab(
+                              text: '추천',),
+                            Tab(
+                              text: '최근사용',),
+                            Tab(
+                              text: '일상',),
+                            Tab(
+                              text: '감정',),
+                            Tab(
+                              text: '궁금해요',),
+                            Tab(
+                              text: '날씨',),
+                            Tab(
+                              text: '이벤트',),
+                          ],
+                        ),
+                        Divider(
+                            color: Colors.black.withOpacity(0.5), height: 2, thickness: 0.3),
+                        Expanded(
+                          child: TabBarView(
+                            controller: controller,
+                            children: <Widget>[
+                              Column(
+                                children: <Widget>[
+                                ],
+                              ),
+                              Column(
+                                children: <Widget>[
+                                ],
+                              ),
+                              Column(
+                                children: <Widget>[
+                                  ChipsChoice<String>.multiple(
+                                    wrapped: true,
+                                    padding: EdgeInsets.symmetric(vertical: 40),
+                                    value: tags,
+                                    onChanged: (value) {
+                                      print(value);
+                                      setState(() {
+                                        tags = value;
+                                        var diaryForm;
+                                        diaryForm['stamps'] = tags;
+                                      });
+                                    },
+
+                                    choiceItems: C2Choice.listFrom<String, String>(
+                                      source: options1,
+                                      value: (i, v) => v,
+                                      label: (i, v) => v,
+                                      tooltip: (i, v) => v,
+                                    ),
+                                    choiceCheckmark: false,
+                                    choiceStyle: C2ChipStyle.filled(),
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                children: <Widget>[
+                                  ChipsChoice<String>.multiple(
+                                    wrapped: true,
+                                    padding: EdgeInsets.symmetric(vertical: 40),
+                                    value: tags,
+                                    onChanged: (value) {
+                                      print(value);
+                                      setState(() {
+                                        tags = value;
+                                        var diaryForm;
+                                        diaryForm['stamps'] = tags;
+                                      });
+                                    },
+
+                                    choiceItems: C2Choice.listFrom<String, String>(
+                                      source: options2,
+                                      value: (i, v) => v,
+                                      label: (i, v) => v,
+                                      tooltip: (i, v) => v,
+                                    ),
+                                    choiceCheckmark: false,
+                                    choiceStyle: C2ChipStyle.filled(),
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                children: <Widget>[
+                                  ChipsChoice<String>.multiple(
+                                    wrapped: true,
+                                    padding: EdgeInsets.symmetric(vertical: 40),
+                                    value: tags,
+                                    onChanged: (value) {
+                                      print(value);
+                                      setState(() {
+                                        tags = value;
+                                        var diaryForm;
+                                        diaryForm['stamps'] = tags;
+                                      });
+                                    },
+
+                                    choiceItems: C2Choice.listFrom<String, String>(
+                                      source: options3,
+                                      value: (i, v) => v,
+                                      label: (i, v) => v,
+                                      tooltip: (i, v) => v,
+                                    ),
+                                    choiceCheckmark: false,
+                                    choiceStyle: C2ChipStyle.filled(),
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                children: <Widget>[
+                                  ChipsChoice<String>.multiple(
+                                    wrapped: true,
+                                    padding: EdgeInsets.symmetric(vertical: 40),
+                                    value: tags,
+                                    onChanged: (value) {
+                                      print(value);
+                                      setState(() {
+                                        tags = value;
+                                        var diaryForm;
+                                        diaryForm['stamps'] = tags;
+                                      });
+                                    },
+
+                                    choiceItems: C2Choice.listFrom<String, String>(
+                                      source: options4,
+                                      value: (i, v) => v,
+                                      label: (i, v) => v,
+                                      tooltip: (i, v) => v,
+                                    ),
+                                    choiceCheckmark: false,
+                                    choiceStyle: C2ChipStyle.filled(),
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                children: <Widget>[
+                                  ChipsChoice<String>.multiple(
+                                    wrapped: true,
+                                    padding: EdgeInsets.symmetric(vertical: 40),
+                                    value: tags,
+                                    onChanged: (value) {
+                                      print(value);
+                                      setState(() {
+                                        tags = value;
+                                        var diaryForm;
+                                        diaryForm['stamps'] = tags;
+                                      });
+                                    },
+
+                                    choiceItems: C2Choice.listFrom<String, String>(
+                                      source: options5,
+                                      value: (i, v) => v,
+                                      label: (i, v) => v,
+                                      tooltip: (i, v) => v,
+                                    ),
+                                    choiceCheckmark: false,
+                                    choiceStyle: C2ChipStyle.filled(),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        )
+                      ]),
+                ),
+              ),
+            );
+          }),
+        ),
       );
     },
   );
-}
-
-// 텍스트 아이콘 헤더
-class _texticonHeader extends StatelessWidget {
-  const _texticonHeader({
-    Key? key,
-    required this.scrollController,
-  }) : super(key: key);
-
-  final ScrollController scrollController;
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      physics: const ClampingScrollPhysics(),
-      controller: scrollController,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          const SizedBox(height: 10),
-          Image.asset('assets/ic_bottomsheetbar.png'),
-          const SizedBox(height: 10),
-          const Text(
-            '텍스트 아이콘',
-            style: TextStyle(fontSize: 18),
-          ),
-          const SizedBox(height: 15),
-          Divider(
-              color: Colors.black.withOpacity(0.5), height: 2, thickness: 2),
-        ],
-      ),
-    );
-  }
 }
