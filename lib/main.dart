@@ -1,4 +1,6 @@
 import 'package:dasi_bom_client/SeeingPage.dart';
+import 'package:dasi_bom_client/dasibom/dasibom_content.dart';
+import 'package:dasi_bom_client/dasibom/dasibom_content2.dart';
 import 'package:flutter/material.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:dasi_bom_client/SplashPage.dart';
@@ -51,8 +53,9 @@ void main() async {
             '/main': (context) => MainPage(),
             '/register1': (context) => RegisterProfileProtector(),
             '/register2': (context) => RegisterProfileAnimal(),
-            // '/seeing': (context) => Seeing(),
             '/detail': (context, {arguments}) => Seeing(routeparam: arguments),
+            '/content' : (context) => DasibomContent(),
+            '/content2' : (context) => DasibomContent2(),
           },
         )),
   );

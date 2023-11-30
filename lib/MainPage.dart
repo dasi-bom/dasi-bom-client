@@ -1,3 +1,4 @@
+import 'package:dasi_bom_client/dasibom/dasibom_content.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dasi_bom_client/widgets/Kakao_Login.dart';
@@ -83,7 +84,8 @@ class _MainPageState extends State<MainPage> {
         elevation: 0.0,
         backgroundColor: Colors.white,
         title: Image.asset('assets/ic_barlogo.png', width: 100, height: 100),
-        automaticallyImplyLeading: false, // appbar 뒤로가기 버튼 숨김
+        automaticallyImplyLeading: false,
+        // appbar 뒤로가기 버튼 숨김
         actions: <Widget>[
           // actions 프로퍼티에는 어떠한 위젯도 리스트로 배치 가능
           IconButton(
@@ -918,30 +920,84 @@ class Page3 extends StatefulWidget {
   State<Page3> createState() => _Page3State();
 }
 
-class _Page3State extends State<Page3> {
+class _Page3State extends State<Page3> with TickerProviderStateMixin {
+  // Tab 변수 선언
+  late TabController tabController;
+
+  // Tab 변수 초기화
+  @override
+  void initState() {
+    super.initState();
+    tabController = TabController(length: 3, vsync: this);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
+    return Scaffold(
+      body: Column(
         children: [
-          GridView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              itemCount: 100,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                childAspectRatio: 1,
-                mainAxisSpacing: 1,
-                crossAxisSpacing: 1,
-              ),
-              itemBuilder: (BuildContext context, int index) {
-                return Container(
-                  color: Colors.grey,
-                );
-              }),
+          TabBar(
+              controller: tabController,
+              indicatorColor: Colors.black,
+              indicatorWeight: 1,
+              tabs: [
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Text('카테고리1'),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Text('카테고리2'),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Text('카테고리3'),
+                ),
+              ]),
+          Expanded(
+            // 내 정보 내의 탭 컨트롤러 지정
+            child: TabBarView(
+              controller: tabController,
+              children: <Widget>[
+                Page11(),
+                Page22(),
+                Page33(),
+              ],
+            ),
+          )
         ],
       ),
     );
+  }
+}
+
+// 커뮤니티 클래스 _ 카테고리1 탭
+class Page11 extends StatelessWidget {
+  const Page11({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text('history');
+  }
+}
+
+// 커뮤니티 클래스 _ 카테고리2 탭
+class Page22 extends StatelessWidget {
+  const Page22({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text('activity');
+  }
+}
+
+// 커뮤니티 클래스 _ 카테고리3 탭
+class Page33 extends StatelessWidget {
+  const Page33({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text('activity');
   }
 }
 
@@ -992,9 +1048,9 @@ class _Page4State extends State<Page4> with TickerProviderStateMixin {
             child: TabBarView(
               controller: tabController,
               children: <Widget>[
-                Page11(),
-                Page22(),
-                Page33(),
+                Page111(),
+                Page222(),
+                Page333(),
               ],
             ),
           )
@@ -1005,17 +1061,17 @@ class _Page4State extends State<Page4> with TickerProviderStateMixin {
 }
 
 // 내 정보 클래스 _ 프로필 탭
-class Page11 extends StatelessWidget {
-  const Page11({Key? key}) : super(key: key);
+class Page111 extends StatelessWidget {
+  const Page111({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
         children: [
-          const SizedBox(height: 10),
           _information(),
           _menu(),
+          const SizedBox(height: 20),
           _tabView()
         ],
       ),
@@ -1023,65 +1079,66 @@ class Page11 extends StatelessWidget {
   }
 
   Widget _statisticsOne(String title, int value) {
-    return Column(
-      children: [
-        Text(
-          value.toString(),
-          style: const TextStyle(
-            fontSize: 20,
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
+    return TextButton(
+      onPressed: () {  },
+      child: Column(
+        children: [
+          Text(
+            value.toString(),
+            style: const TextStyle(
+              fontSize: 18,
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-        Text(
-          title,
-          style: const TextStyle(fontSize: 15, color: Colors.black),
-        ),
-      ],
+          Text(
+            title,
+            style: const TextStyle(
+                fontSize: 15, color: Colors.orange, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
     );
   }
 
   // 프로필 탭 _ 내정보 위젯
   Widget _information() {
-    final viewModel = MainViewModel(KakaoLogin());
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               CircleAvatar(
-                radius: 40,
-                backgroundImage: NetworkImage(
-                    viewModel.user?.kakaoAccount?.profile?.profileImageUrl ??
-                        ''),
-                // backgroundImage: AssetImage('assets/img.jpg'),
+                radius: 25,
+                backgroundImage: AssetImage('assets/user1.png'),
               ),
-              // 유저 프로필사진 가져오기
-              // Image.network(
-              //   viewModel.user?.kakaoAccount?.profile?.profileImageUrl ?? '',
-              // ),
-              const SizedBox(width: 30),
+              const SizedBox(width: 20),
               Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(child: _statisticsOne('공개일기', 10)),
-                    Expanded(child: _statisticsOne('숨긴일기', 1)),
-                    Expanded(child: _statisticsOne('팔로워', 100)),
-                    Expanded(child: _statisticsOne('팔로잉', 100)),
+                    Text(
+                      '카야',
+                      style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Expanded(child: _statisticsOne('팔로우', 5)),
+                        Expanded(child: _statisticsOne('팔로잉', 120)),
+                        Expanded(child: _statisticsOne('북마크', 56)),
+                      ],
+                    ),
                   ],
                 ),
               )
             ],
           ),
-          const SizedBox(height: 20),
-          const Text(
-            'Jiwon',
-            style: TextStyle(fontSize: 15, color: Colors.black),
-          )
         ],
       ),
     );
@@ -1090,24 +1147,58 @@ class Page11 extends StatelessWidget {
   // 프로필 탭 _ Edit profile 위젯
   Widget _menu() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
+          SizedBox(
+            height: 50,
+            width: 170,
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 1),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(
-                  color: const Color(0xffdedede),
+              color: Colors.white,
+              margin: const EdgeInsets.only(top: 20),
+              child: ElevatedButton(
+                style: ButtonStyle(
+                  shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15))),
+                  backgroundColor:
+                  MaterialStateProperty.all(const Color(0xFFFFED8E)),
+                ),
+                onPressed: () {},
+                child: const Text(
+                  "채팅",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-              child: const TextButton(
-                onPressed: null,
-                child: Text('Edit profile'),
+            ),
+          ),
+          SizedBox(
+            height: 50,
+            width: 170,
+            child: Container(
+              color: Colors.white,
+              margin: const EdgeInsets.only(top: 20),
+              child: ElevatedButton(
+                style: ButtonStyle(
+                  shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15))),
+                  backgroundColor:
+                      MaterialStateProperty.all(const Color(0xFFFFED8E)),
+                ),
+                onPressed: () {},
+                child: const Text(
+                  "팔로우",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -1115,27 +1206,44 @@ class Page11 extends StatelessWidget {
 
   // 프로필 탭 _ 게시물 GridView 위젯
   Widget _tabView() {
-    return GridView.builder(
-        physics: const NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        itemCount: 100,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          childAspectRatio: 1,
-          mainAxisSpacing: 1,
-          crossAxisSpacing: 1,
-        ),
-        itemBuilder: (BuildContext context, int index) {
-          return Container(
-            color: Colors.grey,
-          );
-        });
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: GridView.builder(
+          physics: const NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          itemCount: 100,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 1,
+            mainAxisSpacing: 10,
+            crossAxisSpacing: 10,
+          ),
+          itemBuilder: (BuildContext context, int index) {
+            return InkWell(
+              onTap: () {
+                Navigator.of(context).pushNamed('/content');
+              },
+              splashColor: Colors.white.withOpacity(0.05),
+              child: Ink(
+                height: 100,
+                width: 100,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  image: DecorationImage(
+                    image: AssetImage('assets/dog.jpg'),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            );
+          }),
+    );
   }
 }
 
 // 내 정보 클래스 _ 히스토리 탭
-class Page22 extends StatelessWidget {
-  const Page22({Key? key}) : super(key: key);
+class Page222 extends StatelessWidget {
+  const Page222({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -1144,8 +1252,8 @@ class Page22 extends StatelessWidget {
 }
 
 // 내 정보 클래스 _ 내활동 탭
-class Page33 extends StatelessWidget {
-  const Page33({Key? key}) : super(key: key);
+class Page333 extends StatelessWidget {
+  const Page333({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
