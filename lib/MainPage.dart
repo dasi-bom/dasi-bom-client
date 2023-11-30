@@ -1,3 +1,5 @@
+import 'dart:html';
+
 import 'package:dasi_bom_client/dasibom/dasibom_content.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -912,7 +914,7 @@ class _Page2State extends State<Page2> {
   }
 }
 
-// 임시 클래스-> Scaffold의 body 프로퍼티에 코드 연동
+// 커뮤니티 클래스-> Scaffold의 body 프로퍼티에 코드 연동
 class Page3 extends StatefulWidget {
   const Page3({Key? key}) : super(key: key);
 
@@ -971,17 +973,33 @@ class _Page3State extends State<Page3> with TickerProviderStateMixin {
   }
 }
 
-// 커뮤니티 클래스 _ 카테고리1 탭
+/// 커뮤니티 클래스 _ 카테고리1 탭
 class Page11 extends StatelessWidget {
   const Page11({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Text('history');
+    final items = List.generate(20, (i) {
+      // 0부터 9까지의 수를 생성하여 두 번째 인수의 함수에 i 매개변수로 전달함
+      return ListTile(
+        // i 값을 전달받아 ListTile 위젯 형태로 변환하여 그것들의 리스트가 반환됨
+        leading: Icon(Icons.question_answer_sharp),
+        title: Text('산책 메이트 구해요'),
+        // subtitle: Text('역삼동 근처에 임보하시는 분 계신다면 함께..'),
+      );
+    });
+
+    return SingleChildScrollView(
+      child: ListView(
+        physics: NeverScrollableScrollPhysics(), // 이 리스트의 스크롤 동작 금지
+        shrinkWrap: true, // 이 리스트의 다른 스크롤 객체 안에 있다면 true로 설정해야 함
+        children: items,
+      ),
+    );
   }
 }
 
-// 커뮤니티 클래스 _ 카테고리2 탭
+/// 커뮤니티 클래스 _ 카테고리2 탭
 class Page22 extends StatelessWidget {
   const Page22({Key? key}) : super(key: key);
 
@@ -991,7 +1009,7 @@ class Page22 extends StatelessWidget {
   }
 }
 
-// 커뮤니티 클래스 _ 카테고리3 탭
+/// 커뮤니티 클래스 _ 카테고리3 탭
 class Page33 extends StatelessWidget {
   const Page33({Key? key}) : super(key: key);
 
@@ -1001,7 +1019,7 @@ class Page33 extends StatelessWidget {
   }
 }
 
-// 나의 봄 클래스-> Scaffold의 body 프로퍼티에 코드 연동
+// 마이페이지 클래스-> Scaffold의 body 프로퍼티에 코드 연동
 class Page4 extends StatefulWidget {
   const Page4({Key? key}) : super(key: key);
 
@@ -1060,7 +1078,7 @@ class _Page4State extends State<Page4> with TickerProviderStateMixin {
   }
 }
 
-// 내 정보 클래스 _ 프로필 탭
+/// 마이페이지 클래스 _ 프로필 탭
 class Page111 extends StatelessWidget {
   const Page111({Key? key}) : super(key: key);
 
@@ -1080,7 +1098,7 @@ class Page111 extends StatelessWidget {
 
   Widget _statisticsOne(String title, int value) {
     return TextButton(
-      onPressed: () {  },
+      onPressed: () {},
       child: Column(
         children: [
           Text(
@@ -1094,7 +1112,9 @@ class Page111 extends StatelessWidget {
           Text(
             title,
             style: const TextStyle(
-                fontSize: 15, color: Colors.orange, fontWeight: FontWeight.bold),
+                fontSize: 15,
+                color: Colors.orange,
+                fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -1162,7 +1182,7 @@ class Page111 extends StatelessWidget {
                   shape: MaterialStateProperty.all(RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15))),
                   backgroundColor:
-                  MaterialStateProperty.all(const Color(0xFFFFED8E)),
+                      MaterialStateProperty.all(const Color(0xFFFFED8E)),
                 ),
                 onPressed: () {},
                 child: const Text(
@@ -1241,7 +1261,7 @@ class Page111 extends StatelessWidget {
   }
 }
 
-// 내 정보 클래스 _ 히스토리 탭
+/// 마이페이지 클래스 _ 히스토리 탭
 class Page222 extends StatelessWidget {
   const Page222({Key? key}) : super(key: key);
 
@@ -1251,7 +1271,7 @@ class Page222 extends StatelessWidget {
   }
 }
 
-// 내 정보 클래스 _ 내활동 탭
+/// 마이페이지 클래스 _ 내활동 탭
 class Page333 extends StatelessWidget {
   const Page333({Key? key}) : super(key: key);
 
