@@ -1011,7 +1011,23 @@ class Page22 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text('activity');
+    final items = List.generate(20, (i) {
+      // 0부터 9까지의 수를 생성하여 두 번째 인수의 함수에 i 매개변수로 전달함
+      return ListTile(
+        // i 값을 전달받아 ListTile 위젯 형태로 변환하여 그것들의 리스트가 반환됨
+        leading: Icon(Icons.question_answer_sharp),
+        title: Text('입양 문의 드립니다.'),
+        subtitle: Text('역삼동 근처에 임보하시는 분 계신다면 함께..'),
+      );
+    });
+
+    return SingleChildScrollView(
+      child: ListView(
+        physics: NeverScrollableScrollPhysics(), // 이 리스트의 스크롤 동작 금지
+        shrinkWrap: true, // 이 리스트의 다른 스크롤 객체 안에 있다면 true로 설정해야 함
+        children: items,
+      ),
+    );
   }
 }
 
@@ -1021,7 +1037,23 @@ class Page33 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text('activity');
+    final items = List.generate(20, (i) {
+      // 0부터 9까지의 수를 생성하여 두 번째 인수의 함수에 i 매개변수로 전달함
+      return ListTile(
+        // i 값을 전달받아 ListTile 위젯 형태로 변환하여 그것들의 리스트가 반환됨
+        leading: Icon(Icons.question_answer_sharp),
+        title: Text('임보 물품 구해요!'),
+        subtitle: Text('역삼동 근처에 임보하시는 분 계신다면 함께..'),
+      );
+    });
+
+    return SingleChildScrollView(
+      child: ListView(
+        physics: NeverScrollableScrollPhysics(), // 이 리스트의 스크롤 동작 금지
+        shrinkWrap: true, // 이 리스트의 다른 스크롤 객체 안에 있다면 true로 설정해야 함
+        children: items,
+      ),
+    );
   }
 }
 
