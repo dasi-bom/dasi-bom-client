@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:dasi_bom_client/OnboardingPage.dart';
+import 'package:dasi_bom_client/widgets/OnboardingPage.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({Key? key}) : super(key: key);

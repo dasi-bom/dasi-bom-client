@@ -1,11 +1,10 @@
-import 'dart:html';
-
-import 'package:dasi_bom_client/dasibom/dasibom_content.dart';
+import 'package:dasi_bom_client/community/Com_WritingPage.dart';
+import 'package:dasi_bom_client/mypage/dasibom_content.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dasi_bom_client/widgets/Kakao_Login.dart';
 import 'package:dasi_bom_client/widgets/main_view_model.dart';
-import 'package:dasi_bom_client/WritingPage.dart';
+import 'package:dasi_bom_client/writing/WritingPage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -647,9 +646,7 @@ class Page1 extends StatelessWidget {
                     fontSize: 16,
                     color: Colors.black),
               ),
-              onPressed: () {
-                Navigator.of(context).pushNamed('/detail');
-              },
+              onPressed: () { },
             ),
           ),
         ),
@@ -966,14 +963,23 @@ class _Page3State extends State<Page3> with TickerProviderStateMixin {
                 Page33(),
               ],
             ),
-          )
+          ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).pushNamed('/com_writing');
+        },
+        backgroundColor: Color(0xfffd8801),
+        child: Image.asset(
+          'assets/ic_floating_pen.png',
+        ),
       ),
     );
   }
 }
 
-/// 커뮤니티 클래스 _ 카테고리1 탭
+//// 커뮤니티 클래스 _ 카테고리1 탭
 class Page11 extends StatelessWidget {
   const Page11({Key? key}) : super(key: key);
 
@@ -985,7 +991,7 @@ class Page11 extends StatelessWidget {
         // i 값을 전달받아 ListTile 위젯 형태로 변환하여 그것들의 리스트가 반환됨
         leading: Icon(Icons.question_answer_sharp),
         title: Text('산책 메이트 구해요'),
-        // subtitle: Text('역삼동 근처에 임보하시는 분 계신다면 함께..'),
+        subtitle: Text('역삼동 근처에 임보하시는 분 계신다면 함께..'),
       );
     });
 
@@ -999,7 +1005,7 @@ class Page11 extends StatelessWidget {
   }
 }
 
-/// 커뮤니티 클래스 _ 카테고리2 탭
+//// 커뮤니티 클래스 _ 카테고리2 탭
 class Page22 extends StatelessWidget {
   const Page22({Key? key}) : super(key: key);
 
@@ -1009,7 +1015,7 @@ class Page22 extends StatelessWidget {
   }
 }
 
-/// 커뮤니티 클래스 _ 카테고리3 탭
+//// 커뮤니티 클래스 _ 카테고리3 탭
 class Page33 extends StatelessWidget {
   const Page33({Key? key}) : super(key: key);
 
@@ -1074,11 +1080,20 @@ class _Page4State extends State<Page4> with TickerProviderStateMixin {
           )
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).pushNamed('/content');
+        },
+        backgroundColor: Color(0xfffd8801),
+        child: Image.asset(
+          'assets/ic_envelope.png',
+        ),
+      ),
     );
   }
 }
 
-/// 마이페이지 클래스 _ 프로필 탭
+//// 마이페이지 클래스 _ 프로필 탭
 class Page111 extends StatelessWidget {
   const Page111({Key? key}) : super(key: key);
 
@@ -1098,7 +1113,8 @@ class Page111 extends StatelessWidget {
 
   Widget _statisticsOne(String title, int value) {
     return TextButton(
-      onPressed: () {},
+      onPressed: () {
+      },
       child: Column(
         children: [
           Text(
@@ -1241,7 +1257,7 @@ class Page111 extends StatelessWidget {
           itemBuilder: (BuildContext context, int index) {
             return InkWell(
               onTap: () {
-                Navigator.of(context).pushNamed('/content');
+                Navigator.of(context).pushNamed('/detail');
               },
               splashColor: Colors.white.withOpacity(0.05),
               child: Ink(
@@ -1261,7 +1277,7 @@ class Page111 extends StatelessWidget {
   }
 }
 
-/// 마이페이지 클래스 _ 히스토리 탭
+//// 마이페이지 클래스 _ 히스토리 탭
 class Page222 extends StatelessWidget {
   const Page222({Key? key}) : super(key: key);
 
@@ -1271,7 +1287,7 @@ class Page222 extends StatelessWidget {
   }
 }
 
-/// 마이페이지 클래스 _ 내활동 탭
+//// 마이페이지 클래스 _ 내활동 탭
 class Page333 extends StatelessWidget {
   const Page333({Key? key}) : super(key: key);
 

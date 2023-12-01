@@ -1,16 +1,19 @@
-import 'package:dasi_bom_client/SeeingPage.dart';
-import 'package:dasi_bom_client/dasibom/dasibom_content.dart';
-import 'package:dasi_bom_client/dasibom/dasibom_content2.dart';
+import 'package:dasi_bom_client/mypage/SeeingPage.dart';
+import 'package:dasi_bom_client/community/Com_WritingPage.dart';
+import 'package:dasi_bom_client/mypage/dasibom_content.dart';
+import 'package:dasi_bom_client/mypage/dasibom_content2.dart';
 import 'package:flutter/material.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
-import 'package:dasi_bom_client/SplashPage.dart';
-import 'package:dasi_bom_client/OnboardingPage.dart';
+import 'package:dasi_bom_client/widgets/SplashPage.dart';
+import 'package:dasi_bom_client/widgets/OnboardingPage.dart';
 import 'package:dasi_bom_client/profile/profile_register_pro.dart';
 import 'package:dasi_bom_client/profile/profile_register_ani.dart';
 import 'package:dasi_bom_client/MainPage.dart';
 import 'package:dasi_bom_client/provider/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+import 'mypage/dasibom_content2.dart';
 
 void main() async {
   // 웹 환경에서 카카오 로그인을 정상적으로 완료하려면 runApp() 호출 전 아래 메서드 호출 필요
@@ -56,6 +59,7 @@ void main() async {
             '/detail': (context, {arguments}) => Seeing(routeparam: arguments),
             '/content' : (context) => DasibomContent(),
             '/content2' : (context) => DasibomContent2(),
+            '/com_writing' : (context) => CommunityWriting(),
           },
         )),
   );

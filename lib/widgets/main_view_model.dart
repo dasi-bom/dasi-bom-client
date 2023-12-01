@@ -1,5 +1,5 @@
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
-import 'package:dasi_bom_client/SocialLogin.dart';
+import 'package:dasi_bom_client/widgets/SocialLogin.dart';
 
 class MainViewModel{
   final SocialLogin _socialLogin;

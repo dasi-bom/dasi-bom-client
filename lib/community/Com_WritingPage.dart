@@ -1,6 +1,6 @@
 import 'dart:ffi';
 import 'dart:io';
-import 'package:dasi_bom_client/SeeingPage.dart';
+import 'package:dasi_bom_client/mypage/SeeingPage.dart';
 import 'package:dio/dio.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/cupertino.dart';
@@ -21,14 +21,14 @@ import 'package:flutter_switch/flutter_switch.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class Writing extends StatefulWidget {
-  const Writing({Key? key}) : super(key: key);
+class CommunityWriting extends StatefulWidget {
+  const CommunityWriting({Key? key}) : super(key: key);
 
   @override
-  State<Writing> createState() => _WritingState();
+  State<CommunityWriting> createState() => _CommunityWritingState();
 }
 
-class _WritingState extends State<Writing> with SingleTickerProviderStateMixin {
+class _CommunityWritingState extends State<CommunityWriting> with SingleTickerProviderStateMixin {
   final storage = FlutterSecureStorage();
   final baseUrl = dotenv.env['BASE_URL'].toString();
   final createDiaryUrl = dotenv.env['CREATE_DIARY_API'].toString();
@@ -37,12 +37,6 @@ class _WritingState extends State<Writing> with SingleTickerProviderStateMixin {
 
   final userInfo = {};
   final diaryForm = {};
-
-  // final TextEditingController _petIdController = TextEditingController();
-  // final TextEditingController _categoryController = TextEditingController();
-  // final TextEditingController _contentController = TextEditingController();
-  // final TextEditingController _stampsController = TextEditingController();
-  // final TextEditingController _isPublicController = TextEditingController();
 
   // 이미지 받아오기
   XFile? _pickedFile; // 이미지를 담을 변수 선언
@@ -83,20 +77,6 @@ class _WritingState extends State<Writing> with SingleTickerProviderStateMixin {
   // 카테고리 콤보박스
   final _category = ['일기쓰기', '챌린지 등록하기'];
   var _selectedcategory = '일기쓰기';
-
-  // 주제 다중 선택
-  List<String> tags = [];
-  List<String> options = [
-    '산책',
-    '간식',
-    '장난감',
-    '목욕',
-    '소풍',
-    '드라이브',
-    '미용실',
-    '병원',
-    '잠',
-  ];
 
   // 나만보기 토글
   bool? isPublic = false;
@@ -408,84 +388,47 @@ class _WritingState extends State<Writing> with SingleTickerProviderStateMixin {
                 const SizedBox(
                   height: 5,
                 ),
-                // 글 쓸 동물 친구 등록
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 100),
-                  child: DropdownButtonFormField(
-                    items: write.map(
-                      (value) {
-                        return DropdownMenuItem(
-                          value: value['name'].toString(),
-                          child: Text(value['name'].toString()),
-                        );
-                      },
-                    ).toList(),
-                    value: _selectedWrite != null &&
-                            _selectedWrite['name'] != null
-                        ? _selectedWrite['name'].toString()
-                        : (write.isNotEmpty ? write[0]['name'].toString() : ''),
-                    onChanged: (value) {
-                      print('@@ => $value');
-                      setState(() {
-                        _selectedWrite =
-                            write.firstWhere((pet) => pet['name'] == value);
-                        diaryForm['petId'] = _selectedWrite['petId'].toString();
-                        diaryForm['name'] = _selectedWrite['name'].toString();
-                      });
-                      print(diaryForm);
-                    },
-                  ),
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
                 Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   child: SizedBox(
                     width: double.infinity,
                     child: const Text(
-                      '카테고리 선택하기',
+                      '제목 입력하기',
                       textAlign: TextAlign.left,
                       style: TextStyle(
                           fontWeight: FontWeight.normal, fontSize: 13),
                     ),
                   ),
                 ),
-                // 카테고리 등록
+                // 제목 등록
                 Padding(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  child: DropdownButtonFormField(
-                    items: _category.map(
-                      (value) {
-                        return DropdownMenuItem(
-                          value: value,
-                          child: Text(value),
-                        );
-                      },
-                    ).toList(),
-                    value: _selectedcategory,
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  child: TextFormField(
+                    maxLines: 1,
+                    keyboardType: TextInputType.text,
+                    autovalidateMode: AutovalidateMode.always,
                     decoration: const InputDecoration(
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.black,
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.black,
+                          ),
                         ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.black,
-                          width: 1,
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.black,
+                            width: 1,
+                          ),
                         ),
-                      ),
-                    ),
-                    onChanged: (value) {
-                      print(value);
+                        hintText: '제목을 입력해 주세요.'),
+                    onSaved: (value) {
                       setState(() {
-                        _selectedcategory = value!;
-                        diaryForm['challengeId'] = _selectedcategory;
+                        _body = value as String;
+                        diaryForm['content'] = value;
                       });
                     },
+                    controller: _bodyController,
                   ),
                 ),
                 const SizedBox(
@@ -549,6 +492,9 @@ class _WritingState extends State<Writing> with SingleTickerProviderStateMixin {
                             radius: const Radius.circular(10))),
                   ),
                 ),
+                const SizedBox(
+                  height: 10,
+                ),
                 Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -567,7 +513,7 @@ class _WritingState extends State<Writing> with SingleTickerProviderStateMixin {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   child: TextFormField(
-                    maxLines: 5,
+                    maxLines: 10,
                     keyboardType: TextInputType.text,
                     autovalidateMode: AutovalidateMode.always,
                     decoration: const InputDecoration(
@@ -595,109 +541,7 @@ class _WritingState extends State<Writing> with SingleTickerProviderStateMixin {
                 const SizedBox(
                   height: 10,
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        child: const Text(
-                          '텍스트 아이콘',
-                          textAlign: TextAlign.right,
-                          style: TextStyle(
-                              fontWeight: FontWeight.normal, fontSize: 13),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 40,
-                        width: 40,
-                        child: GestureDetector(
-                          child: Image.asset('assets/ic_addtexticon.png'),
-                          onTap: () {
-                            _texticonBottomSheet(context);
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                // 주제 해시태그 등록
-                ChipsChoice<String>.multiple(
-                  value: tags,
-                  // onChanged: (val) => setState(() {
-                  //   print(val);
-                  //   tags = val;
-                  //   diaryForm['stamps'] = tags;
-                  // }),
-                  onChanged: (value) {
-                    print(value);
-                    setState(() {
-                      tags = value;
-                      diaryForm['stamps'] = tags;
-                    });
-                  },
-
-                  choiceItems: C2Choice.listFrom<String, String>(
-                    source: options,
-                    value: (i, v) => v,
-                    label: (i, v) => v,
-                    tooltip: (i, v) => v,
-                  ),
-                  choiceCheckmark: false,
-                  choiceStyle: C2ChipStyle.filled(),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: const Text(
-                      '나만 보기 설정',
-                      textAlign: TextAlign.left,
-                      style: TextStyle(
-                          fontWeight: FontWeight.normal, fontSize: 13),
-                    ),
-                  ),
-                ),
-                // 나만 보기 설정
-                Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      FlutterSwitch(
-                        activeColor: Colors.green,
-                        width: 60,
-                        height: 30,
-                        valueFontSize: 10,
-                        toggleSize: 20,
-                        value: isPublic ?? false,
-                        borderRadius: 30,
-                        padding: 8,
-                        showOnOff: true,
-                        onToggle: (val) {
-                          setState(() {
-                            isPublic = val;
-                            diaryForm['isPublic'] = val;
-                          });
-                        },
-                      ),
-                      const Text(
-                        '* 일기를 나만 열람할 수 있어요.',
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                            fontWeight: FontWeight.normal, fontSize: 13),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                // 일기 등록하기
+                // 글 등록하기
                 Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -733,7 +577,7 @@ class _WritingState extends State<Writing> with SingleTickerProviderStateMixin {
                           );
                         },
                         child: const Text(
-                          "일기 등록하기",
+                          "글 등록하기",
                           style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
@@ -742,9 +586,6 @@ class _WritingState extends State<Writing> with SingleTickerProviderStateMixin {
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(
-                  height: 20,
                 ),
               ],
             ),
@@ -854,283 +695,4 @@ class _WritingState extends State<Writing> with SingleTickerProviderStateMixin {
       }
     }
   }
-}
-
-// 텍스트아이콘 bottomsheet
-_texticonBottomSheet(BuildContext context) {
-  List<String> tags = [];
-  List<String> options1 = [
-    '산책',
-    '간식',
-    '밥',
-    '장난감',
-    '목욕',
-    '소풍',
-    '드라이브',
-    '데이트',
-    '미용실',
-    '병원',
-    '다이어트',
-    '친구',
-    '수면',
-    'TMI',
-  ];
-  List<String> options2 = [
-    '행복',
-    '사랑',
-    '즐거움',
-    '설렘',
-    '호기심',
-    '슬픔',
-    '화남',
-    '질투',
-  ];
-  List<String> options3 = [
-    '특기',
-    '취미',
-    '건강',
-    '패션',
-    '매력포인트',
-  ];
-  List<String> options4 = [
-    '맑음',
-    '바람',
-    '더움',
-    '비',
-    '눈',
-    '흐림',
-  ];
-  List<String> options5 = [
-    '세계강아지의날',
-    '세계고양이의날',
-    '지구의날',
-  ];
-  return showModalBottomSheet<dynamic>(
-    isScrollControlled: true,
-    context: context,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(25),
-      ),
-    ),
-    builder: (BuildContext context) {
-      return SingleChildScrollView(
-        child: Padding(
-          padding: MediaQuery.of(context).viewInsets,
-          child: StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-            var controller;
-            return Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height/2,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(18.0),
-                  topRight: const Radius.circular(18.0),
-                ),
-              ),
-              child: DefaultTabController(
-                length: 7,
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 15),
-                            const Text(
-                              '텍스트 아이콘',
-                              style: TextStyle(fontSize: 18),
-                            ),
-                            const SizedBox(height: 15),
-                            Divider(
-                                color: Colors.black.withOpacity(0.5), height: 2, thickness: 0.3),
-                          ],
-                        ),
-                        TabBar(
-                          isScrollable: true,
-                          labelStyle: TextStyle(fontWeight: FontWeight.bold),
-                          unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),
-                          indicator: UnderlineTabIndicator(
-                            borderSide: BorderSide(color: Colors.orange, width: 5), // Indicator height
-                            insets: EdgeInsets.symmetric(horizontal: 5), // Indicator width
-                          ),
-                          tabs: [
-                            Tab(
-                              text: '추천',),
-                            Tab(
-                              text: '최근사용',),
-                            Tab(
-                              text: '일상',),
-                            Tab(
-                              text: '감정',),
-                            Tab(
-                              text: '궁금해요',),
-                            Tab(
-                              text: '날씨',),
-                            Tab(
-                              text: '이벤트',),
-                          ],
-                        ),
-                        Divider(
-                            color: Colors.black.withOpacity(0.5), height: 2, thickness: 0.3),
-                        Expanded(
-                          child: TabBarView(
-                            controller: controller,
-                            children: <Widget>[
-                              Column(
-                                children: <Widget>[
-                                ],
-                              ),
-                              Column(
-                                children: <Widget>[
-                                ],
-                              ),
-                              Column(
-                                children: <Widget>[
-                                  ChipsChoice<String>.multiple(
-                                    wrapped: true,
-                                    padding: EdgeInsets.symmetric(vertical: 40),
-                                    value: tags,
-                                    onChanged: (value) {
-                                      print(value);
-                                      setState(() {
-                                        tags = value;
-                                        var diaryForm;
-                                        diaryForm['stamps'] = tags;
-                                      });
-                                    },
-
-                                    choiceItems: C2Choice.listFrom<String, String>(
-                                      source: options1,
-                                      value: (i, v) => v,
-                                      label: (i, v) => v,
-                                      tooltip: (i, v) => v,
-                                    ),
-                                    choiceCheckmark: false,
-                                    choiceStyle: C2ChipStyle.filled(),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                children: <Widget>[
-                                  ChipsChoice<String>.multiple(
-                                    wrapped: true,
-                                    padding: EdgeInsets.symmetric(vertical: 40),
-                                    value: tags,
-                                    onChanged: (value) {
-                                      print(value);
-                                      setState(() {
-                                        tags = value;
-                                        var diaryForm;
-                                        diaryForm['stamps'] = tags;
-                                      });
-                                    },
-
-                                    choiceItems: C2Choice.listFrom<String, String>(
-                                      source: options2,
-                                      value: (i, v) => v,
-                                      label: (i, v) => v,
-                                      tooltip: (i, v) => v,
-                                    ),
-                                    choiceCheckmark: false,
-                                    choiceStyle: C2ChipStyle.filled(),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                children: <Widget>[
-                                  ChipsChoice<String>.multiple(
-                                    wrapped: true,
-                                    padding: EdgeInsets.symmetric(vertical: 40),
-                                    value: tags,
-                                    onChanged: (value) {
-                                      print(value);
-                                      setState(() {
-                                        tags = value;
-                                        var diaryForm;
-                                        diaryForm['stamps'] = tags;
-                                      });
-                                    },
-
-                                    choiceItems: C2Choice.listFrom<String, String>(
-                                      source: options3,
-                                      value: (i, v) => v,
-                                      label: (i, v) => v,
-                                      tooltip: (i, v) => v,
-                                    ),
-                                    choiceCheckmark: false,
-                                    choiceStyle: C2ChipStyle.filled(),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                children: <Widget>[
-                                  ChipsChoice<String>.multiple(
-                                    wrapped: true,
-                                    padding: EdgeInsets.symmetric(vertical: 40),
-                                    value: tags,
-                                    onChanged: (value) {
-                                      print(value);
-                                      setState(() {
-                                        tags = value;
-                                        var diaryForm;
-                                        diaryForm['stamps'] = tags;
-                                      });
-                                    },
-
-                                    choiceItems: C2Choice.listFrom<String, String>(
-                                      source: options4,
-                                      value: (i, v) => v,
-                                      label: (i, v) => v,
-                                      tooltip: (i, v) => v,
-                                    ),
-                                    choiceCheckmark: false,
-                                    choiceStyle: C2ChipStyle.filled(),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                children: <Widget>[
-                                  ChipsChoice<String>.multiple(
-                                    wrapped: true,
-                                    padding: EdgeInsets.symmetric(vertical: 40),
-                                    value: tags,
-                                    onChanged: (value) {
-                                      print(value);
-                                      setState(() {
-                                        tags = value;
-                                        var diaryForm;
-                                        diaryForm['stamps'] = tags;
-                                      });
-                                    },
-
-                                    choiceItems: C2Choice.listFrom<String, String>(
-                                      source: options5,
-                                      value: (i, v) => v,
-                                      label: (i, v) => v,
-                                      tooltip: (i, v) => v,
-                                    ),
-                                    choiceCheckmark: false,
-                                    choiceStyle: C2ChipStyle.filled(),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        )
-                      ]),
-                ),
-              ),
-            );
-          }),
-        ),
-      );
-    },
-  );
 }
