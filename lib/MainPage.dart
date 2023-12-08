@@ -1,3 +1,6 @@
+import 'package:dasi_bom_client/widgets/AppDrawer.dart';
+import 'package:dasi_bom_client/widgets/BaseAppBar.dart';
+import 'package:dasi_bom_client/widgets/BottomMenu.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dasi_bom_client/widgets/Kakao_Login.dart';
@@ -63,7 +66,7 @@ class _MainPageState extends State<MainPage> {
 
   // 하단 바 페이지 전환 변수 선언
   var _index = 0; // 페이지 인덱스 0,1,2,3
-  var _pages = [
+  final _pages = [
     // Page1,2,3,4 클래스와 연동하여 변수 선언(페이지를 _pages 리스트 변수의 값으로 정의)
     Page1(),
     Page2(),
@@ -83,81 +86,11 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
       key: _scaffoldKey,
       // 상단 앱 바
-      appBar: AppBar(
-        elevation: 0.0,
-        backgroundColor: Colors.white,
-        title: Image.asset('assets/ic_barlogo.png', width: 100, height: 100),
-        automaticallyImplyLeading: false,
-        // appbar 뒤로가기 버튼 숨김
-        actions: <Widget>[
-          // actions 프로퍼티에는 어떠한 위젯도 리스트로 배치 가능
-          IconButton(
-            // 카카오 로그아웃 버튼
-            onPressed: () async {
-              await storage.deleteAll(); // Delete all
-              // await viewModel.logout();
-
-              // 로그아웃 되면 로그인 화면으로 화면 이동
-              final result = await Navigator.pushNamed(context, '/login');
-            },
-            icon: Icon((Icons.outbond)),
-            color: Colors.black,
-          ),
-          IconButton(
-            // 채팅 버튼
-            onPressed: () {},
-            icon: Icon(Icons.chat_outlined),
-            color: Colors.black,
-          ),
-          IconButton(
-            // 알림 버튼
-            onPressed: () {},
-            icon: Icon(Icons.add_alert_outlined),
-            color: Colors.black,
-          ),
-          IconButton(
-            // 햄버거 메뉴 버튼
-            onPressed: () {
-              _scaffoldKey.currentState?.openEndDrawer();
-            },
-            icon: Icon(Icons.menu),
-            color: Colors.black,
-          ),
-        ],
+      appBar: BaseAppBar(
+        appBar: AppBar(),
       ),
       // 햄버거 메뉴 버튼 구성
-      endDrawer: Drawer(
-        elevation: 10,
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Color(0xffFFF1AA),
-              ),
-              child: Text('메뉴'),
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.home,
-              ),
-              title: const Text('다시, 봄 가이드'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.settings,
-              ),
-              title: const Text('설정'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
+      endDrawer: AppDrawr(),
       // index에 따라 페이지 바뀜
       body: _pages[_index],
 
@@ -194,6 +127,8 @@ class _MainPageState extends State<MainPage> {
           ),
         ],
       ),
+
+      // bottomNavigationBar: BottomMenu(),
     );
   }
 }
@@ -252,4 +187,3 @@ class _Page4State extends State<Page4> {
     return MyPage();
   }
 }
-

@@ -9,6 +9,11 @@ import 'package:flutter/services.dart';
 import 'package:like_button/like_button.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+import '../MainPage.dart';
+import '../widgets/AppDrawer.dart';
+import '../widgets/BaseAppBar.dart';
+import '../widgets/BottomMenu.dart';
+
 class Seeing extends StatefulWidget {
   final dynamic routeparam;
 
@@ -35,6 +40,16 @@ class Seeing extends StatefulWidget {
 class _SeeingState extends State<Seeing> {
   // 일기 이미지 인덱스
   int _current = 0;
+
+  // 하단 바 페이지 전환 변수 선언
+  var _index = 0; // 페이지 인덱스 0,1,2,3
+  final _pages = [
+    // Page1,2,3,4 클래스와 연동하여 변수 선언(페이지를 _pages 리스트 변수의 값으로 정의)
+    Page1(),
+    Page2(),
+    Page3(),
+    Page4(),
+  ];
 
   // Textformfield 값 받아오기
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -74,6 +89,12 @@ class _SeeingState extends State<Seeing> {
       key: scaffoldKey,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
+        // 상단 앱 바
+        appBar: BaseAppBar(
+          appBar: AppBar(),
+        ),
+        // 햄버거 메뉴 버튼 구성
+        endDrawer: AppDrawr(),
         body: SingleChildScrollView(
           child: Column(
             children: [
@@ -84,6 +105,8 @@ class _SeeingState extends State<Seeing> {
             ],
           ),
         ),
+        // 하단 내비게이션 바
+        bottomNavigationBar: BottomMenu(),
       ),
     );
   }

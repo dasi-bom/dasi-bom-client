@@ -21,6 +21,10 @@ import 'package:flutter_switch/flutter_switch.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../widgets/AppDrawer.dart';
+import '../widgets/BaseAppBar.dart';
+import '../widgets/BottomMenu.dart';
+
 class CommunityWriting extends StatefulWidget {
   const CommunityWriting({Key? key}) : super(key: key);
 
@@ -379,6 +383,12 @@ class _CommunityWritingState extends State<CommunityWriting> with SingleTickerPr
     return SafeArea(
       child: Scaffold(
         key: scaffoldKey,
+        // 상단 앱 바
+        appBar: BaseAppBar(
+          appBar: AppBar(),
+        ),
+        // 햄버거 메뉴 버튼 구성
+        endDrawer: AppDrawr(),
         body: Form(
           // form으로 input 데이터 저장
           key: formKey,
@@ -591,6 +601,8 @@ class _CommunityWritingState extends State<CommunityWriting> with SingleTickerPr
             ),
           ),
         ),
+        // 하단 내비게이션 바
+        bottomNavigationBar: BottomMenu(),
       ),
     );
   }
