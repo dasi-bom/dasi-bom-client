@@ -27,7 +27,7 @@ class HomePage extends StatelessWidget {
     return ListView(
       // Column을 ListView로 변경하면 상하 스크롤이 생김
       children: <Widget>[
-        _buildTop(),
+        _buildTop(context),
         _buildMiddle(context),
         _buildBottom(),
       ],
@@ -35,7 +35,7 @@ class HomePage extends StatelessWidget {
   }
 
   // 홈 클래스 _ 상단
-  Widget _buildTop() {
+  Widget _buildTop(BuildContext context) {
     return Container(
       // color: Color(0xffFFF1AA),
       height: 200,
@@ -98,7 +98,9 @@ class HomePage extends StatelessWidget {
                       fontSize: 11,
                       color: Colors.black),
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).pushNamed('/challenge_page');
+                },
               ),
             ),
           ),

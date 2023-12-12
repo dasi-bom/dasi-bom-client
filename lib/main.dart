@@ -1,7 +1,9 @@
+import 'package:dasi_bom_client/home/challenge_page.dart';
 import 'package:dasi_bom_client/mypage/SeeingPage.dart';
 import 'package:dasi_bom_client/community/Com_WritingPage.dart';
 import 'package:dasi_bom_client/mypage/dasibom_content.dart';
 import 'package:dasi_bom_client/mypage/dasibom_content2.dart';
+import 'package:dasi_bom_client/writing/WritingPage.dart';
 import 'package:flutter/material.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:dasi_bom_client/widgets/SplashPage.dart';
@@ -48,7 +50,8 @@ void main() async {
           onGenerateRoute: (settings) {
             var arguments = settings.arguments;
             if (settings.name == '/detail') {
-              return MaterialPageRoute(builder: (context) => Seeing(routeparam: arguments));
+              return MaterialPageRoute(
+                  builder: (context) => Seeing(routeparam: arguments));
             }
           },
           routes: {
@@ -57,9 +60,11 @@ void main() async {
             '/register1': (context) => RegisterProfileProtector(),
             '/register2': (context) => RegisterProfileAnimal(),
             '/detail': (context, {arguments}) => Seeing(routeparam: arguments),
-            '/content' : (context) => DasibomContent(),
-            '/content2' : (context) => DasibomContent2(),
-            '/com_writing' : (context) => CommunityWriting(),
+            '/writing': (context) => Writing(),
+            '/content': (context) => DasibomContent(),
+            '/content2': (context) => DasibomContent2(),
+            '/com_writing': (context) => CommunityWriting(),
+            '/challenge_page': (context) => ChallengePage(),
           },
         )),
   );
