@@ -64,13 +64,12 @@ class _RegisterFinishState extends State<RegisterFinish> {
                 textAlign: TextAlign.center,
               ),
             ),
-          if (createInfo['nickname'] != null || createInfo['petName'] != null)
+          // if (createInfo['nickname'] != null || createInfo['petName'] != null)
+          if (createInfo['nickname'] != null)
             Align(
               alignment: Alignment.topCenter,
               child: Text(
-                '''${createInfo['nickname']}님 반가워요!
-오늘부터 ${createInfo['petName']}와 
-소중한 일상을 나눠주세요!''',
+                '''${createInfo['nickname']}님 반가워요!''',
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 18,
@@ -95,26 +94,26 @@ class _RegisterFinishState extends State<RegisterFinish> {
                       width: 100,
                       child: Image.asset('assets/user_default.png'),
                     ),
-              SizedBox(
-                height: 100,
-                width: 100,
-                child: Image.asset('assets/ic_heart.png'),
-              ),
-              createInfo['petProfileImage'] != null
-                  ? SizedBox(
-                      child: ClipRRect(
-                      borderRadius: BorderRadius.circular(50),
-                      child: Image.network(
-                        '${createInfo['petProfileImage']}',
-                        width: 100,
-                        height: 100,
-                        fit: BoxFit.cover,
-                      ),
-                    ))
-                  : SizedBox(
-                      height: 100,
-                      width: 100,
-                      child: Image.asset('assets/pet_default.png')),
+              // SizedBox(
+              //   height: 100,
+              //   width: 100,
+              //   child: Image.asset('assets/ic_heart.png'),
+              // ),
+              // createInfo['petProfileImage'] != null
+              //     ? SizedBox(
+              //         child: ClipRRect(
+              //         borderRadius: BorderRadius.circular(50),
+              //         child: Image.network(
+              //           '${createInfo['petProfileImage']}',
+              //           width: 100,
+              //           height: 100,
+              //           fit: BoxFit.cover,
+              //         ),
+              //       ))
+              //     : SizedBox(
+              //         height: 100,
+              //         width: 100,
+              //         child: Image.asset('assets/pet_default.png')),
             ],
           ),
           SizedBox(
@@ -187,8 +186,8 @@ class _RegisterFinishState extends State<RegisterFinish> {
 
   getCreateProfileInfo() async {
     try {
-      final data = jsonDecode(widget.data);
-      print('data ===> $data');
+      // final data = jsonDecode(widget.data);
+      // print('data ===> $data');
       final accessToken = await storage.read(key: 'accessToken');
       final url = Uri.parse('$baseUrl$getCreateProfile');
       final headers = {'Authorization': 'Bearer $accessToken'};
@@ -208,28 +207,28 @@ class _RegisterFinishState extends State<RegisterFinish> {
               createInfo['nickname'] = info['nickname'].toString();
               createInfo['profileImage'] = info['profileImage'].toString();
 
-              if (data != null) {
-                print('data => $data');
-                int petId = (data['petId']);
-
-                List<Map<String, dynamic>>? petResponses =
-                    info['petProfileResponses']?.cast<Map<String, dynamic>>();
-                if (petResponses != null) {
-                  for (Map<String, dynamic> petData in petResponses) {
-                    if (data['petId'] == petData['petId']) {
-                      createInfo['petProfileImage'] =
-                          petData['imageUrl'].toString();
-                      createInfo['petName'] =
-                          petData['petInfo']['name'].toString();
-                    }
-                  }
-                } else {
-                  print('pet list xxxxx');
-                }
-              } else {
-                createInfo['petName'] = '-';
-                createInfo['petProfileImage'] = null;
-              }
+              // if (data != null) {
+              //   print('data => $data');
+              //   int petId = (data['petId']);
+              //
+              //   List<Map<String, dynamic>>? petResponses =
+              //       info['petProfileResponses']?.cast<Map<String, dynamic>>();
+              //   if (petResponses != null) {
+              //     for (Map<String, dynamic> petData in petResponses) {
+              //       if (data['petId'] == petData['petId']) {
+              //         createInfo['petProfileImage'] =
+              //             petData['imageUrl'].toString();
+              //         createInfo['petName'] =
+              //             petData['petInfo']['name'].toString();
+              //       }
+              //     }
+              //   } else {
+              //     print('pet list xxxxx');
+              //   }
+              // } else {
+              //   createInfo['petName'] = '-';
+              //   createInfo['petProfileImage'] = null;
+              // }
             });
           }
 
@@ -249,7 +248,7 @@ class _RegisterFinishState extends State<RegisterFinish> {
         count++;
       });
     } catch (err) {
-      print('err => $err');
+      print('err111 => $err');
     }
   }
 }
