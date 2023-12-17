@@ -411,17 +411,17 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   // 페이지 전환 애니메이션
   Route _createRoute() {
-    if (user_name == '') {
+    // if (user_name == '') {
       return PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
-            const RegisterProfileProtector(),
+        user_name == '' ? const RegisterProfileProtector() : const MainPage(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           const begin = Offset(0.0, 10.0);
           const end = Offset.zero;
           const curve = Curves.ease;
 
           var tween =
-              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+          Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
           return SlideTransition(
             position: animation.drive(tween),
@@ -429,42 +429,43 @@ class _OnboardingPageState extends State<OnboardingPage> {
           );
         },
       );
-    } else if (pet_list == 0) {
-      return PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            const RegisterProfileAnimal(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          const begin = Offset(0.0, 10.0);
-          const end = Offset.zero;
-          const curve = Curves.ease;
-
-          var tween =
-              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-          return SlideTransition(
-            position: animation.drive(tween),
-            child: child,
-          );
-        },
-      );
-    } else {
-      return PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            const MainPage(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          const begin = Offset(0.0, 10.0);
-          const end = Offset.zero;
-          const curve = Curves.ease;
-
-          var tween =
-              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-          return SlideTransition(
-            position: animation.drive(tween),
-            child: child,
-          );
-        },
-      );
-    }
+    // }
+    // } else if (pet_list == 0) {
+    //   return PageRouteBuilder(
+    //     pageBuilder: (context, animation, secondaryAnimation) =>
+    //         const RegisterProfileAnimal(),
+    //     transitionsBuilder: (context, animation, secondaryAnimation, child) {
+    //       const begin = Offset(0.0, 10.0);
+    //       const end = Offset.zero;
+    //       const curve = Curves.ease;
+    //
+    //       var tween =
+    //           Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+    //
+    //       return SlideTransition(
+    //         position: animation.drive(tween),
+    //         child: child,
+    //       );
+    //     },
+    //   );
+    // } else {
+    //   return PageRouteBuilder(
+    //     pageBuilder: (context, animation, secondaryAnimation) =>
+    //         const MainPage(),
+    //     transitionsBuilder: (context, animation, secondaryAnimation, child) {
+    //       const begin = Offset(0.0, 10.0);
+    //       const end = Offset.zero;
+    //       const curve = Curves.ease;
+    //
+    //       var tween =
+    //           Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+    //
+    //       return SlideTransition(
+    //         position: animation.drive(tween),
+    //         child: child,
+    //       );
+    //     },
+    //   );
+    // }
   }
 }
