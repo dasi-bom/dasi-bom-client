@@ -1,6 +1,6 @@
 import 'dart:ffi';
 import 'dart:io';
-import 'package:dasi_bom_client/SeeingPage.dart';
+import 'package:dasi_bom_client/mypage/SeeingPage.dart';
 import 'package:dio/dio.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/cupertino.dart';
@@ -21,14 +21,18 @@ import 'package:flutter_switch/flutter_switch.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class Writing extends StatefulWidget {
-  const Writing({Key? key}) : super(key: key);
+import '../widgets/AppDrawer.dart';
+import '../widgets/BaseAppBar.dart';
+import '../widgets/BottomMenu.dart';
+
+class CommunityWriting extends StatefulWidget {
+  const CommunityWriting({Key? key}) : super(key: key);
 
   @override
-  State<Writing> createState() => _WritingState();
+  State<CommunityWriting> createState() => _CommunityWritingState();
 }
 
-class _WritingState extends State<Writing> {
+class _CommunityWritingState extends State<CommunityWriting> with SingleTickerProviderStateMixin {
   final storage = FlutterSecureStorage();
   final baseUrl = dotenv.env['BASE_URL'].toString();
   final createDiaryUrl = dotenv.env['CREATE_DIARY_API'].toString();
@@ -37,12 +41,6 @@ class _WritingState extends State<Writing> {
 
   final userInfo = {};
   final diaryForm = {};
-
-  // final TextEditingController _petIdController = TextEditingController();
-  // final TextEditingController _categoryController = TextEditingController();
-  // final TextEditingController _contentController = TextEditingController();
-  // final TextEditingController _stampsController = TextEditingController();
-  // final TextEditingController _isPublicController = TextEditingController();
 
   // 이미지 받아오기
   XFile? _pickedFile; // 이미지를 담을 변수 선언
@@ -83,20 +81,6 @@ class _WritingState extends State<Writing> {
   // 카테고리 콤보박스
   final _category = ['일기쓰기', '챌린지 등록하기'];
   var _selectedcategory = '일기쓰기';
-
-  // 주제 다중 선택
-  List<String> tags = [];
-  List<String> options = [
-    '산책',
-    '간식',
-    '장난감',
-    '목욕',
-    '소풍',
-    '드라이브',
-    '미용실',
-    '병원',
-    '잠',
-  ];
 
   // 나만보기 토글
   bool? isPublic = false;
@@ -206,6 +190,8 @@ class _WritingState extends State<Writing> {
     }
   }
 
+  late TabController _controller;
+
   @override
   void initState() {
     validationResult = false;
@@ -214,6 +200,7 @@ class _WritingState extends State<Writing> {
     getUserInfo();
 
     super.initState();
+    _controller = TabController(vsync: this, length: 7);
   }
 
   uploadImages(List<XFile?> images) async {
@@ -396,6 +383,12 @@ class _WritingState extends State<Writing> {
     return SafeArea(
       child: Scaffold(
         key: scaffoldKey,
+        // 상단 앱 바
+        appBar: BaseAppBar(
+          appBar: AppBar(),
+        ),
+        // 햄버거 메뉴 버튼 구성
+        endDrawer: AppDrawr(),
         body: Form(
           // form으로 input 데이터 저장
           key: formKey,
@@ -405,98 +398,83 @@ class _WritingState extends State<Writing> {
                 const SizedBox(
                   height: 5,
                 ),
-                // 글 쓸 동물 친구 등록
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 100),
-                  child: DropdownButtonFormField(
-                    items: write.map(
-                      (value) {
-                        return DropdownMenuItem(
-                          value: value['name'].toString(),
-                          child: Text(value['name'].toString()),
-                        );
-                      },
-                    ).toList(),
-                    value: _selectedWrite != null &&
-                            _selectedWrite['name'] != null
-                        ? _selectedWrite['name'].toString()
-                        : (write.isNotEmpty ? write[0]['name'].toString() : ''),
-                    onChanged: (value) {
-                      print('@@ => $value');
-                      setState(() {
-                        _selectedWrite =
-                            write.firstWhere((pet) => pet['name'] == value);
-                        diaryForm['petId'] = _selectedWrite['petId'].toString();
-                        diaryForm['name'] = _selectedWrite['name'].toString();
-                      });
-                      print(diaryForm);
-                    },
-                  ),
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                Container(
-                  width: 340,
-                  child: const Text(
-                    '카테고리 선택하기',
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
-                  ),
-                ),
-                // 카테고리 등록
-                Padding(
-                  padding: const EdgeInsets.only(right: 130, left: 20, top: 5),
-                  child: DropdownButtonFormField(
-                    items: _category.map(
-                      (value) {
-                        return DropdownMenuItem(
-                          value: value,
-                          child: Text(value),
-                        );
-                      },
-                    ).toList(),
-                    value: _selectedcategory,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.black,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.black,
-                          width: 1,
-                        ),
-                      ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: const Text(
+                      '제목 입력하기',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                          fontWeight: FontWeight.normal, fontSize: 13),
                     ),
-                    onChanged: (value) {
-                      print(value);
+                  ),
+                ),
+                // 제목 등록
+                Padding(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  child: TextFormField(
+                    maxLines: 1,
+                    keyboardType: TextInputType.text,
+                    autovalidateMode: AutovalidateMode.always,
+                    decoration: const InputDecoration(
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.black,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.black,
+                            width: 1,
+                          ),
+                        ),
+                        hintText: '제목을 입력해 주세요.'),
+                    onSaved: (value) {
                       setState(() {
-                        _selectedcategory = value!;
-                        diaryForm['challengeId'] = _selectedcategory;
+                        _body = value as String;
+                        diaryForm['content'] = value;
                       });
                     },
+                    controller: _bodyController,
                   ),
                 ),
                 const SizedBox(
-                  height: 15,
+                  height: 10,
                 ),
-                Container(
-                  width: 340,
-                  child: const Text(
-                    '사진 등록하기',
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        child: const Text(
+                          '사진 등록하기',
+                          textAlign: TextAlign.right,
+                          style: TextStyle(
+                              fontWeight: FontWeight.normal, fontSize: 13),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 40,
+                        width: 40,
+                        child: GestureDetector(
+                          child: Image.asset('assets/ic_addtexticon.png'),
+                          onTap: () {
+                            _showBottomSheet();
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 // 사진 등록
                 GridView.count(
                   shrinkWrap: true,
-                  padding: const EdgeInsets.all(20),
-                  crossAxisCount: isPadMode ? 2 : 4,
+                  padding: const EdgeInsets.all(16),
+                  crossAxisCount: isPadMode ? 1 : 4,
                   mainAxisSpacing: 5,
                   crossAxisSpacing: 5,
                   children: List.generate(
@@ -524,21 +502,28 @@ class _WritingState extends State<Writing> {
                             radius: const Radius.circular(10))),
                   ),
                 ),
-                Container(
-                  width: 340,
-                  child: const Text(
-                    '본문 작성하기',
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
+                const SizedBox(
+                  height: 10,
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: const Text(
+                      '본문 작성하기',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                          fontWeight: FontWeight.normal, fontSize: 13),
+                    ),
                   ),
                 ),
                 // 본문 등록
                 Padding(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   child: TextFormField(
-                    maxLines: 5,
+                    maxLines: 10,
                     keyboardType: TextInputType.text,
                     autovalidateMode: AutovalidateMode.always,
                     decoration: const InputDecoration(
@@ -564,181 +549,60 @@ class _WritingState extends State<Writing> {
                   ),
                 ),
                 const SizedBox(
-                  height: 15,
+                  height: 10,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: 100,
-                      child: const Text(
-                        '텍스트 아이콘',
-                        textAlign: TextAlign.right,
-                        style: TextStyle(
-                            fontWeight: FontWeight.normal, fontSize: 13),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 40,
-                      width: 40,
-                      child: GestureDetector(
-                        child: Image.asset('assets/ic_addtexticon.png'),
-                        onTap: () {
-                          _texticonBottomSheet(context);
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-                // 주제 해시태그 등록
-                ChipsChoice<String>.multiple(
-                  value: tags,
-                  // onChanged: (val) => setState(() {
-                  //   print(val);
-                  //   tags = val;
-                  //   diaryForm['stamps'] = tags;
-                  // }),
-                  onChanged: (value) {
-                    print(value);
-                    setState(() {
-                      tags = value;
-                      diaryForm['stamps'] = tags;
-                    });
-                  },
-
-                  choiceItems: C2Choice.listFrom<String, String>(
-                    source: options,
-                    value: (i, v) => v,
-                    label: (i, v) => v,
-                    tooltip: (i, v) => v,
-                  ),
-                  choiceCheckmark: false,
-                  choiceStyle: C2ChipStyle.filled(),
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                Container(
-                  width: 340,
-                  child: const Text(
-                    '나만 보기 설정',
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
-                  ),
-                ),
-                // 나만 보기 설정
+                // 글 등록하기
                 Padding(
-                  padding: const EdgeInsets.only(top: 15),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      FlutterSwitch(
-                        activeColor: Colors.green,
-                        width: 60,
-                        height: 30,
-                        valueFontSize: 10,
-                        toggleSize: 20,
-                        value: isPublic ?? false,
-                        borderRadius: 30,
-                        padding: 8,
-                        showOnOff: true,
-                        onToggle: (val) {
-                          setState(() {
-                            isPublic = val;
-                            diaryForm['isPublic'] = val;
-                          });
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  child: SizedBox(
+                    height: 60,
+                    width: double.infinity,
+                    child: Container(
+                      color: Colors.white,
+                      margin: const EdgeInsets.only(top: 20),
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                          shape: MaterialStateProperty.all(
+                              RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15))),
+                          backgroundColor: MaterialStateProperty.all(
+                              const Color(0xFFFFED8E)),
+                        ),
+                        onPressed: () {
+                          setState(
+                            () {
+                              validationResult =
+                                  formKey.currentState?.validate() ?? false;
+                              formKey.currentState!.save();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                    content: Text('$_selectedcategory/$_body')),
+                              );
+
+                              // Writing(formData);
+
+                              createDiary(diaryForm); // 일기 등록 테스트
+                            },
+                          );
                         },
-                      ),
-                      const Text(
-                        '* 일기를 나만 열람할 수 있어요.',
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                            fontWeight: FontWeight.normal, fontSize: 13),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                // 일기 등록하기
-                SizedBox(
-                  height: 60,
-                  width: 350,
-                  child: Container(
-                    height: 30,
-                    color: Colors.white,
-                    margin: const EdgeInsets.only(top: 20),
-                    child: ElevatedButton(
-                      style: ButtonStyle(
-                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15))),
-                        backgroundColor:
-                            MaterialStateProperty.all(const Color(0xFFFFED8E)),
-                      ),
-                      onPressed: () {
-                        setState(
-                          () {
-                            validationResult =
-                                formKey.currentState?.validate() ?? false;
-                            formKey.currentState!.save();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                  content: Text('$_selectedcategory/$_body')),
-                            );
-
-                            // Writing(formData);
-
-                            createDiary(diaryForm); // 일기 등록 테스트
-                            // Navigator.of(context)
-                            //     .push(_createRoute()); // 일기보기에서 홈화면으로 수정
-
-                            // 일기쓰기 완료 팝업 메시지
-                            // showDialog(
-                            //     context: context,
-                            //     barrierDismissible: false,
-                            //     builder: (BuildContext context) {
-                            //       return AlertDialog(
-                            //         title: const Text('완료'),
-                            //         content: SingleChildScrollView(
-                            //           child: ListBody(
-                            //             children: const <Widget>[
-                            //               Text('일기가 등록되었습니다:)'),
-                            //             ],
-                            //           ),
-                            //         ),
-                            //         actions: <Widget>[
-                            //           ElevatedButton(
-                            //             child: const Text('확인'),
-                            //             onPressed: () {
-                            //               Navigator.of(context)
-                            //                   .push(_createRoute());
-                            //             },
-                            //           )
-                            //         ],
-                            //       );
-                            //     });
-                          },
-                        );
-                      },
-                      child: const Text(
-                        "일기 등록하기",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
+                        child: const Text(
+                          "글 등록하기",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 40,
-                ),
               ],
             ),
           ),
         ),
+        // 하단 내비게이션 바
+        bottomNavigationBar: BottomMenu(),
       ),
     );
   }
@@ -842,71 +706,5 @@ class _WritingState extends State<Writing> {
         print('이미지 선택안함');
       }
     }
-  }
-}
-
-// const TabController tabController;
-
-// texticon bottomsheet
-_texticonBottomSheet(BuildContext context) {
-  final GlobalKey texticonHeaderKey = GlobalKey();
-  return showModalBottomSheet<dynamic>(
-    isScrollControlled: true,
-    context: context,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(25),
-      ),
-    ),
-    builder: (BuildContext context) {
-      return DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: 0.5,
-        minChildSize: 0.5,
-        maxChildSize: 0.9,
-        builder: (context, scrollController) {
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              _texticonHeader(
-                  key: texticonHeaderKey, scrollController: scrollController),
-            ],
-          );
-        },
-      );
-    },
-  );
-}
-
-// 텍스트 아이콘 헤더
-class _texticonHeader extends StatelessWidget {
-  const _texticonHeader({
-    Key? key,
-    required this.scrollController,
-  }) : super(key: key);
-
-  final ScrollController scrollController;
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      physics: const ClampingScrollPhysics(),
-      controller: scrollController,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          const SizedBox(height: 10),
-          Image.asset('assets/ic_bottomsheetbar.png'),
-          const SizedBox(height: 10),
-          const Text(
-            '텍스트 아이콘',
-            style: TextStyle(fontSize: 18),
-          ),
-          const SizedBox(height: 15),
-          Divider(
-              color: Colors.black.withOpacity(0.5), height: 2, thickness: 2),
-        ],
-      ),
-    );
   }
 }
