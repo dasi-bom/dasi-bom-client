@@ -278,7 +278,7 @@ class _WritingState extends State<Writing> with SingleTickerProviderStateMixin {
       }
 
       if (data['challengeId'] != null && data['challengeId'] != '일기쓰기') {
-        challengeId = 2;
+        challengeId = '1';
       } else {
         challengeId = null;
       }
