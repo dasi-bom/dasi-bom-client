@@ -1,3 +1,4 @@
+import 'package:dasi_bom_client/profile/register_finish.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -388,7 +389,8 @@ class _RegisterProfileProtectorState extends State<RegisterProfileProtector> {
   Route _createRoute() {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) =>
-          const RegisterProfileAnimal(),
+          const RegisterFinish(),
+          // const RegisterProfileAnimal(),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         const begin = Offset(0.0, 10.0);
         const end = Offset.zero;
