@@ -1,6 +1,9 @@
+import 'package:dasi_bom_client/diary/DiaryList.dart';
+import 'package:dasi_bom_client/mypage/SeeingPage.dart';
 import 'package:dasi_bom_client/widgets/AppDrawer.dart';
 import 'package:dasi_bom_client/widgets/BaseAppBar.dart';
 import 'package:dasi_bom_client/widgets/BottomMenu.dart';
+import 'package:dasi_bom_client/widgets/WritingAppBar.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dasi_bom_client/widgets/Kakao_Login.dart';
@@ -86,9 +89,12 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
       key: _scaffoldKey,
       // 상단 앱 바
-      appBar: BaseAppBar(
-        appBar: AppBar(),
-      ),
+      appBar: _index != 1
+          ? BaseAppBar(
+              appBar: AppBar(),
+            )
+          : WritingAppBar(),
+
       // 햄버거 메뉴 버튼 구성
       endDrawer: AppDrawr(),
       // index에 따라 페이지 바뀜
@@ -154,7 +160,8 @@ class Page2 extends StatefulWidget {
 class _Page2State extends State<Page2> {
   @override
   Widget build(BuildContext context) {
-    return Writing();
+    // return Writing();
+    return DiaryList();
   }
 }
 
