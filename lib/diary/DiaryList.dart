@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:dasi_bom_client/writing/WritingPage.dart';
 import 'package:dio/dio.dart';
 import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/cupertino.dart';
@@ -98,6 +99,13 @@ class _SeeingState extends State<DiaryList> {
                 _options(), // 댓글, 쓰다듬기, 공유하기
               ]);
             }),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            // 플로팅 버튼을 눌렀을 때 수행할 동작을 여기에 추가하세요.
+            Navigator.push(context, MaterialPageRoute(builder: (context) => Writing()));
+          },
+          child: Icon(Icons.add), // 버튼에 표시할 아이콘
+        ),
       ),
     );
   }
