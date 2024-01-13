@@ -1,5 +1,6 @@
 import 'dart:ffi';
 import 'dart:io';
+import 'package:dasi_bom_client/diary/DiaryList.dart';
 import 'package:dasi_bom_client/mypage/SeeingPage.dart';
 import 'package:dio/dio.dart';
 import 'package:dotted_border/dotted_border.dart';
@@ -37,6 +38,15 @@ class _WritingState extends State<Writing> with SingleTickerProviderStateMixin {
 
   final userInfo = {};
   final diaryForm = {};
+
+  // 하단 바 페이지 전환 변수 선언
+  var _index = 0; // 페이지 인덱스 0,1,2,3
+  final _pages = [
+    Page1(),
+    Page2(),
+    Page3(),
+    Page4(),
+  ];
 
   // final TextEditingController _petIdController = TextEditingController();
   // final TextEditingController _categoryController = TextEditingController();
@@ -330,7 +340,9 @@ class _WritingState extends State<Writing> with SingleTickerProviderStateMixin {
 
       if (status == 201) {
         print('create diary ===> $info');
-        await Navigator.pushNamed(context, '/main');
+        // await Navigator.pushNamed(context, '/main');
+        // await Navigator.push(context, MaterialPageRoute(builder: (context) => DiaryList()));
+        Navigator.pop(context);
       } else if (status == 404) {
         showDialog(
           context: context,
@@ -399,6 +411,51 @@ class _WritingState extends State<Writing> with SingleTickerProviderStateMixin {
     return SafeArea(
       child: Scaffold(
         key: scaffoldKey,
+        appBar: AppBar(
+          key: scaffoldKey,
+          backgroundColor: Colors.white,
+          automaticallyImplyLeading: false,
+          leadingWidth: 20,
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(Icons.arrow_back_ios),
+            color: Colors.black,
+          ),
+          title: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 100),
+            child: DropdownButtonFormField(
+              items: write.map(
+                (value) {
+                  return DropdownMenuItem(
+                    value: value['name'].toString(),
+                    child: Text(value['name'].toString()),
+                  );
+                },
+              ).toList(),
+              value: _selectedWrite != null && _selectedWrite['name'] != null
+                  ? _selectedWrite['name'].toString()
+                  : (write.isNotEmpty ? write[0]['name'].toString() : ''),
+              onChanged: (value) {
+                print('@@ => $value');
+                setState(() {
+                  _selectedWrite =
+                      write.firstWhere((pet) => pet['name'] == value);
+                  diaryForm['petId'] = _selectedWrite['petId'].toString();
+                  diaryForm['name'] = _selectedWrite['name'].toString();
+                });
+                print(diaryForm);
+              },
+            ),
+          ),
+          centerTitle: true,
+          actions: [
+            SizedBox(
+              width: 20,
+            )
+          ],
+        ),
         body: Form(
           // form으로 input 데이터 저장
           key: formKey,
@@ -409,33 +466,33 @@ class _WritingState extends State<Writing> with SingleTickerProviderStateMixin {
                   height: 5,
                 ),
                 // 글 쓸 동물 친구 등록
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 100),
-                  child: DropdownButtonFormField(
-                    items: write.map(
-                      (value) {
-                        return DropdownMenuItem(
-                          value: value['name'].toString(),
-                          child: Text(value['name'].toString()),
-                        );
-                      },
-                    ).toList(),
-                    value: _selectedWrite != null &&
-                            _selectedWrite['name'] != null
-                        ? _selectedWrite['name'].toString()
-                        : (write.isNotEmpty ? write[0]['name'].toString() : ''),
-                    onChanged: (value) {
-                      print('@@ => $value');
-                      setState(() {
-                        _selectedWrite =
-                            write.firstWhere((pet) => pet['name'] == value);
-                        diaryForm['petId'] = _selectedWrite['petId'].toString();
-                        diaryForm['name'] = _selectedWrite['name'].toString();
-                      });
-                      print(diaryForm);
-                    },
-                  ),
-                ),
+                // Padding(
+                //   padding: const EdgeInsets.symmetric(horizontal: 100),
+                //   child: DropdownButtonFormField(
+                //     items: write.map(
+                //       (value) {
+                //         return DropdownMenuItem(
+                //           value: value['name'].toString(),
+                //           child: Text(value['name'].toString()),
+                //         );
+                //       },
+                //     ).toList(),
+                //     value: _selectedWrite != null &&
+                //             _selectedWrite['name'] != null
+                //         ? _selectedWrite['name'].toString()
+                //         : (write.isNotEmpty ? write[0]['name'].toString() : ''),
+                //     onChanged: (value) {
+                //       print('@@ => $value');
+                //       setState(() {
+                //         _selectedWrite =
+                //             write.firstWhere((pet) => pet['name'] == value);
+                //         diaryForm['petId'] = _selectedWrite['petId'].toString();
+                //         diaryForm['name'] = _selectedWrite['name'].toString();
+                //       });
+                //       print(diaryForm);
+                //     },
+                //   ),
+                // ),
                 const SizedBox(
                   height: 15,
                 ),
@@ -750,6 +807,38 @@ class _WritingState extends State<Writing> with SingleTickerProviderStateMixin {
             ),
           ),
         ),
+        // bottomNavigationBar: BottomNavigationBar(
+        //   backgroundColor: Colors.white,
+        //   selectedItemColor: Colors.black,
+        //   unselectedItemColor: Colors.grey,
+        //   showUnselectedLabels: true,
+        //   onTap: (index) {
+        //     setState(() {
+        //       _index = index; // 선택된 탭의 인덱스로 _index를 변경
+        //     });
+        //   },
+        //   currentIndex: _index,
+        //   // 선택된 인덱스
+        //   items: <BottomNavigationBarItem>[
+        //     BottomNavigationBarItem(
+        //       // 하단 탭 아이템리스트 선언
+        //       label: '',
+        //       icon: Icon(Icons.home_outlined),
+        //     ),
+        //     BottomNavigationBarItem(
+        //       label: '',
+        //       icon: Icon(Icons.border_color_outlined),
+        //     ),
+        //     BottomNavigationBarItem(
+        //       label: '',
+        //       icon: Icon(Icons.people_outline),
+        //     ),
+        //     BottomNavigationBarItem(
+        //       label: '',
+        //       icon: Icon(Icons.account_circle_outlined),
+        //     ),
+        //   ],
+        // ),
       ),
     );
   }
@@ -922,7 +1011,7 @@ _texticonBottomSheet(BuildContext context) {
             var controller;
             return Container(
               width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height/2,
+              height: MediaQuery.of(context).size.height / 2,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
@@ -949,47 +1038,60 @@ _texticonBottomSheet(BuildContext context) {
                             ),
                             const SizedBox(height: 15),
                             Divider(
-                                color: Colors.black.withOpacity(0.5), height: 2, thickness: 0.3),
+                                color: Colors.black.withOpacity(0.5),
+                                height: 2,
+                                thickness: 0.3),
                           ],
                         ),
                         TabBar(
                           isScrollable: true,
                           labelStyle: TextStyle(fontWeight: FontWeight.bold),
-                          unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),
+                          unselectedLabelStyle:
+                              TextStyle(fontWeight: FontWeight.normal),
                           indicator: UnderlineTabIndicator(
-                            borderSide: BorderSide(color: Colors.orange, width: 5), // Indicator height
-                            insets: EdgeInsets.symmetric(horizontal: 5), // Indicator width
+                            borderSide:
+                                BorderSide(color: Colors.orange, width: 5),
+                            // Indicator height
+                            insets: EdgeInsets.symmetric(
+                                horizontal: 5), // Indicator width
                           ),
                           tabs: [
                             Tab(
-                              text: '추천',),
+                              text: '추천',
+                            ),
                             Tab(
-                              text: '최근사용',),
+                              text: '최근사용',
+                            ),
                             Tab(
-                              text: '일상',),
+                              text: '일상',
+                            ),
                             Tab(
-                              text: '감정',),
+                              text: '감정',
+                            ),
                             Tab(
-                              text: '궁금해요',),
+                              text: '궁금해요',
+                            ),
                             Tab(
-                              text: '날씨',),
+                              text: '날씨',
+                            ),
                             Tab(
-                              text: '이벤트',),
+                              text: '이벤트',
+                            ),
                           ],
                         ),
                         Divider(
-                            color: Colors.black.withOpacity(0.5), height: 2, thickness: 0.3),
+                            color: Colors.black.withOpacity(0.5),
+                            height: 2,
+                            thickness: 0.3),
                         Expanded(
                           child: TabBarView(
                             controller: controller,
                             children: <Widget>[
                               Column(
-                                children: <Widget>[
-                                ],
+                                children: <Widget>[],
                               ),
                               Column(
-                                children: <Widget>[
-                                ],
+                                children: <Widget>[],
                               ),
                               Column(
                                 children: <Widget>[
@@ -1005,8 +1107,8 @@ _texticonBottomSheet(BuildContext context) {
                                         diaryForm['stamps'] = tags;
                                       });
                                     },
-
-                                    choiceItems: C2Choice.listFrom<String, String>(
+                                    choiceItems:
+                                        C2Choice.listFrom<String, String>(
                                       source: options1,
                                       value: (i, v) => v,
                                       label: (i, v) => v,
@@ -1031,8 +1133,8 @@ _texticonBottomSheet(BuildContext context) {
                                         diaryForm['stamps'] = tags;
                                       });
                                     },
-
-                                    choiceItems: C2Choice.listFrom<String, String>(
+                                    choiceItems:
+                                        C2Choice.listFrom<String, String>(
                                       source: options2,
                                       value: (i, v) => v,
                                       label: (i, v) => v,
@@ -1057,8 +1159,8 @@ _texticonBottomSheet(BuildContext context) {
                                         diaryForm['stamps'] = tags;
                                       });
                                     },
-
-                                    choiceItems: C2Choice.listFrom<String, String>(
+                                    choiceItems:
+                                        C2Choice.listFrom<String, String>(
                                       source: options3,
                                       value: (i, v) => v,
                                       label: (i, v) => v,
@@ -1083,8 +1185,8 @@ _texticonBottomSheet(BuildContext context) {
                                         diaryForm['stamps'] = tags;
                                       });
                                     },
-
-                                    choiceItems: C2Choice.listFrom<String, String>(
+                                    choiceItems:
+                                        C2Choice.listFrom<String, String>(
                                       source: options4,
                                       value: (i, v) => v,
                                       label: (i, v) => v,
@@ -1109,8 +1211,8 @@ _texticonBottomSheet(BuildContext context) {
                                         diaryForm['stamps'] = tags;
                                       });
                                     },
-
-                                    choiceItems: C2Choice.listFrom<String, String>(
+                                    choiceItems:
+                                        C2Choice.listFrom<String, String>(
                                       source: options5,
                                       value: (i, v) => v,
                                       label: (i, v) => v,
